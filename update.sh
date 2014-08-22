@@ -33,7 +33,7 @@ for version in "${versions[@]}"; do
 		set -x
 		sed -ri '
 			s/^(ENV PHP_VERSION) .*/\1 '"$fullVersion"'/;
-			s/^(RUN gpg .* --recv-keys) [0-9a-fA-F]*$/\1 '"$gpgKey"'/
+			s/^(RUN gpg .* --recv-keys) [0-9a-fA-F ]*$/\1 '"$gpgKey"'/
 		' "$version/Dockerfile"
 		
 		awk -vf2="$insert" '/^\t&& make install \\$/{print f2;next}1' "$version/Dockerfile" "Dockerfile-apache-tail" > "$version/apache/Dockerfile"
