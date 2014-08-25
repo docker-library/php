@@ -17,7 +17,7 @@ versions=( "${versions[@]%/}" )
 
 packagesUrl='http://php.net/releases/index.php?serialize=1&version=5'
 packages="$(echo "$packagesUrl" | sed -r 's/[^a-zA-Z.-]+/-/g')"
-curl -sSL "${packagesUrl}.gz" > "$packages"
+curl -sSL "${packagesUrl}" > "$packages"
 
 for version in "${versions[@]}"; do
 	fullVersion="$(sed -r 's/.*"filename";s:[0-9]+:"php-([^"]+)\.tar\.bz2".*/\1/' $packages)"
