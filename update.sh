@@ -23,7 +23,7 @@ for version in "${versions[@]}"; do
 	fullVersion="$(sed -r 's/.*"filename";s:[0-9]+:"php-([^"]+)\.tar\.bz2".*/\1/' $packages)"
 	gpgKey="${gpgKeys[$version]}"
 	if [ -z "$gpgKey" ]; then
-		echo >&2 "ERROR: missing GPG key fingerprint for $version; try:"
+		echo >&2 "ERROR: missing GPG key fingerprint for $version"
 		echo >&2 "  try looking on http://php.net/downloads.php#gpg-$version"
 		exit 1
 	fi
