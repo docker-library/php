@@ -1,11 +1,12 @@
 FROM buildpack-deps
 
-RUN gpg --keyserver pgp.mit.edu --recv-keys 0BD78B5F97500D450838F95DFE857D9A90D90EC1 0B96609E270F565C13292B24C13C70B87267B52D
+RUN gpg --keyserver pgp.mit.edu --recv-keys 0B96609E270F565C13292B24C13C70B87267B52D 0A95E9A026542D53835E3F3A7DEC4E69FC9C83D7
 
-ENV PHP_VERSION 5.5.16
+ENV PHP_VERSION 5.3.29
 
+# php 5.3 needs older autoconf
 RUN set -x \
-	&& apt-get update && apt-get install -y curl && rm -r /var/lib/apt/lists/* \
+	&& apt-get update && apt-get install -y autoconf2.13 curl && rm -r /var/lib/apt/lists/* \
 	&& curl -SLO http://launchpadlibrarian.net/140087283/libbison-dev_2.7.1.dfsg-1_amd64.deb \
 	&& curl -SLO http://launchpadlibrarian.net/140087282/bison_2.7.1.dfsg-1_amd64.deb \
 	&& dpkg -i libbison-dev_2.7.1.dfsg-1_amd64.deb \
@@ -56,7 +57,7 @@ RUN set -x \
 	&& make install \
 	&& cp php.ini-development /usr/local/lib/php.ini \
 	&& dpkg -r bison libbison-dev \
-	&& apt-get purge -y --auto-remove curl \
+	&& apt-get purge -y --auto-remove autoconf2.13 curl \
 	&& rm -r /usr/src/php
 
 ENV PATH $PATH:/usr/local/apache2/bin
