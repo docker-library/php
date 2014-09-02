@@ -1,8 +1,8 @@
 FROM buildpack-deps
 
-RUN gpg --keyserver pgp.mit.edu --recv-keys 0BD78B5F97500D450838F95DFE857D9A90D90EC1 0B96609E270F565C13292B24C13C70B87267B52D
+RUN gpg --keyserver pgp.mit.edu --recv-keys F38252826ACD957EF380D39F2F7956BC5DA04B5D
 
-ENV PHP_VERSION 5.5.16
+ENV PHP_VERSION 5.4.32
 
 RUN set -x \
 	&& apt-get update && apt-get install -y curl && rm -r /var/lib/apt/lists/* \
