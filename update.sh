@@ -31,7 +31,9 @@ for version in "${versions[@]}"; do
 		exit 1
 	fi
 	
-	insert="$(cat "Dockerfile-apache-insert" | sed 's/[\]/\\&/g')"
+	dockerfile="$( cat "$version/Dockerfile")"
+	apacheInsert="$(cat "Dockerfile-apache-insert")"
+	apacheTail="$(cat "Dockerfile-apache-tail")"
 	(
 		set -x
 		sed -ri '
@@ -39,7 +41,8 @@ for version in "${versions[@]}"; do
 			s/^(RUN gpg .* --recv-keys) [0-9a-fA-F ]*$/\1 '"$gpgKey"'/
 		' "$version/Dockerfile"
 		
-		awk -vf2="$insert" '/^\t&& make install \\$/{print f2;next}1' "$version/Dockerfile" "Dockerfile-apache-tail" > "$version/apache/Dockerfile"
+		apacheDockerfile="${dockerfile/?\&\& make install \\/$apacheInsert}"
+		echo "${apacheDockerfile/CMD*/$apacheTail}" > "$version/apache/Dockerfile"
 	)
 done
 
