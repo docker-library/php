@@ -25,3 +25,5 @@ RUN set -x \
 	&& dpkg -r bison libbison-dev \
 	&& apt-get purge -y --auto-remove curl \
 	&& rm -r /usr/src/php
+
+CMD ["php", "-a"]

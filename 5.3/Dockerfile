@@ -26,3 +26,5 @@ RUN set -x \
 	&& dpkg -r bison libbison-dev \
 	&& apt-get purge -y --auto-remove autoconf2.13 curl \
 	&& rm -r /usr/src/php
+
+CMD ["php", "-a"]
