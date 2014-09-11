@@ -11,8 +11,8 @@ RUN set -x \
 	&& dpkg -i libbison-dev_2.7.1.dfsg-1_amd64.deb \
 	&& dpkg -i bison_2.7.1.dfsg-1_amd64.deb \
 	&& rm *.deb \
-	&& curl -SL "http://us2.php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror" -o php.tar.bz2 \
-	&& curl -SL "http://us2.php.net/get/php-$PHP_VERSION.tar.bz2.asc/from/this/mirror" -o php.tar.bz2.asc \
+	&& curl -SL "http://php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror" -o php.tar.bz2 \
+	&& curl -SL "http://php.net/get/php-$PHP_VERSION.tar.bz2.asc/from/this/mirror" -o php.tar.bz2.asc \
 	&& gpg --verify php.tar.bz2.asc \
 	&& mkdir -p /usr/src/php \
 	&& tar -xvf php.tar.bz2 -C /usr/src/php --strip-components=1 \
