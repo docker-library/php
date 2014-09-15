@@ -31,9 +31,26 @@ for version in "${versions[@]}"; do
 		exit 1
 	fi
 	
-	dockerfile="$( cat "$version/Dockerfile")"
-	apacheInsert="$(cat "Dockerfile-apache-insert")"
-	apacheTail="$(cat "Dockerfile-apache-tail")"
+	awk '$1 != "CMD" { print } $1 == "##<apache2>##" && c == 0 { c = 1; system("cat") }' "$version/Dockerfile" > "$version/apache/Dockerfile" <<-'EOD'
+		RUN apt-get update && apt-get install -y apache2-bin apache2-dev apache2.2-common --no-install-recommends && rm -rf /var/lib/apt/lists/*
+		
+		RUN rm -rf /var/www/html && mkdir -p /var/lock/apache2 /var/run/apache2 /var/log/apache2 /var/www/html && chown -R www-data:www-data /var/lock/apache2 /var/run/apache2 /var/log/apache2 /var/www/html
+		
+		# Apache + PHP requires preforking Apache for best results
+		RUN a2dismod mpm_event && a2enmod mpm_prefork
+		
+		RUN mv /etc/apache2/apache2.conf /etc/apache2/apache2.conf.dist
+		COPY apache2.conf /etc/apache2/apache2.conf
+	EOD
+	
+	cat >> "$version/apache/Dockerfile" <<-'EOD'
+		WORKDIR /var/www/html
+		VOLUME /var/www/html
+		
+		EXPOSE 80
+		CMD ["apache2", "-DFOREGROUND"]
+	EOD
+	
 	(
 		set -x
 		sed -ri '
@@ -41,8 +58,7 @@ for version in "${versions[@]}"; do
 			s/^(RUN gpg .* --recv-keys) [0-9a-fA-F ]*$/\1 '"$gpgKey"'/
 		' "$version/Dockerfile"
 		
-		apacheDockerfile="${dockerfile/?\&\& make install \\/$apacheInsert}"
-		echo "${apacheDockerfile/CMD*/$apacheTail}" > "$version/apache/Dockerfile"
+		cp apache2.conf "$version/apache/"
 	)
 done
 
