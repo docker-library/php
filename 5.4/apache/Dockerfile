@@ -51,7 +51,7 @@ RUN set -x \
 	&& echo "<html><head></head><body><?php echo '<h1>Hello, World!</h1>'; ?></body></html>" >> /var/www/html/index.php \
 	&& cd /usr/src/php \
 	&& make clean \
-	&& ./configure --with-apxs2=/usr/local/apache2/bin/apxs --with-mysql \
+	&& ./configure --with-apxs2=/usr/local/apache2/bin/apxs --with-mysql --with-mysqli --with-pdo-mysql \
 	&& make -j"$(nproc)" \
 	&& make install \
 	&& cp php.ini-development /usr/local/lib/php.ini \
