@@ -1,7 +1,0 @@
-ENV PATH $PATH:/usr/local/apache2/bin
-
-WORKDIR /var/www/html
-VOLUME /var/www/html
-
-EXPOSE 80
-CMD ["httpd", "-DFOREGROUND"]
