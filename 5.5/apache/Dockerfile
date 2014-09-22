@@ -16,7 +16,7 @@ COPY apache2.conf /etc/apache2/apache2.conf
 
 RUN gpg --keyserver pgp.mit.edu --recv-keys 0BD78B5F97500D450838F95DFE857D9A90D90EC1 0B96609E270F565C13292B24C13C70B87267B52D
 
-ENV PHP_VERSION 5.5.16
+ENV PHP_VERSION 5.5.17
 
 RUN set -x \
 	&& curl -SLO http://launchpadlibrarian.net/140087283/libbison-dev_2.7.1.dfsg-1_amd64.deb \
