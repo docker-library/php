@@ -46,7 +46,6 @@ RUN set -x \
 	&& rm -r /usr/src/php
 
 WORKDIR /var/www/html
-VOLUME /var/www/html
 
 EXPOSE 80
 CMD ["apache2", "-DFOREGROUND"]

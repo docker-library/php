@@ -45,7 +45,6 @@ for version in "${versions[@]}"; do
 	
 	cat >> "$version/apache/Dockerfile" <<-'EOD'
 		WORKDIR /var/www/html
-		VOLUME /var/www/html
 		
 		EXPOSE 80
 		CMD ["apache2", "-DFOREGROUND"]
