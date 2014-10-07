@@ -21,9 +21,14 @@ for version in "${versions[@]}"; do
 	
 	echo
 	for va in "${versionAliases[@]}"; do
-		if [ "$va" != 'latest' ]; then
+		if [ "$va" = 'latest' ]; then
+			va='cli'
+		else
 			va="$va-cli"
 		fi
+		echo "$va: ${url}@${commit} $version"
+	done
+	for va in "${versionAliases[@]}"; do
 		echo "$va: ${url}@${commit} $version"
 	done
 	
