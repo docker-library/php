@@ -30,6 +30,7 @@ RUN set -x \
 		--with-mysql \
 		--with-mysqli \
 		--with-pdo-mysql \
+		--with-openssl \
 	&& make -j"$(nproc)" \
 	&& make install \
 	&& dpkg -r bison libbison-dev \
