@@ -46,7 +46,7 @@ RUN set -x \
 	&& make install \
 	&& dpkg -r bison libbison-dev \
 	&& cp /usr/src/php/php.ini-development /usr/local/lib/php.ini \
-	&& sed 's#;date.timezone =#date.timezone = Europe/Paris#' /usr/local/lib/php.ini \
+	&& sed -i "s/^;date.timezone =$/date.timezone = \"Europe\/Paris\"/" /usr/local/lib/php.ini \
 	&& rm -r /usr/src/php
 
 WORKDIR /var/www/html
