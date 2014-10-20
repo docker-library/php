@@ -38,9 +38,15 @@ RUN set -x \
 		--with-mysqli \
 		--with-pdo-mysql \
 		--with-openssl \
+		--enable-zip \
+		--enable-fpm \
+		--with-fpm-user=www-data \
+		--with-fpm-group=www-data \
 	&& make -j"$(nproc)" \
 	&& make install \
 	&& dpkg -r bison libbison-dev \
+	&& cp /usr/src/php/php.ini-development /usr/local/lib/php.ini \
+	&& sed -i "s/^;date.timezone =$/date.timezone = \"UTC\"/" /usr/local/lib/php.ini \
 	&& rm -r /usr/src/php
 
 WORKDIR /var/www/html
