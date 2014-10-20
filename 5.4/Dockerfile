@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y curl && rm -r /var/lib/apt/lists/*
 
 RUN gpg --keyserver pgp.mit.edu --recv-keys F38252826ACD957EF380D39F2F7956BC5DA04B5D
 
-ENV PHP_VERSION 5.4.33
+ENV PHP_VERSION 5.4.34
 
 RUN set -x \
 	&& curl -SLO http://launchpadlibrarian.net/140087283/libbison-dev_2.7.1.dfsg-1_amd64.deb \
