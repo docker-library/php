@@ -25,10 +25,13 @@ RUN set -x \
 	&& ./buildconf --force \
 	&& ./configure --disable-cgi \
 		$(command -v apxs2 > /dev/null 2>&1 && echo '--with-apxs2' || true) \
+		--with-curl \
+		--with-gd \
+		--with-gzip \
 		--with-mysql \
 		--with-mysqli \
-		--with-pdo-mysql \
 		--with-openssl \
+		--with-pdo-mysql \
 	&& make -j"$(nproc)" \
 	&& make install \
 	&& dpkg -r bison libbison-dev \
