@@ -27,7 +27,7 @@ RUN set -x \
 		$(command -v apxs2 > /dev/null 2>&1 && echo '--with-apxs2' || true) \
 		--with-curl \
 		--with-gd \
-		--with-mysql \
+		--with-mysql=shared \
 		--with-mysqli \
 		--with-openssl \
 		--with-pdo-mysql \
