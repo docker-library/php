@@ -31,7 +31,6 @@ RUN set -x \
 	&& tar -xf php.tar.bz2 -C /usr/src/php --strip-components=1 \
 	&& rm php.tar.bz2* \
 	&& cd /usr/src/php \
-	&& ./buildconf --force \
 	&& ./configure --disable-cgi \
 		$(command -v apxs2 > /dev/null 2>&1 && echo '--with-apxs2' || true) \
 		--with-curl \
