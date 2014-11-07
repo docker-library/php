@@ -1,0 +1,13 @@
+RUN apt-get update && apt-get install -y apache2-bin apache2.2-common --no-install-recommends && rm -rf /var/lib/apt/lists/*
+
+RUN rm -rf /var/www/html && mkdir -p /var/lock/apache2 /var/run/apache2 /var/log/apache2 /var/www/html && chown -R www-data:www-data /var/lock/apache2 /var/run/apache2 /var/log/apache2 /var/www/html
+
+# Apache + PHP requires preforking Apache for best results
+RUN a2dismod mpm_event && a2enmod mpm_prefork
+
+RUN mv /etc/apache2/apache2.conf /etc/apache2/apache2.conf.dist
+COPY apache2.conf /etc/apache2/apache2.conf
+# it'd be nice if we could not COPY apache2.conf until the end of the Dockerfile, but its contents are checked by PHP during compilation
+
+ENV PHP_EXTRA_BUILD_DEPS apache2-dev
+ENV PHP_EXTRA_CONFIGURE_ARGS --with-apxs2
