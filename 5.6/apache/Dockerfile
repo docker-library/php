@@ -47,7 +47,7 @@ RUN buildDeps=" \
 	&& cd /usr/src/php \
 	&& ./configure --disable-cgi \
 		$PHP_EXTRA_CONFIGURE_ARGS \
-		--enable-soap \
+		--enable-soap=shared \
 		--with-curl \
 		--with-gd \
 		--with-mysql \
