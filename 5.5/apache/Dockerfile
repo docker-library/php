@@ -50,7 +50,7 @@ RUN buildDeps=" \
 		--enable-soap \
 		--with-curl \
 		--with-gd \
-		--with-mysql \
+		--with-mysql=shared \
 		--with-mysqli \
 		--with-openssl \
 		--with-pdo-mysql \
