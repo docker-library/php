@@ -49,6 +49,8 @@ for version in "${versions[@]}"; do
 			s/^(RUN gpg .* --recv-keys) [0-9a-fA-F ]*$/\1 '"$gpgKey"'/
 		' "$version/Dockerfile"
 		
+		cp docker-php-ext-* "$version/"
+		cp docker-php-ext-* "$version/apache/"
 		cp apache2.conf "$version/apache/"
 	)
 done
