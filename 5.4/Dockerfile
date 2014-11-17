@@ -20,6 +20,7 @@ ENV PHP_VERSION 5.4.35
 RUN buildDeps=" \
 		$PHP_EXTRA_BUILD_DEPS \
 		bzip2 \
+		libbz2-dev \
 		file \
 		libcurl4-openssl-dev \
 		libreadline6-dev \
