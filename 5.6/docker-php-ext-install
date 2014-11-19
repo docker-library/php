@@ -44,7 +44,12 @@ for ext in "${exts[@]}"; do
 		ini="/usr/local/etc/php/conf.d/docker-php-ext-$ext.ini"
 		for module in modules/*.so; do
 			if [ -f "$module" ]; then
-				line="extension=$(basename "$module")"
+				if grep -q zend_extension_entry "$module"; then
+					# https://wiki.php.net/internals/extensions#loading_zend_extensions
+					line="zend_extension=$(basename "$module")"
+				else
+					line="extension=$(basename "$module")"
+				fi
 				if ! grep -q "$line" "$ini"; then
 					echo "$line" >> "/usr/local/etc/php/conf.d/ext-$ext.ini"
 				fi
