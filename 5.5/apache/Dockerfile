@@ -38,6 +38,7 @@ RUN buildDeps=" \
 		libreadline6-dev \
 		libssl-dev \
 		libxml2-dev \
+		libpq-dev \
 	"; \
 	set -x \
 	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
@@ -58,6 +59,7 @@ RUN buildDeps=" \
 		--with-openssl \
 		--with-readline \
 		--with-zlib \
+		--with-pgsql \
 	&& make -j"$(nproc)" \
 	&& make install \
 	&& { find /usr/local/bin /usr/local/sbin -type f -executable -exec strip --strip-all '{}' + || true; } \
