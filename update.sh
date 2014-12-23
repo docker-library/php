@@ -51,9 +51,6 @@ for version in "${versions[@]}"; do
 			s/^(ENV PHP_VERSION) .*/\1 '"$fullVersion"'/;
 			s/^(RUN gpg .* --recv-keys) [0-9a-fA-F ]*$/\1 '"$gpgKey"'/
 		' "$version/Dockerfile" "$version/"*/Dockerfile
-		
-		cp apache2.conf "$version/apache/"
-		cp php-fpm.conf "$version/fpm/"
 	)
 done
 
