@@ -51,6 +51,7 @@ for ext in "${exts[@]}"; do
 					line="extension=$(basename "$module")"
 				fi
 				if ! grep -q "$line" "$ini"; then
+					touch "/usr/local/etc/php/conf.d/ext-$ext.ini"
 					echo "$line" >> "/usr/local/etc/php/conf.d/ext-$ext.ini"
 				fi
 			fi
