@@ -27,7 +27,7 @@ ENV PHP_EXTRA_CONFIGURE_ARGS --with-apxs2
 
 RUN gpg --keyserver pool.sks-keyservers.net --recv-keys F38252826ACD957EF380D39F2F7956BC5DA04B5D
 
-ENV PHP_VERSION 5.4.37
+ENV PHP_VERSION 5.4.38
 
 # --enable-mysqlnd is included below because it's harder to compile after the fact the extensions are (since it's a plugin for several extensions, not an extension in itself)
 RUN buildDeps=" \
