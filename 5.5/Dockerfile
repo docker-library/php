@@ -14,7 +14,7 @@ RUN mkdir -p $PHP_INI_DIR/conf.d
 
 RUN gpg --keyserver pool.sks-keyservers.net --recv-keys 0BD78B5F97500D450838F95DFE857D9A90D90EC1 0B96609E270F565C13292B24C13C70B87267B52D
 
-ENV PHP_VERSION 5.5.22
+ENV PHP_VERSION 5.5.23
 
 # --enable-mysqlnd is included below because it's harder to compile after the fact the extensions are (since it's a plugin for several extensions, not an extension in itself)
 RUN buildDeps=" \
