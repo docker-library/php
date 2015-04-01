@@ -26,8 +26,8 @@ RUN buildDeps=" \
 		libreadline6-dev \
 		libssl-dev \
 		libxml2-dev \
-	"; \
-	set -x \
+	" \
+	&& set -x \
 	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
 	&& curl -SL "http://php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror" -o php.tar.bz2 \
 	&& curl -SL "http://php.net/get/php-$PHP_VERSION.tar.bz2.asc/from/this/mirror" -o php.tar.bz2.asc \
