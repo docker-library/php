@@ -17,7 +17,7 @@ RUN rm -rf /var/www/html && mkdir -p /var/lock/apache2 /var/run/apache2 /var/log
 # Apache + PHP requires preforking Apache for best results
 RUN a2dismod mpm_event && a2enmod mpm_prefork
 
-RUN mv /etc/apache2/apache2.conf /etc/apache2/apache2.conf.dist
+RUN mv /etc/apache2/apache2.conf /etc/apache2/apache2.conf.dist && rm /etc/apache2/conf-enabled/* /etc/apache2/sites-enabled/*
 COPY apache2.conf /etc/apache2/apache2.conf
 # it'd be nice if we could not COPY apache2.conf until the end of the Dockerfile, but its contents are checked by PHP during compilation
 
