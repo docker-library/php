@@ -33,7 +33,7 @@ RUN buildDeps=" \
 	&& curl -SL "http://php.net/get/php-$PHP_VERSION.tar.bz2.asc/from/this/mirror" -o php.tar.bz2.asc \
 	&& gpg --verify php.tar.bz2.asc \
 	&& mkdir -p /usr/src/php \
-	&& tar -xf php.tar.bz2 -C /usr/src/php --strip-components=1 \
+	&& tar -xof php.tar.bz2 -C /usr/src/php --strip-components=1 \
 	&& rm php.tar.bz2* \
 	&& cd /usr/src/php \
 	&& ./configure \
