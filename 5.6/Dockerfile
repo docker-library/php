@@ -1,7 +1,7 @@
 FROM debian:jessie
 
 # persistent / runtime deps
-RUN apt-get update && apt-get install -y ca-certificates curl libxml2 --no-install-recommends && rm -r /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y ca-certificates curl libpcre3 librecode0 libsqlite3-0 libxml2 --no-install-recommends && rm -r /var/lib/apt/lists/*
 
 # phpize deps
 RUN apt-get update && apt-get install -y autoconf file gcc libc-dev make pkg-config re2c --no-install-recommends && rm -r /var/lib/apt/lists/*
@@ -21,7 +21,10 @@ RUN buildDeps=" \
 		$PHP_EXTRA_BUILD_DEPS \
 		bzip2 \
 		libcurl4-openssl-dev \
+		libpcre3-dev \
 		libreadline6-dev \
+		librecode-dev \
+		libsqlite3-dev \
 		libssl-dev \
 		libxml2-dev \
 	" \
@@ -42,7 +45,9 @@ RUN buildDeps=" \
 		--enable-mysqlnd \
 		--with-curl \
 		--with-openssl \
+		--with-pcre \
 		--with-readline \
+		--with-recode \
 		--with-zlib \
 	&& make -j"$(nproc)" \
 	&& make install \
