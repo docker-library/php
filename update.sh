@@ -49,7 +49,7 @@ for version in "${versions[@]}"; do
 		set -x
 		sed -ri '
 			s/^(ENV PHP_VERSION) .*/\1 '"$fullVersion"'/;
-			s/^(RUN gpg .* --recv-keys) [0-9a-fA-F ]*$/\1 '"$gpgKey"'/
+			s/^(ENV GPG_KEYS) [0-9a-fA-F ]*$/\1 '"$gpgKey"'/
 		' "$version/Dockerfile" "$version/"*/Dockerfile
 	)
 done
