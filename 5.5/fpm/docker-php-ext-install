@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+[ -d /usr/src/php ] || tar -C /usr/src -xj -f /usr/src/php.tar.bz2
+
 cd /usr/src/php/ext
 
 usage() {
@@ -58,3 +60,5 @@ for ext in "${exts[@]}"; do
 		make clean
 	)
 done
+
+rm -rf /usr/src/php

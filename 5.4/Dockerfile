@@ -23,7 +23,6 @@ ENV PHP_VERSION 5.4.40
 # --enable-mysqlnd is included below because it's harder to compile after the fact the extensions are (since it's a plugin for several extensions, not an extension in itself)
 RUN buildDeps=" \
 		$PHP_EXTRA_BUILD_DEPS \
-		bzip2 \
 		libcurl4-openssl-dev \
 		libpcre3-dev \
 		libreadline6-dev \
@@ -33,7 +32,7 @@ RUN buildDeps=" \
 		libxml2-dev \
 	" \
 	&& set -x \
-	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
+	&& apt-get update && apt-get install -y bzip2 $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
 	&& curl -SL "http://php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror" -o php.tar.bz2 \
 	&& curl -SL "http://php.net/get/php-$PHP_VERSION.tar.bz2.asc/from/this/mirror" -o php.tar.bz2.asc \
 	&& gpg --verify php.tar.bz2.asc \
@@ -55,9 +54,11 @@ RUN buildDeps=" \
 		--with-zlib \
 	&& make -j"$(nproc)" \
 	&& make install \
+	&& make clean \
+	&& tar -C /usr/src -cj -f /usr/src/php.tar.bz2 php \
+	&& rm -rf /usr/src/php \
 	&& { find /usr/local/bin /usr/local/sbin -type f -executable -exec strip --strip-all '{}' + || true; } \
-	&& apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false $buildDeps \
-	&& make clean
+	&& apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false $buildDeps
 
 COPY docker-php-ext-* /usr/local/bin/
 
