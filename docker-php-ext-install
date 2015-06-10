@@ -41,7 +41,7 @@ for ext in "${exts[@]}"; do
 		[ -e Makefile ] || docker-php-ext-configure "$ext"
 		make
 		make install
-		ini="/usr/local/etc/php/conf.d/docker-php-ext-$ext.ini"
+		ini="/usr/local/etc/php/conf.d/ext-$ext.ini"
 		for module in modules/*.so; do
 			if [ -f "$module" ]; then
 				if grep -q zend_extension_entry "$module"; then
