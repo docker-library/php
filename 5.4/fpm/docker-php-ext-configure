@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+[ -d /usr/src/php ] || tar -C /usr/src -xj -f /usr/src/php.tar.bz2
+
 ext="$1"
 extDir="/usr/src/php/ext/$ext"
 if [ -z "$ext" -o ! -d "$extDir" ]; then
