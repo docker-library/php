@@ -23,7 +23,18 @@ packages="$(echo "$packagesUrl" | sed -r 's/[^a-zA-Z.-]+/-/g')"
 curl -sSL "${packagesUrl}" > "$packages"
 
 for version in "${versions[@]}"; do
-	fullVersion="$(sed 's/;/;\n/g' $packages | grep -e 'php-'"$version"'.*\.tar\.bz2' | sed -r 's/.*php-('"$version"'[^"]+)\.tar\.bz2.*/\1/' | sort -V | tail -1)"
+	fullVersion=''
+	for comp in xz bz2; do
+		fullVersion="$(sed 's/;/;\n/g' $packages | grep -e 'php-'"$version"'.*\.tar\.'"$comp" | sed -r 's/.*php-('"$version"'[^"]+)\.tar\.'"$comp"'.*/\1/' | sort -V | tail -1)"
+		if [ "$fullVersion" ]; then
+			break
+		fi
+	done
+	if [ -z "$fullVersion" ]; then
+		echo >&2 "ERROR: missing $version in $packagesUrl"
+		continue
+	fi
+	
 	gpgKey="${gpgKeys[$version]}"
 	if [ -z "$gpgKey" ]; then
 		echo >&2 "ERROR: missing GPG key fingerprint for $version"
