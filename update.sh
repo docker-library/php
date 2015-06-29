@@ -3,6 +3,7 @@ set -e
 
 declare -A gpgKeys
 gpgKeys=(
+	[7.0.0alpha2]='1A4E8B7277C42E53DBA9C7B9BCAA30EA9C0D5763'
 	[5.6]='6E4F6AB321FDC07F2C332E3AC2BF0BC433CFC8B3 0BD78B5F97500D450838F95DFE857D9A90D90EC1'
 	[5.5]='0BD78B5F97500D450838F95DFE857D9A90D90EC1 0B96609E270F565C13292B24C13C70B87267B52D'
 	[5.4]='F38252826ACD957EF380D39F2F7956BC5DA04B5D'
@@ -36,12 +37,16 @@ for version in "${versions[@]}"; do
 	fi
 	
 	gpgKey="${gpgKeys[$version]}"
-	if [ -z "$gpgKey" ]; then
-		echo >&2 "ERROR: missing GPG key fingerprint for $version"
-		echo >&2 "  try looking on http://php.net/downloads.php#gpg-$version"
-		exit 1
+	if [ -z "$fullVersion" ]; then
+		echo >&2 "Version not found on $packagesUrl not adding GPG keys"
+		fullVersion="$version"
+	else
+		if [ -z "$gpgKey" ]; then
+			echo >&2 "ERROR: missing GPG key fingerprint for $version"
+			echo >&2 "  try looking on http://php.net/downloads.php#gpg-$version"
+			exit 1
+		fi
 	fi
-	
 	( set -x; cp docker-php-ext-* "$version/" )
 	
 	for variant in apache fpm; do
