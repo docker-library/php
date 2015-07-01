@@ -10,7 +10,8 @@ gpgKeys=(
 	[5.3]='0B96609E270F565C13292B24C13C70B87267B52D 0A95E9A026542D53835E3F3A7DEC4E69FC9C83D7'
 )
 # see http://php.net/downloads.php
-
+alphaVersion="7.0"
+fullAlphaVersion="7.0.0alpha2"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 versions=( "$@" )
@@ -33,20 +34,21 @@ for version in "${versions[@]}"; do
 	done
 	if [ -z "$fullVersion" ]; then
 		echo >&2 "ERROR: missing $version in $packagesUrl"
-		continue
+		# if version is alpha then we add the missing part 
+		if [ "$alphaVersion" == "$version" ]; then
+			fullVersion="$fullAlphaVersion"
+		else
+			continue
+		fi
 	fi
 	
 	gpgKey="${gpgKeys[$version]}"
-	if [ -z "$fullVersion" ]; then
-		echo >&2 "Version not found on $packagesUrl not adding GPG keys"
-		fullVersion="$version"
-	else
-		if [ -z "$gpgKey" ]; then
-			echo >&2 "ERROR: missing GPG key fingerprint for $version"
-			echo >&2 "  try looking on http://php.net/downloads.php#gpg-$version"
-			exit 1
-		fi
+	if [ -z "$gpgKey" ]; then
+		echo >&2 "ERROR: missing GPG key fingerprint for $version"
+		echo >&2 "  try looking on http://php.net/downloads.php#gpg-$version"
+		exit 1
 	fi
+
 	( set -x; cp docker-php-ext-* "$version/" )
 	
 	for variant in apache fpm; do

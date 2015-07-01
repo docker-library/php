@@ -19,12 +19,11 @@ RUN set -xe \
 		gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
 	done
 
-ENV PHP_VERSION 7.0
+ENV PHP_VERSION 7.0.0alpha2
 
 # --enable-mysqlnd is included below because it's harder to compile after the fact the extensions are (since it's a plugin for several extensions, not an extension in itself)
 RUN buildDeps=" \
 		$PHP_EXTRA_BUILD_DEPS \
-		bzip2 \
 		libcurl4-openssl-dev \
 		libpcre3-dev \
 		libreadline6-dev \
@@ -32,13 +31,14 @@ RUN buildDeps=" \
 		libsqlite3-dev \
 		libssl-dev \
 		libxml2-dev \
+		xz-utils \
 	" \
 	&& set -x \
 	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
-	&& curl -SL "http://downloads.php.net/~ab/php-$PHP_VERSION.tar.bz2" -o php.tar.bz2 \
+	&& curl -SL "https://downloads.php.net/~ab/php-$PHP_VERSION.tar.xz" -o php.tar.xz \
 	&& mkdir -p /usr/src/php \
-	&& tar -xof php.tar.bz2 -C /usr/src/php --strip-components=1 \
-	&& rm php.tar.bz2* \
+	&& tar -xof php.tar.xz -C /usr/src/php --strip-components=1 \
+	&& rm php.tar.xz* \
 	&& cd /usr/src/php \
 	&& ./configure \
 		--with-config-file-path="$PHP_INI_DIR" \
