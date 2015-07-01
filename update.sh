@@ -43,10 +43,15 @@ for version in "${versions[@]}"; do
 	fi
 	
 	gpgKey="${gpgKeys[$version]}"
-	if [ -z "$gpgKey" ]; then
-		echo >&2 "ERROR: missing GPG key fingerprint for $version"
-		echo >&2 "  try looking on http://php.net/downloads.php#gpg-$version"
-		exit 1
+	if [ -z "$fullVersion" ]; then
+		echo >&2 "Version not found on $packagesUrl not adding GPG keys"
+		fullVersion="$version"
+	else
+		if [ -z "$gpgKey" ]; then
+			echo >&2 "ERROR: missing GPG key fingerprint for $version"
+			echo >&2 "  try looking on http://php.net/downloads.php#gpg-$version"
+			exit 1
+		fi
 	fi
 
 	( set -x; cp docker-php-ext-* "$version/" )
