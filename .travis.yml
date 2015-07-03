@@ -4,6 +4,9 @@ language: bash
 dist: trusty
 
 env:
+  - VERSION=7.0 VARIANT=
+  - VERSION=7.0 VARIANT=apache
+  - VERSION=7.0 VARIANT=fpm
   - VERSION=5.6 VARIANT=
   - VERSION=5.6 VARIANT=apache
   - VERSION=5.6 VARIANT=fpm
