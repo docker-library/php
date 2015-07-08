@@ -3,6 +3,7 @@ set -e
 
 declare -A gpgKeys
 gpgKeys=(
+	[7.0]='1A4E8B7277C42E53DBA9C7B9BCAA30EA9C0D5763'
 	[5.6]='6E4F6AB321FDC07F2C332E3AC2BF0BC433CFC8B3 0BD78B5F97500D450838F95DFE857D9A90D90EC1'
 	[5.5]='0BD78B5F97500D450838F95DFE857D9A90D90EC1 0B96609E270F565C13292B24C13C70B87267B52D'
 	[5.4]='F38252826ACD957EF380D39F2F7956BC5DA04B5D'
@@ -30,10 +31,6 @@ for version in "${versions[@]}"; do
 			break
 		fi
 	done
-	if [ -z "$fullVersion" ]; then
-		echo >&2 "ERROR: missing $version in $packagesUrl"
-		continue
-	fi
 	
 	gpgKey="${gpgKeys[$version]}"
 	if [ -z "$gpgKey" ]; then
@@ -55,6 +52,11 @@ for version in "${versions[@]}"; do
 		' "$version/Dockerfile" > "$version/$variant/Dockerfile"
 		( set -x; cp docker-php-ext-* "$version/$variant/" )
 	done
+	
+	if [ -z "$fullVersion" ]; then
+		echo >&2 "ERROR: missing $version in $packagesUrl"
+		continue
+	fi
 	
 	(
 		set -x
