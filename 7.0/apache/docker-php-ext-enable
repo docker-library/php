@@ -1,8 +1,7 @@
 #!/bin/bash
 set -e
 
-EXT_DIR="$(php -r 'echo ini_get("extension_dir");')"
-cd $EXT_DIR
+cd "$(php -r 'echo ini_get("extension_dir");')"
 
 usage() {
 	echo "usage: $0 module-name [module-name ...]"
@@ -41,7 +40,7 @@ fi
 for module in "${modules[@]}"; do
 	if grep -q zend_extension_entry "$module"; then
 		# https://wiki.php.net/internals/extensions#loading_zend_extensions
-		line="zend_extension=$EXT_DIR/$module"
+		line="zend_extension=$(readlink -f "$module")"
 	else
 		line="extension=$module"
 	fi
