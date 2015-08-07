@@ -29,4 +29,7 @@ script:
   - docker build -t "$image" "${VARIANT:-.}"
   - ~/official-images/test/run.sh "$image"
 
+after_script:
+  - docker images
+
 # vim:set et ts=2 sw=2:
