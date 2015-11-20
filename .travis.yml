@@ -1,7 +1,5 @@
 language: bash
-
-# for secret experimental features ;)
-sudo: 9000
+services: docker
 
 env:
   - VERSION=7.0 VARIANT=
