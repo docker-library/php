@@ -32,6 +32,8 @@ RUN set -xe \
 	done
 
 ENV PHP_VERSION 5.6.16
+ENV PHP_FILENAME php-5.6.16.tar.xz
+ENV PHP_SHA256 8ef43271d9bd8cc8f8d407d3ba569de9fa14a28985ae97c76085bb50d597de98
 
 # --enable-mysqlnd is included below because it's harder to compile after the fact the extensions are (since it's a plugin for several extensions, not an extension in itself)
 RUN buildDeps=" \
@@ -46,12 +48,13 @@ RUN buildDeps=" \
 	" \
 	&& set -x \
 	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
-	&& curl -SL "http://php.net/get/php-$PHP_VERSION.tar.xz/from/this/mirror" -o php.tar.xz \
-	&& curl -SL "http://php.net/get/php-$PHP_VERSION.tar.xz.asc/from/this/mirror" -o php.tar.xz.asc \
-	&& gpg --verify php.tar.xz.asc \
+	&& curl -fSL "http://php.net/get/$PHP_FILENAME/from/this/mirror" -o "$PHP_FILENAME" \
+	&& echo "$PHP_SHA256 *$PHP_FILENAME" | sha256sum -c - \
+	&& curl -fSL "http://php.net/get/$PHP_FILENAME.asc/from/this/mirror" -o "$PHP_FILENAME.asc" \
+	&& gpg --verify "$PHP_FILENAME.asc" \
 	&& mkdir -p /usr/src/php \
-	&& tar -xof php.tar.xz -C /usr/src/php --strip-components=1 \
-	&& rm php.tar.xz* \
+	&& tar -xf "$PHP_FILENAME" -C /usr/src/php --strip-components=1 \
+	&& rm "$PHP_FILENAME"* \
 	&& cd /usr/src/php \
 	&& ./configure \
 		--with-config-file-path="$PHP_INI_DIR" \
