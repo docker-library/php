@@ -17,18 +17,26 @@ if [ ${#versions[@]} -eq 0 ]; then
 fi
 versions=( "${versions[@]%/}" )
 
-packagesUrl='http://php.net/releases/index.php?serialize=1&max=100'
-packages="$(echo "$packagesUrl" | sed -r 's/[^a-zA-Z.-]+/-/g')"
-curl -sSL "${packagesUrl}" > "$packages"
-
 for version in "${versions[@]}"; do
 	fullVersion=''
 	for comp in xz bz2; do
-		fullVersion="$(sed 's/;/;\n/g' $packages | grep -e 'php-'"$version"'.*\.tar\.'"$comp" | sed -r 's/.*php-('"$version"'[^"]+)\.tar\.'"$comp"'.*/\1/' | sort -V | tail -1)"
+		fullVersion="$(
+			curl -fsSL "https://secure.php.net/releases/index.php?serialize&max=100&version=${version%%.*}" \
+				| sed 's/;/;\n/g' \
+				| grep -e 'php-'"$version"'.*\.tar\.'"$comp" \
+				| sed -r 's/.*php-('"$version"'[^"]+)\.tar\.'"$comp"'.*/\1/' \
+				| sort -V \
+				| tail -1
+		)"
 		if [ "$fullVersion" ]; then
 			break
 		fi
 	done
+	
+	if [ -z "$fullVersion" ]; then
+		echo >&2 "warning: missing full version for $version; skipping"
+		continue
+	fi
 	
 	gpgKey="${gpgKeys[$version]}"
 	if [ -z "$gpgKey" ]; then
@@ -64,5 +72,3 @@ for version in "${versions[@]}"; do
 		' "$version/Dockerfile" "$version/"*/Dockerfile
 	)
 done
-
-rm "$packages"
