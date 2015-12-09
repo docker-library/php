@@ -4,15 +4,37 @@ set -e
 cd /usr/src/php/ext
 
 usage() {
-	echo "usage: $0 ext-name [ext-name ...]"
+	echo "usage: $0 [-jN] ext-name [ext-name ...]"
 	echo "   ie: $0 gd mysqli"
 	echo "       $0 pdo pdo_mysql"
+	echo "       $0 -j5 gd mbstring mysqli pdo pdo_mysql shmop"
 	echo
 	echo 'if custom ./configure arguments are necessary, see docker-php-ext-configure'
 	echo
 	echo 'Possible values for ext-name:'
 	echo $(find /usr/src/php/ext -mindepth 2 -maxdepth 2 -type f -name 'config.m4' | cut -d/ -f6 | sort)
 }
+
+opts="$(getopt -o 'h?j:' --long 'help,jobs:' -- "$@" || { usage >&2 && false; })"
+eval set -- "$opts"
+
+j=1
+while true; do
+	flag="$1"
+	shift
+	case "$flag" in
+		--help|-h|'-?') usage && exit 0 ;;
+		--jobs|-j) j="$1" && shift ;;
+		--) break ;;
+		*)
+			{
+				echo "error: unknown flag: $flag"
+				usage
+			} >&2
+			exit 1
+			;;
+	esac
+done
 
 exts=()
 while [ $# -gt 0 ]; do
@@ -39,9 +61,9 @@ for ext in "${exts[@]}"; do
 	(
 		cd "$ext"
 		[ -e Makefile ] || docker-php-ext-configure "$ext"
-		make
-		make install
+		make -j"$j"
+		make -j"$j" install
 		find modules -maxdepth 1 -name '*.so' -exec basename '{}' ';' | xargs --no-run-if-empty --verbose docker-php-ext-enable
-		make clean
+		make -j"$j" clean
 	)
 done
