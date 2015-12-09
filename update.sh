@@ -17,18 +17,36 @@ if [ ${#versions[@]} -eq 0 ]; then
 fi
 versions=( "${versions[@]%/}" )
 
+jsonSh="$(curl -fsSL 'https://raw.githubusercontent.com/dominictarr/JSON.sh/ed3f9dd285ebd4183934adb54ea5a2fda6b25a98/JSON.sh')"
+
 for version in "${versions[@]}"; do
-	fullVersion=''
-	for comp in xz bz2; do
+	packagesJson="$(curl -fsSL "https://secure.php.net/releases/index.php?json&max=100&version=${version%%.*}" | bash -- <(echo "$jsonSh") -l)"
+	fullVersion=
+	filename=
+	sha256=
+	for comp in xz bz2 gz; do
 		fullVersion="$(
-			curl -fsSL "https://secure.php.net/releases/index.php?serialize&max=100&version=${version%%.*}" \
-				| sed 's/;/;\n/g' \
-				| grep -e 'php-'"$version"'.*\.tar\.'"$comp" \
-				| sed -r 's/.*php-('"$version"'[^"]+)\.tar\.'"$comp"'.*/\1/' \
-				| sort -V \
-				| tail -1
+			echo "$packagesJson" \
+				| grep '^\["'"$version"'[."].*,"filename"\].*\.'"$comp"'"' \
+				| cut -d'"' -f2 \
+				| head -1
 		)"
 		if [ "$fullVersion" ]; then
+			sourceNumber="$(
+				echo "$packagesJson" \
+					| grep '^\["'"$fullVersion"'","source",.*,"filename"\].*\.'"$comp"'"' \
+					| cut -d, -f3
+			)"
+			filename="$(
+				echo "$packagesJson" \
+					| grep '^\["'"$fullVersion"'","source",'"$sourceNumber"',"filename"\]' \
+					| cut -d$'\t' -f2 | cut -d'"' -f2
+			)"
+			sha256="$(
+				echo "$packagesJson" \
+					| grep '^\["'"$fullVersion"'","source",'"$sourceNumber"',"sha256"\]' \
+					| cut -d$'\t' -f2 | cut -d'"' -f2
+			)"
 			break
 		fi
 	done
@@ -68,7 +86,9 @@ for version in "${versions[@]}"; do
 		set -x
 		sed -ri '
 			s/^(ENV PHP_VERSION) .*/\1 '"$fullVersion"'/;
-			s/^(ENV GPG_KEYS) [0-9a-fA-F ]*$/\1 '"$gpgKey"'/
+			s/^(ENV PHP_FILENAME) .*/\1 '"$filename"'/;
+			s/^(ENV PHP_SHA256) .*/\1 '"$sha256"'/;
+			s/^(ENV GPG_KEYS) [0-9a-fA-F ]*$/\1 '"$gpgKey"'/;
 		' "$version/Dockerfile" "$version/"*/Dockerfile
 	)
 done
