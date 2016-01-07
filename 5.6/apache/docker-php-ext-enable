@@ -38,7 +38,7 @@ if [ "${#modules[@]}" -eq 0 ]; then
 fi
 
 for module in "${modules[@]}"; do
-	if grep -q zend_extension_entry "$module"; then
+	if nm -g "$module" | grep -q ' zend_extension_entry$'; then
 		# https://wiki.php.net/internals/extensions#loading_zend_extensions
 		line="zend_extension=$(readlink -f "$module")"
 	else
