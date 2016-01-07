@@ -31,9 +31,9 @@ RUN set -xe \
 		gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
 	done
 
-ENV PHP_VERSION 5.5.30
-ENV PHP_FILENAME php-5.5.30.tar.xz
-ENV PHP_SHA256 d00dc06fa5e0f3de048fb0cf940b3cc59b43b3f8cad825d4fffb35503cf2e8f2
+ENV PHP_VERSION 5.5.31
+ENV PHP_FILENAME php-5.5.31.tar.xz
+ENV PHP_SHA256 a9ac5b94fcc3811b661a090dddd716f81e43947240b35e6a0123e609a135ac54
 
 # --enable-mysqlnd is included below because it's harder to compile after the fact the extensions are (since it's a plugin for several extensions, not an extension in itself)
 RUN buildDeps=" \
