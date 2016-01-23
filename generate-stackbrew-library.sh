@@ -33,7 +33,11 @@ for version in "${versions[@]}"; do
 		echo "$va: ${url}@${commit} $version"
 	done
 	
-	for variant in apache fpm; do
+	for variant in apache fpm phpdbg; do
+		if [ $version == '5.4' -o $version == '5.5' ]; then
+			continue;
+		fi
+
 		commit="$(cd "$version/$variant" && git log -1 --format='format:%H' -- Dockerfile $(awk 'toupper($1) == "COPY" { for (i = 2; i < NF; i++) { print $i } }' Dockerfile))"
 		echo
 		for va in "${versionAliases[@]}"; do
