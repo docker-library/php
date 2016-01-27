@@ -1,0 +1,63 @@
+#!/bin/bash
+set -e
+
+cd "$(php -r 'echo ini_get("extension_dir");')"
+
+usage() {
+	echo "usage: $0 module-name [module-name ...]"
+	echo "   ie: $0 gd mysqli"
+	echo "       $0 pdo pdo_mysql"
+	echo
+	echo 'Possible values for module-name:'
+	echo $(find -maxdepth 1 -type f -name '*.so' -exec basename '{}' ';' | sort)
+}
+
+modules=()
+while [ $# -gt 0 ]; do
+	module="$1"
+	shift
+	if [ -z "$module" ]; then
+		continue
+	fi
+	if [ -f "$module.so" -a ! -f "$module" ]; then
+		# allow ".so" to be optional
+		module+='.so'
+	fi
+	if [ ! -f "$module" ]; then
+		echo >&2 "error: $(readlink -f "$module") does not exist"
+		echo >&2
+		usage >&2
+		exit 1
+	fi
+	modules+=( "$module" )
+done
+
+if [ "${#modules[@]}" -eq 0 ]; then
+	usage >&2
+	exit 1
+fi
+
+for module in "${modules[@]}"; do
+	if grep -q zend_extension_entry "$module"; then
+		# https://wiki.php.net/internals/extensions#loading_zend_extensions
+		line="zend_extension=$(readlink -f "$module")"
+	else
+		line="extension=$module"
+	fi
+
+	ext="$(basename "$module")"
+	ext="${ext%.*}"
+	if php -r 'exit(extension_loaded("'"$ext"'") ? 0 : 1);'; then
+		# this isn't perfect, but it's better than nothing
+		# (for example, 'opcache.so' presents inside PHP as 'Zend OPcache', not 'opcache')
+		echo >&2
+		echo >&2 "warning: $ext ($module) is already loaded!"
+		echo >&2
+		continue
+	fi
+
+	ini="/usr/local/etc/php/conf.d/docker-php-ext-$ext.ini"
+	if ! grep -q "$line" "$ini" 2>/dev/null; then
+		echo "$line" >> "$ini"
+	fi
+done

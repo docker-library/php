@@ -5,12 +5,15 @@ env:
   - VERSION=7.0 VARIANT=
   - VERSION=7.0 VARIANT=apache
   - VERSION=7.0 VARIANT=fpm
+  - VERSION=7.0 VARIANT=zts
   - VERSION=5.6 VARIANT=
   - VERSION=5.6 VARIANT=apache
   - VERSION=5.6 VARIANT=fpm
+  - VERSION=5.6 VARIANT=zts
   - VERSION=5.5 VARIANT=
   - VERSION=5.5 VARIANT=apache
   - VERSION=5.5 VARIANT=fpm
+  - VERSION=5.5 VARIANT=zts
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
