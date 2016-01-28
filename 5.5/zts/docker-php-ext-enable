@@ -4,13 +4,35 @@ set -e
 cd "$(php -r 'echo ini_get("extension_dir");')"
 
 usage() {
-	echo "usage: $0 module-name [module-name ...]"
+	echo "usage: $0 [options] module-name [module-name ...]"
 	echo "   ie: $0 gd mysqli"
 	echo "       $0 pdo pdo_mysql"
+	echo "       $0 --ini-name 0-apc.ini apcu apc"
 	echo
 	echo 'Possible values for module-name:'
 	echo $(find -maxdepth 1 -type f -name '*.so' -exec basename '{}' ';' | sort)
 }
+
+opts="$(getopt -o 'h?' --long 'help,ini-name:' -- "$@" || { usage >&2 && false; })"
+eval set -- "$opts"
+
+iniName=
+while true; do
+	flag="$1"
+	shift
+	case "$flag" in
+		--help|-h|'-?') usage && exit 0 ;;
+		--ini-name) iniName="$1" && shift ;;
+		--) break ;;
+		*)
+			{
+				echo "error: unknown flag: $flag"
+				usage
+			} >&2
+			exit 1
+			;;
+	esac
+done
 
 modules=()
 while [ $# -gt 0 ]; do
@@ -38,7 +60,7 @@ if [ "${#modules[@]}" -eq 0 ]; then
 fi
 
 for module in "${modules[@]}"; do
-	if grep -q zend_extension_entry "$module"; then
+	if nm -g "$module" | grep -q ' zend_extension_entry$'; then
 		# https://wiki.php.net/internals/extensions#loading_zend_extensions
 		line="zend_extension=$(readlink -f "$module")"
 	else
@@ -56,7 +78,7 @@ for module in "${modules[@]}"; do
 		continue
 	fi
 
-	ini="/usr/local/etc/php/conf.d/docker-php-ext-$ext.ini"
+	ini="/usr/local/etc/php/conf.d/${iniName:-"docker-php-ext-$ext.ini"}"
 	if ! grep -q "$line" "$ini" 2>/dev/null; then
 		echo "$line" >> "$ini"
 	fi
