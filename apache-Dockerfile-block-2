@@ -1,5 +1,6 @@
 COPY apache2-foreground /usr/local/bin/
 WORKDIR /var/www/html
 
-EXPOSE 80
+EXPOSE 8080
+USER www-data
 CMD ["apache2-foreground"]
