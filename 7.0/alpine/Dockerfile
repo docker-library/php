@@ -51,7 +51,7 @@ RUN set -xe \
 		--with-openssl \
 		--with-libedit \
 		--with-zlib \
-	&& make -j"$(nproc)" \
+	&& make -j"$(getconf _NPROCESSORS_ONLN)" \
 	&& make install \
 	&& { find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; } \
 	&& make clean \
