@@ -53,7 +53,7 @@ RUN set -xe \
 		--with-zlib \
 	&& make -j"$(nproc)" \
 	&& make install \
-	&& { find /usr/local/bin /usr/local/sbin -type f -executable -exec strip --strip-all '{}' + || true; } \
+	&& { find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; } \
 	&& make clean \
 	&& runDeps="$( \
 		scanelf --needed --nobanner --recursive /usr/local \
