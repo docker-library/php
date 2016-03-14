@@ -14,20 +14,19 @@ ENV PHP_SHA256 584e0e374e357a71b6e95175a2947d787453afc7f9ab7c55651c10491c4df532
 ENV GPG_KEYS 1A4E8B7277C42E53DBA9C7B9BCAA30EA9C0D5763
 RUN set -xe \
 	&& apk add --no-cache --virtual .build-deps \
-		gnupg \
-		curl-dev \
 		autoconf \
+		curl-dev \
 		file \
 		gcc \
+		gnupg \
 		libc-dev \
+		libedit-dev \
+		libxml2-dev \
 		make \
+		openssl-dev \
 		pkgconf \
 		re2c \
-		libxml2-dev \
-		libedit-dev \
 		sqlite-dev \
-		openssl-dev \
-		libxml2-dev \
 	&& for key in $GPG_KEYS; do \
 		gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
 	done \

@@ -18,20 +18,19 @@ RUN addgroup -g 82 -S www-data \
 	&& adduser -u 82 -D -S -G www-data www-data
 RUN set -xe \
 	&& apk add --no-cache --virtual .build-deps \
-		gnupg \
-		curl-dev \
 		autoconf \
+		curl-dev \
 		file \
 		gcc \
+		gnupg \
 		libc-dev \
+		libedit-dev \
+		libxml2-dev \
 		make \
+		openssl-dev \
 		pkgconf \
 		re2c \
-		libxml2-dev \
-		libedit-dev \
 		sqlite-dev \
-		openssl-dev \
-		libxml2-dev \
 	&& for key in $GPG_KEYS; do \
 		gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
 	done \
