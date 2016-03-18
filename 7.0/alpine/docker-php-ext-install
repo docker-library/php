@@ -61,7 +61,11 @@ for ext in $exts; do
 		[ -e Makefile ] || docker-php-ext-configure "$ext"
 		make -j"$j"
 		make -j"$j" install
-		ls modules/*.so | cut -d/ -f2 | xargs -r docker-php-ext-enable
+		find modules \
+			-maxdepth 1 \
+			-name '*.so' \
+			-exec basename '{}' ';' \
+				| xargs -r docker-php-ext-enable
 		make -j"$j" clean
 	)
 done

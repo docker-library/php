@@ -1,25 +1,29 @@
-FROM debian:jessie
+FROM alpine:3.3
 
 # phpize deps
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache --virtual .phpize-deps \
 		autoconf \
 		file \
 		g++ \
 		gcc \
 		libc-dev \
 		make \
-		pkg-config \
-		re2c \
-	--no-install-recommends && rm -r /var/lib/apt/lists/*
+		pkgconf \
+		re2c
 
 # persistent / runtime deps
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache --virtual .persistent-deps \
 		ca-certificates \
-		curl \
-		libedit2 \
-		libsqlite3-0 \
-		libxml2 \
-	--no-install-recommends && rm -r /var/lib/apt/lists/*
+		curl
+
+# ensure www-data user exists
+RUN set -x \
+	&& addgroup -g 82 -S www-data \
+	&& adduser -u 82 -D -S -G www-data www-data
+# 82 is the standard uid/gid for "www-data" in Alpine
+# http://git.alpinelinux.org/cgit/aports/tree/main/apache2/apache2.pre-install?h=v3.3.2
+# http://git.alpinelinux.org/cgit/aports/tree/main/lighttpd/lighttpd.pre-install?h=v3.3.2
+# http://git.alpinelinux.org/cgit/aports/tree/main/nginx-initscripts/nginx-initscripts.pre-install?h=v3.3.2
 
 ENV PHP_INI_DIR /usr/local/etc/php
 RUN mkdir -p $PHP_INI_DIR/conf.d
@@ -35,16 +39,13 @@ ENV PHP_FILENAME php-5.5.33.tar.xz
 ENV PHP_SHA256 b91dbd3c53f9895e8f7b29e5fed25a64dd3a76b454f6ef7265e73c96b4303f30
 
 RUN set -xe \
-	&& buildDeps=" \
-		$PHP_EXTRA_BUILD_DEPS \
-		libcurl4-openssl-dev \
+	&& apk add --no-cache --virtual .build-deps \
+		curl-dev \
+		gnupg \
 		libedit-dev \
-		libsqlite3-dev \
-		libssl-dev \
 		libxml2-dev \
-		xz-utils \
-	" \
-	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
+		openssl-dev \
+		sqlite-dev \
 	&& curl -fSL "http://php.net/get/$PHP_FILENAME/from/this/mirror" -o "$PHP_FILENAME" \
 	&& echo "$PHP_SHA256 *$PHP_FILENAME" | sha256sum -c - \
 	&& curl -fSL "http://php.net/get/$PHP_FILENAME.asc/from/this/mirror" -o "$PHP_FILENAME.asc" \
@@ -54,8 +55,9 @@ RUN set -xe \
 	done \
 	&& gpg --batch --verify "$PHP_FILENAME.asc" "$PHP_FILENAME" \
 	&& rm -r "$GNUPGHOME" "$PHP_FILENAME.asc" \
-	&& mkdir -p /usr/src/php \
-	&& tar -xf "$PHP_FILENAME" -C /usr/src/php --strip-components=1 \
+	&& mkdir -p /usr/src \
+	&& tar -Jxf "$PHP_FILENAME" -C /usr/src \
+	&& mv "/usr/src/php-$PHP_VERSION" /usr/src/php \
 	&& rm "$PHP_FILENAME" \
 	&& cd /usr/src/php \
 	&& ./configure \
@@ -69,11 +71,19 @@ RUN set -xe \
 		--with-libedit \
 		--with-openssl \
 		--with-zlib \
-	&& make -j"$(nproc)" \
+	&& make -j"$(getconf _NPROCESSORS_ONLN)" \
 	&& make install \
-	&& { find /usr/local/bin /usr/local/sbin -type f -executable -exec strip --strip-all '{}' + || true; } \
+	&& { find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; } \
 	&& make clean \
-	&& apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false $buildDeps
+	&& runDeps="$( \
+		scanelf --needed --nobanner --recursive /usr/local \
+			| awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+			| sort -u \
+			| xargs -r apk info --installed \
+			| sort -u \
+	)" \
+	&& apk add --virtual .php-rundeps $runDeps \
+	&& apk del .build-deps
 
 COPY docker-php-ext-* /usr/local/bin/
 
