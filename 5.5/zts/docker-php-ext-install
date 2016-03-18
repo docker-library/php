@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 cd /usr/src/php/ext
@@ -36,10 +36,8 @@ while true; do
 	esac
 done
 
-exts=()
-while [ $# -gt 0 ]; do
-	ext="$1"
-	shift
+exts=
+for ext; do
 	if [ -z "$ext" ]; then
 		continue
 	fi
@@ -49,21 +47,25 @@ while [ $# -gt 0 ]; do
 		usage >&2
 		exit 1
 	fi
-	exts+=( "$ext" )
+	exts="$exts $ext"
 done
 
-if [ "${#exts[@]}" -eq 0 ]; then
+if [ -z "$exts" ]; then
 	usage >&2
 	exit 1
 fi
 
-for ext in "${exts[@]}"; do
+for ext in $exts; do
 	(
 		cd "$ext"
 		[ -e Makefile ] || docker-php-ext-configure "$ext"
 		make -j"$j"
 		make -j"$j" install
-		find modules -maxdepth 1 -name '*.so' -exec basename '{}' ';' | xargs --no-run-if-empty --verbose docker-php-ext-enable
+		find modules \
+			-maxdepth 1 \
+			-name '*.so' \
+			-exec basename '{}' ';' \
+				| xargs -r docker-php-ext-enable
 		make -j"$j" clean
 	)
 done

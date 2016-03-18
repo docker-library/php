@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 cd "$(php -r 'echo ini_get("extension_dir");')"
@@ -34,32 +34,30 @@ while true; do
 	esac
 done
 
-modules=()
-while [ $# -gt 0 ]; do
-	module="$1"
-	shift
+modules=
+for module; do
 	if [ -z "$module" ]; then
 		continue
 	fi
-	if [ -f "$module.so" -a ! -f "$module" ]; then
+	if [ -f "$module.so" ] && ! [ -f "$module" ]; then
 		# allow ".so" to be optional
-		module+='.so'
+		module="$module.so"
 	fi
-	if [ ! -f "$module" ]; then
+	if ! [ -f "$module" ]; then
 		echo >&2 "error: $(readlink -f "$module") does not exist"
 		echo >&2
 		usage >&2
 		exit 1
 	fi
-	modules+=( "$module" )
+	modules="$modules $module"
 done
 
-if [ "${#modules[@]}" -eq 0 ]; then
+if [ -z "$modules" ]; then
 	usage >&2
 	exit 1
 fi
 
-for module in "${modules[@]}"; do
+for module in $modules; do
 	if nm -g "$module" | grep -q ' zend_extension_entry$'; then
 		# https://wiki.php.net/internals/extensions#loading_zend_extensions
 		line="zend_extension=$(readlink -f "$module")"
