@@ -33,14 +33,22 @@ for version in "${versions[@]}"; do
 		echo "$va: ${url}@${commit} $version"
 	done
 	
-	for variant in apache fpm zts; do
+	for variant in \
+		alpine \
+		apache \
+		fpm fpm/alpine \
+		zts zts/alpine \
+	; do
+		[ -e "$version/$variant/Dockerfile" ] || continue
 		commit="$(cd "$version/$variant" && git log -1 --format='format:%H' -- Dockerfile $(awk 'toupper($1) == "COPY" { for (i = 2; i < NF; i++) { print $i } }' Dockerfile))"
+		slash='/'
+		variantTag="${variant//$slash/-}"
 		echo
 		for va in "${versionAliases[@]}"; do
 			if [ "$va" = 'latest' ]; then
-				va="$variant"
+				va="$variantTag"
 			else
-				va="$va-$variant"
+				va="$va-$variantTag"
 			fi
 			echo "$va: ${url}@${commit} $version/$variant"
 		done
