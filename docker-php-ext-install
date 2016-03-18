@@ -4,7 +4,7 @@ set -e
 cd /usr/src/php/ext
 
 usage() {
-	echo "usage: $0 [-jN] ext-name [ext-name ...]"
+	echo "usage: $0 [-jN] [-s] ext-name [ext-name ...]"
 	echo "   ie: $0 gd mysqli"
 	echo "       $0 pdo pdo_mysql"
 	echo "       $0 -j5 gd mbstring mysqli pdo pdo_mysql shmop"
@@ -15,16 +15,18 @@ usage() {
 	echo $(find /usr/src/php/ext -mindepth 2 -maxdepth 2 -type f -name 'config.m4' | cut -d/ -f6 | sort)
 }
 
-opts="$(getopt -o 'h?j:' --long 'help,jobs:' -- "$@" || { usage >&2 && false; })"
+opts="$(getopt -o 'h?j:s' --long 'help,jobs:,silent,quiet' -- "$@" || { usage >&2 && false; })"
 eval set -- "$opts"
 
 j=1
+makeopts=""
 while true; do
 	flag="$1"
 	shift
 	case "$flag" in
 		--help|-h|'-?') usage && exit 0 ;;
 		--jobs|-j) j="$1" && shift ;;
+		--silent|--quiet|-s) makeopts="$makeopts -s" ;;
 		--) break ;;
 		*)
 			{
@@ -35,6 +37,7 @@ while true; do
 			;;
 	esac
 done
+makeopts="$makeopts -j$j"
 
 exts=()
 while [ $# -gt 0 ]; do
@@ -61,9 +64,9 @@ for ext in "${exts[@]}"; do
 	(
 		cd "$ext"
 		[ -e Makefile ] || docker-php-ext-configure "$ext"
-		make -j"$j"
-		make -j"$j" install
+		make "$makeopts"
+		make "$makeopts" install
 		find modules -maxdepth 1 -name '*.so' -exec basename '{}' ';' | xargs --no-run-if-empty --verbose docker-php-ext-enable
-		make -j"$j" clean
+		make "$makeopts" clean
 	)
 done
