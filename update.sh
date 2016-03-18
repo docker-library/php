@@ -19,6 +19,7 @@ versions=( "${versions[@]%/}" )
 
 jsonSh="$(curl -fsSL 'https://raw.githubusercontent.com/dominictarr/JSON.sh/ed3f9dd285ebd4183934adb54ea5a2fda6b25a98/JSON.sh')"
 
+travisEnv=
 for version in "${versions[@]}"; do
 	packagesJson="$(curl -fsSL "https://secure.php.net/releases/index.php?json&max=100&version=${version%%.*}" | bash -- <(echo "$jsonSh") -l)"
 	fullVersion=
@@ -75,7 +76,11 @@ for version in "${versions[@]}"; do
 		dockerfiles+=( "$version/alpine/Dockerfile" )
 	fi
 	
-	for target in apache fpm zts fpm/alpine zts/alpine; do
+	for target in \
+		apache \
+		fpm fpm/alpine \
+		zts zts/alpine \
+	; do
 		[ -d "$version/$target" ] || continue
 		base="$version/Dockerfile"
 		variant="${target%%/*}"
@@ -110,4 +115,17 @@ for version in "${versions[@]}"; do
 			s!%%GPG_KEYS%%!'"$gpgKey"'!;
 		' "${dockerfiles[@]}"
 	)
+	
+	newTravisEnv=
+	for dockerfile in "${dockerfiles[@]}"; do
+		dir="${dockerfile%Dockerfile}"
+		dir="${dir%/}"
+		variant="${dir#$version}"
+		variant="${variant#/}"
+		newTravisEnv+='\n  - VERSION='"$version VARIANT=$variant"
+	done
+	travisEnv="$newTravisEnv$travisEnv"
 done
+
+travis="$(awk -v 'RS=\n\n' '$1 == "env:" { $0 = "env:'"$travisEnv"'" } { printf "%s%s", $0, RS }' .travis.yml)"
+echo "$travis" > .travis.yml
