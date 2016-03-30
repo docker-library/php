@@ -65,6 +65,8 @@ RUN set -xe \
 		--disable-cgi \
 # --enable-mysqlnd is included here because it's harder to compile after the fact than extensions are (since it's a plugin for several extensions, not an extension in itself)
 		--enable-mysqlnd \
+# --enable-mbstring is included here because otherwise there's no way to get pecl to use it properly (see https://github.com/docker-library/php/issues/195)
+		--enable-mbstring \
 		--with-curl \
 		--with-libedit \
 		--with-openssl \
