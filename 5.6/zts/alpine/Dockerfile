@@ -84,7 +84,7 @@ RUN set -xe \
 			| xargs -r apk info --installed \
 			| sort -u \
 	)" \
-	&& apk add --virtual .php-rundeps $runDeps \
+	&& apk add --no-cache --virtual .php-rundeps $runDeps \
 	&& apk del .build-deps
 
 COPY docker-php-ext-* /usr/local/bin/
