@@ -55,6 +55,11 @@ if [ -z "$exts" ]; then
 	exit 1
 fi
 
+: ${PHPIZE_DEPS:="autoconf file g++ gcc libc-dev make pkgconf re2c"}
+if [ -e /lib/apk/db/installed ]; then
+	apk add --no-cache --virtual .phpize-deps $PHPIZE_DEPS
+fi
+
 for ext in $exts; do
 	(
 		cd "$ext"
@@ -69,3 +74,7 @@ for ext in $exts; do
 		make -j"$j" clean
 	)
 done
+
+if [ -e /lib/apk/db/installed ]; then
+	apk del .phpize-deps
+fi
