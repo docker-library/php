@@ -1,16 +1,5 @@
 FROM alpine:3.3
 
-# phpize deps
-RUN apk add --no-cache --virtual .phpize-deps \
-		autoconf \
-		file \
-		g++ \
-		gcc \
-		libc-dev \
-		make \
-		pkgconf \
-		re2c
-
 # persistent / runtime deps
 RUN apk add --no-cache --virtual .persistent-deps \
 		ca-certificates \
@@ -38,8 +27,11 @@ ENV PHP_VERSION 5.6.21
 ENV PHP_FILENAME php-5.6.21.tar.xz
 ENV PHP_SHA256 566ff1a486cb0485ed477a91ea292423f77a58671270ff73b74e67e3ce7084f9
 
+ENV PHPIZE_DEPS autoconf file g++ gcc libc-dev make pkgconf re2c
+
 RUN set -xe \
 	&& apk add --no-cache --virtual .build-deps \
+		$PHPIZE_DEPS \
 		curl-dev \
 		gnupg \
 		libedit-dev \
