@@ -1,6 +1,15 @@
 FROM alpine:3.3
 
 # persistent / runtime deps
+ENV PHPIZE_DEPS \
+		autoconf \
+		file \
+		g++ \
+		gcc \
+		libc-dev \
+		make \
+		pkgconf \
+		re2c
 RUN apk add --no-cache --virtual .persistent-deps \
 		ca-certificates \
 		curl
@@ -25,8 +34,6 @@ ENV GPG_KEYS %%GPG_KEYS%%
 ENV PHP_VERSION %%PHP_VERSION%%
 ENV PHP_FILENAME %%PHP_FILENAME%%
 ENV PHP_SHA256 %%PHP_SHA256%%
-
-ENV PHPIZE_DEPS autoconf file g++ gcc libc-dev make pkgconf re2c
 
 RUN set -xe \
 	&& apk add --no-cache --virtual .build-deps \
