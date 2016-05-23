@@ -1,7 +1,7 @@
 FROM debian:jessie
 
-# phpize deps
-RUN apt-get update && apt-get install -y \
+# persistent / runtime deps
+ENV PHPIZE_DEPS \
 		autoconf \
 		file \
 		g++ \
@@ -9,11 +9,9 @@ RUN apt-get update && apt-get install -y \
 		libc-dev \
 		make \
 		pkg-config \
-		re2c \
-	--no-install-recommends && rm -r /var/lib/apt/lists/*
-
-# persistent / runtime deps
+		re2c
 RUN apt-get update && apt-get install -y \
+		$PHPIZE_DEPS \
 		ca-certificates \
 		curl \
 		libedit2 \
