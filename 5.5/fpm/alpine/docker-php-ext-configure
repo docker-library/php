@@ -15,5 +15,14 @@ shift
 
 set -x
 cd "$extDir"
+
+if [ -e /lib/apk/db/installed ] && [ -n "$PHPIZE_DEPS" ]; then
+	apk add --no-cache --virtual .phpize-deps $PHPIZE_DEPS
+fi
+
 phpize
 ./configure "$@"
+
+if [ -e /lib/apk/db/installed ] && [ -n "$PHPIZE_DEPS" ]; then
+	apk del .phpize-deps
+fi
