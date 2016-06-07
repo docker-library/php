@@ -1,4 +1,4 @@
-FROM alpine:3.3
+FROM alpine:3.4
 
 # persistent / runtime deps
 ENV PHPIZE_DEPS \
