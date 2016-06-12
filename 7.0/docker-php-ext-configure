@@ -13,6 +13,21 @@ if [ -z "$ext" ] || ! [ -d "$extDir" ]; then
 fi
 shift
 
+pm='unknown'
+if [ -e /lib/apk/db/installed ]; then
+	pm='apk'
+fi
+
+if [ "$pm" = 'apk' ]; then
+	if \
+		[ -n "$PHPIZE_DEPS" ] \
+		&& ! apk info --installed .phpize-deps > /dev/null \
+		&& ! apk info --installed .phpize-deps-configure > /dev/null \
+	; then
+		apk add --no-cache --virtual .phpize-deps-configure $PHPIZE_DEPS
+	fi
+fi
+
 set -x
 cd "$extDir"
 phpize
