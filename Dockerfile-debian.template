@@ -31,6 +31,8 @@ ENV PHP_VERSION %%PHP_VERSION%%
 ENV PHP_FILENAME %%PHP_FILENAME%%
 ENV PHP_SHA256 %%PHP_SHA256%%
 
+COPY docker-php-source /usr/local/bin/
+
 RUN set -xe \
 	&& buildDeps=" \
 		$PHP_EXTRA_BUILD_DEPS \
@@ -51,9 +53,7 @@ RUN set -xe \
 	done \
 	&& gpg --batch --verify "$PHP_FILENAME.asc" "$PHP_FILENAME" \
 	&& rm -r "$GNUPGHOME" "$PHP_FILENAME.asc" \
-	&& mkdir -p /usr/src/php \
-	&& tar -xf "$PHP_FILENAME" -C /usr/src/php --strip-components=1 \
-	&& rm "$PHP_FILENAME" \
+	&& docker-php-source extract \
 	&& cd /usr/src/php \
 	&& ./configure \
 		--with-config-file-path="$PHP_INI_DIR" \
@@ -72,7 +72,8 @@ RUN set -xe \
 	&& make install \
 	&& { find /usr/local/bin /usr/local/sbin -type f -executable -exec strip --strip-all '{}' + || true; } \
 	&& make clean \
-	&& apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false $buildDeps
+	&& apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false $buildDeps \
+	&& docker-php-source delete
 
 COPY docker-php-ext-* /usr/local/bin/
 

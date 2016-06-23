@@ -28,6 +28,8 @@ if [ "$pm" = 'apk' ]; then
 	fi
 fi
 
+docker-php-source extract
+
 set -x
 cd "$extDir"
 phpize
