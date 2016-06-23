@@ -72,6 +72,8 @@ if [ "$pm" = 'apk' ]; then
 	fi
 fi
 
+docker-php-source extract
+
 for ext in $exts; do
 	(
 		cd "$ext"
@@ -90,3 +92,4 @@ done
 if [ "$pm" = 'apk' ] && [ -n "$apkDel" ]; then
 	apk del $apkDel
 fi
+docker-php-source delete
