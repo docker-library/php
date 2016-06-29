@@ -1,5 +1,7 @@
 FROM debian:jessie
 
+ENV PORT 80
+
 # persistent / runtime deps
 ENV PHPIZE_DEPS \
 		autoconf \
