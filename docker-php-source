@@ -22,6 +22,7 @@ case "$1" in
             mkdir -p $SRC_DIR
             tar -Jxf "/$PHP_FILENAME" -C $SRC_DIR
             mv "$PHP_SRC_DIR-$PHP_VERSION" $PHP_SRC_DIR
+            echo " "$(find $PHP_SRC_DIR/ext -mindepth 2 -maxdepth 2 -type f -name 'config.m4' | cut -d/ -f6 | sort)" " > /available-exts
             echo "php source tarball successfully extracted."
         fi
         ;;
