@@ -1,41 +1,42 @@
 #!/bin/sh
 set -e
-SRC_DIR=/usr/src
-PHP_SRC_DIR=$SRC_DIR/php
+PHP_SRC_DIR=/usr/src/php
 
 usage() {
-    echo "usage: $0 COMMAND"
-    echo
-    echo "Manage php source tarball lifecycle."
-    echo
-    echo "Commands:"
-    echo "   extract  extract php source tarball into directory $PHP_SRC_DIR if not already done."
-    echo "   delete   delete extracted php source located into $PHP_SRC_DIR if not already done."
-    echo
+	echo "usage: $0 COMMAND"
+	echo
+	echo "Manage php source tarball lifecycle."
+	echo
+	echo "Commands:"
+	echo "   extract  extract php source tarball into directory $PHP_SRC_DIR if not already done."
+	echo "   delete   delete extracted php source located into $PHP_SRC_DIR if not already done."
+	echo
 }
 
 case "$1" in
-    extract)
-        if [ -f "$PHP_SRC_DIR" ] ; then
-            echo "php source tarball already extracted, skipping extract step."
-        else
-            mkdir -p $SRC_DIR
-            tar -Jxf "/$PHP_FILENAME" -C $SRC_DIR
-            mv "$PHP_SRC_DIR-$PHP_VERSION" $PHP_SRC_DIR
-            echo " "$(find $PHP_SRC_DIR/ext -mindepth 2 -maxdepth 2 -type f -name 'config.m4' | cut -d/ -f6 | sort)" " > /available-exts
-            echo "php source tarball successfully extracted."
-        fi
-        ;;
-    delete)
-        if [ -d "$PHP_SRC_DIR" ] ; then
-            rm -rf $PHP_SRC_DIR \
-            && echo "php extracted source successfully deleted."
-        else
-            echo "php extracted source already deleted, skipping delete extracted source step."
-        fi
-        ;;
-    *)
-        usage
-        exit 1
-        ;;
+	extract)
+		if [ -e "$PHP_SRC_DIR" -a ! -d "$PHP_SRC_DIR" ] ; then
+			echo >&2 "$PHP_SRC_DIR exists and is not a directory"
+			exit 1
+		fi
+		if [ ! -d "$PHP_SRC_DIR" ]; then
+			mkdir -p $PHP_SRC_DIR
+			tar -Jxf /usr/src/php.tar.xz -C "$PHP_SRC_DIR" --strip-components=1
+
+			if [ ! -f /usr/src/available-php-exts ]; then
+				find "$PHP_SRC_DIR"/ext \
+						-mindepth 2 -maxdepth 2 \
+						-type f -name 'config.m4' \
+					| cut -d/ -f6 | sort \
+				> /usr/src/available-php-exts
+			fi
+		fi
+		;;
+	delete)
+		rm -rf "$PHP_SRC_DIR"
+		;;
+	*)
+		usage
+		exit 1
+		;;
 esac

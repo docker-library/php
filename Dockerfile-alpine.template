@@ -12,7 +12,9 @@ ENV PHPIZE_DEPS \
 		re2c
 RUN apk add --no-cache --virtual .persistent-deps \
 		ca-certificates \
-		curl
+		curl \
+		tar \
+		xz
 
 # ensure www-data user exists
 RUN set -x \
@@ -46,17 +48,19 @@ RUN set -xe \
 		libxml2-dev \
 		openssl-dev \
 		sqlite-dev \
-	&& curl -fSL "http://php.net/get/$PHP_FILENAME/from/this/mirror" -o "$PHP_FILENAME" \
-	&& echo "$PHP_SHA256 *$PHP_FILENAME" | sha256sum -c - \
-	&& curl -fSL "http://php.net/get/$PHP_FILENAME.asc/from/this/mirror" -o "$PHP_FILENAME.asc" \
+	&& mkdir -p /usr/src \
+	&& cd /usr/src/ \
+	&& curl -fSL "http://php.net/get/$PHP_FILENAME/from/this/mirror" -o php.tar.xz \
+	&& echo "$PHP_SHA256 *php.tar.xz" | sha256sum -c - \
+	&& curl -fSL "http://php.net/get/$PHP_FILENAME.asc/from/this/mirror" -o php.tar.xz.asc \
 	&& export GNUPGHOME="$(mktemp -d)" \
 	&& for key in $GPG_KEYS; do \
 		gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
 	done \
-	&& gpg --batch --verify "$PHP_FILENAME.asc" "$PHP_FILENAME" \
-	&& rm -r "$GNUPGHOME" "$PHP_FILENAME.asc" \
+	&& gpg --batch --verify php.tar.xz.asc php.tar.xz \
+	&& rm -r "$GNUPGHOME" \
 	&& docker-php-source extract \
-	&& cd /usr/src/php \
+	&& cd php \
 	&& ./configure \
 		--with-config-file-path="$PHP_INI_DIR" \
 		--with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \

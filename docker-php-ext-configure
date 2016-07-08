@@ -2,12 +2,12 @@
 set -e
 
 ext="$1"
-if [ -z "$ext" ] || ! [ $(grep -c " $ext " /available-exts) -eq 1 ]; then
+if [ -z "$ext" ] || ! grep -qE "^$ext$" /usr/src/available-php-exts; then
 	echo >&2 "usage: $0 ext-name [configure flags]"
 	echo >&2 "   ie: $0 gd --with-jpeg-dir=/usr/local/something"
 	echo >&2
 	echo >&2 'Possible values for ext-name:'
-	echo $(cat /available-exts)
+	echo $(cat /usr/src/available-php-exts)
 	exit 1
 fi
 shift

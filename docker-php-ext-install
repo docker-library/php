@@ -1,6 +1,5 @@
 #!/bin/sh
 set -e
-PHP_SRC_DIR=/usr/src/php
 
 usage() {
 	echo "usage: $0 [-jN] ext-name [ext-name ...]"
@@ -11,7 +10,7 @@ usage() {
 	echo 'if custom ./configure arguments are necessary, see docker-php-ext-configure'
 	echo
 	echo 'Possible values for ext-name:'
-	echo $(cat /available-exts)
+	echo $(cat /usr/src/available-php-exts)
 }
 
 opts="$(getopt -o 'h?j:' --long 'help,jobs:' -- "$@" || { usage >&2 && false; })"
@@ -40,8 +39,8 @@ for ext; do
 	if [ -z "$ext" ]; then
 		continue
 	fi
-    if [ ! $(grep -c " $ext " /available-exts) -eq 1 ]; then
-		echo >&2 "error: $PHP_SRC_DIR/$ext does not exist"
+	if ! grep -qE "^$ext$" /usr/src/available-php-exts; then
+		echo >&2 "error: /usr/src/php/ext/$ext does not exist"
 		echo >&2
 		usage >&2
 		exit 1
@@ -72,7 +71,7 @@ if [ "$pm" = 'apk' ]; then
 fi
 
 docker-php-source extract
-cd $PHP_SRC_DIR/ext
+cd /usr/src/php/ext
 
 for ext in $exts; do
 	(
