@@ -37,17 +37,9 @@ ENV PHP_VERSION %%PHP_VERSION%%
 ENV PHP_FILENAME %%PHP_FILENAME%%
 ENV PHP_SHA256 %%PHP_SHA256%%
 
-COPY docker-php-source /usr/local/bin/
-
 RUN set -xe \
-	&& apk add --no-cache --virtual .build-deps \
-		$PHPIZE_DEPS \
-		curl-dev \
+	&& apk add --no-cache --virtual .fetch-deps \
 		gnupg \
-		libedit-dev \
-		libxml2-dev \
-		openssl-dev \
-		sqlite-dev \
 	&& mkdir -p /usr/src \
 	&& cd /usr/src/ \
 	&& curl -fSL "http://php.net/get/$PHP_FILENAME/from/this/mirror" -o php.tar.xz \
@@ -59,8 +51,20 @@ RUN set -xe \
 	done \
 	&& gpg --batch --verify php.tar.xz.asc php.tar.xz \
 	&& rm -r "$GNUPGHOME" \
+	&& apk del .fetch-deps
+
+COPY docker-php-source /usr/local/bin/
+
+RUN set -xe \
+	&& apk add --no-cache --virtual .build-deps \
+		$PHPIZE_DEPS \
+		curl-dev \
+		libedit-dev \
+		libxml2-dev \
+		openssl-dev \
+		sqlite-dev \
 	&& docker-php-source extract \
-	&& cd php \
+	&& cd /usr/src/php \
 	&& ./configure \
 		--with-config-file-path="$PHP_INI_DIR" \
 		--with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \

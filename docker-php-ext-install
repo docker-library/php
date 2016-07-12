@@ -10,7 +10,7 @@ usage() {
 	echo 'if custom ./configure arguments are necessary, see docker-php-ext-configure'
 	echo
 	echo 'Possible values for ext-name:'
-	echo $(cat /usr/src/available-php-exts)
+	echo $(cat /usr/src/php-available-exts)
 }
 
 opts="$(getopt -o 'h?j:' --long 'help,jobs:' -- "$@" || { usage >&2 && false; })"
@@ -39,7 +39,7 @@ for ext; do
 	if [ -z "$ext" ]; then
 		continue
 	fi
-	if ! grep -qE "^$ext$" /usr/src/available-php-exts; then
+	if ! grep -qE "^$ext$" /usr/src/php-available-exts; then
 		echo >&2 "error: /usr/src/php/ext/$ext does not exist"
 		echo >&2
 		usage >&2

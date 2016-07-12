@@ -32,6 +32,18 @@ ENV PHP_VERSION %%PHP_VERSION%%
 ENV PHP_FILENAME %%PHP_FILENAME%%
 ENV PHP_SHA256 %%PHP_SHA256%%
 
+RUN set -xe \
+	&& cd /usr/src/ \
+	&& curl -fSL "http://php.net/get/$PHP_FILENAME/from/this/mirror" -o php.tar.xz \
+	&& echo "$PHP_SHA256 *php.tar.xz" | sha256sum -c - \
+	&& curl -fSL "http://php.net/get/$PHP_FILENAME.asc/from/this/mirror" -o php.tar.xz.asc \
+	&& export GNUPGHOME="$(mktemp -d)" \
+	&& for key in $GPG_KEYS; do \
+		gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
+	done \
+	&& gpg --batch --verify php.tar.xz.asc php.tar.xz \
+	&& rm -r "$GNUPGHOME"
+
 COPY docker-php-source /usr/local/bin/
 
 RUN set -xe \
@@ -44,18 +56,8 @@ RUN set -xe \
 		libxml2-dev \
 	" \
 	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
-	&& cd /usr/src/ \
-	&& curl -fSL "http://php.net/get/$PHP_FILENAME/from/this/mirror" -o php.tar.xz \
-	&& echo "$PHP_SHA256 *php.tar.xz" | sha256sum -c - \
-	&& curl -fSL "http://php.net/get/$PHP_FILENAME.asc/from/this/mirror" -o php.tar.xz.asc \
-	&& export GNUPGHOME="$(mktemp -d)" \
-	&& for key in $GPG_KEYS; do \
-		gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
-	done \
-	&& gpg --batch --verify php.tar.xz.asc php.tar.xz \
-	&& rm -r "$GNUPGHOME" \
 	&& docker-php-source extract \
-	&& cd php \
+	&& cd /usr/src/php \
 	&& ./configure \
 		--with-config-file-path="$PHP_INI_DIR" \
 		--with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
