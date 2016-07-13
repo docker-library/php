@@ -12,7 +12,9 @@ ENV PHPIZE_DEPS \
 		re2c
 RUN apk add --no-cache --virtual .persistent-deps \
 		ca-certificates \
-		curl
+		curl \
+		tar \
+		xz
 
 # ensure www-data user exists
 RUN set -x \
@@ -37,27 +39,32 @@ ENV PHP_FILENAME php-5.5.37.tar.xz
 ENV PHP_SHA256 c322444fdf6d3ba26aa67d67ee32d1e815a877f35831351c83763431a80e3612
 
 RUN set -xe \
-	&& apk add --no-cache --virtual .build-deps \
-		$PHPIZE_DEPS \
-		curl-dev \
+	&& apk add --no-cache --virtual .fetch-deps \
 		gnupg \
-		libedit-dev \
-		libxml2-dev \
-		openssl-dev \
-		sqlite-dev \
-	&& curl -fSL "http://php.net/get/$PHP_FILENAME/from/this/mirror" -o "$PHP_FILENAME" \
-	&& echo "$PHP_SHA256 *$PHP_FILENAME" | sha256sum -c - \
-	&& curl -fSL "http://php.net/get/$PHP_FILENAME.asc/from/this/mirror" -o "$PHP_FILENAME.asc" \
+	&& mkdir -p /usr/src \
+	&& cd /usr/src/ \
+	&& curl -fSL "http://php.net/get/$PHP_FILENAME/from/this/mirror" -o php.tar.xz \
+	&& echo "$PHP_SHA256 *php.tar.xz" | sha256sum -c - \
+	&& curl -fSL "http://php.net/get/$PHP_FILENAME.asc/from/this/mirror" -o php.tar.xz.asc \
 	&& export GNUPGHOME="$(mktemp -d)" \
 	&& for key in $GPG_KEYS; do \
 		gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
 	done \
-	&& gpg --batch --verify "$PHP_FILENAME.asc" "$PHP_FILENAME" \
-	&& rm -r "$GNUPGHOME" "$PHP_FILENAME.asc" \
-	&& mkdir -p /usr/src \
-	&& tar -Jxf "$PHP_FILENAME" -C /usr/src \
-	&& mv "/usr/src/php-$PHP_VERSION" /usr/src/php \
-	&& rm "$PHP_FILENAME" \
+	&& gpg --batch --verify php.tar.xz.asc php.tar.xz \
+	&& rm -r "$GNUPGHOME" \
+	&& apk del .fetch-deps
+
+COPY docker-php-source /usr/local/bin/
+
+RUN set -xe \
+	&& apk add --no-cache --virtual .build-deps \
+		$PHPIZE_DEPS \
+		curl-dev \
+		libedit-dev \
+		libxml2-dev \
+		openssl-dev \
+		sqlite-dev \
+	&& docker-php-source extract \
 	&& cd /usr/src/php \
 	&& ./configure \
 		--with-config-file-path="$PHP_INI_DIR" \
@@ -84,7 +91,8 @@ RUN set -xe \
 			| sort -u \
 	)" \
 	&& apk add --no-cache --virtual .php-rundeps $runDeps \
-	&& apk del .build-deps
+	&& apk del .build-deps \
+	&& docker-php-source delete
 
 COPY docker-php-ext-* /usr/local/bin/
 
