@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+php -r '
+	$file = "composer-setup.php";
+	copy("https://getcomposer.org/installer", $file);
+	if (hash_file("SHA384", $file) !== trim(file_get_contents("https://composer.github.io/installer.sig"))) {
+		echo "ERROR: Invalid installer signature", PHP_EOL;
+		return 1;
+	}'
+
+php composer-setup.php --install-dir=$(dirname $0) --filename=composer "$@"
+rm composer-setup.php
