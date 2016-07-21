@@ -40,7 +40,16 @@ for ext; do
 		continue
 	fi
 	if ! grep -qE "^$ext$" /usr/src/php-available-exts; then
-		echo >&2 "error: /usr/src/php/ext/$ext does not exist"
+		info=$(pecl remote-info $ext)
+		if [ ! $? -eq 0 ] ; then
+			echo >&2 "error: sorry but '$ext' extension is either not a pecl extension"
+			echo >&2 "       nor an officially bundled extension from php source code."
+			echo >&2
+		else
+			echo >&2 "error: docker-php-ext-install only permit to install php source code"
+			echo >&2 "bundled extensions. You should install '${ext}' extension with pecl:"
+			echo >&2 $info
+		fi
 		echo >&2
 		usage >&2
 		exit 1
