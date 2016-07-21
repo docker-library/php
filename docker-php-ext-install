@@ -39,11 +39,13 @@ for ext; do
 	if [ -z "$ext" ]; then
 		continue
 	fi
-	if ! grep -qE "^$ext$" /usr/src/php-available-exts; then
-		echo >&2 "error: /usr/src/php/ext/$ext does not exist"
-		echo >&2
-		usage >&2
-		exit 1
+	if ! grep -qE "^$ext$" /usr/src/php-available-exts ; then
+		if [ ! -d "/usr/src/php/ext/$ext" ] ; then
+			echo >&2 "error: /usr/src/php/ext/$ext does not exist"
+			echo >&2
+			usage >&2
+			exit 1
+		fi
 	fi
 	exts="$exts $ext"
 done
