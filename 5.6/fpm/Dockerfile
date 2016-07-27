@@ -65,6 +65,8 @@ RUN set -xe \
 		--enable-mysqlnd \
 # --enable-mbstring is included here because otherwise there's no way to get pecl to use it properly (see https://github.com/docker-library/php/issues/195)
 		--enable-mbstring \
+# --enable-bcmath is needed to support bcmath functions like bcmul/bcadd/bcdiv/bcmod etc.
+		--enable-bcmath \
 		--with-curl \
 		--with-libedit \
 		--with-openssl \
