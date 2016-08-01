@@ -17,6 +17,17 @@ if [ ${#versions[@]} -eq 0 ]; then
 fi
 versions=( "${versions[@]%/}" )
 
+generated_warning() {
+	cat <<-EOH
+		#
+		# NOTE: THIS DOCKERFILE IS GENERATED VIA "update.sh"
+		#
+		# PLEASE DO NOT EDIT IT DIRECTLY.
+		#
+
+	EOH
+}
+
 jsonSh="$(curl -fsSL 'https://raw.githubusercontent.com/dominictarr/JSON.sh/ed3f9dd285ebd4183934adb54ea5a2fda6b25a98/JSON.sh')"
 
 travisEnv=
@@ -66,13 +77,13 @@ for version in "${versions[@]}"; do
 	
 	dockerfiles=()
 	
-	cp -v Dockerfile-debian.template "$version/Dockerfile"
+	{ generated_warning; cat Dockerfile-debian.template; } > "$version/Dockerfile"
 	cp -v docker-php-ext-* "$version/"
 	cp -v docker-php-source "$version/"
 	dockerfiles+=( "$version/Dockerfile" )
 	
 	if [ -d "$version/alpine" ]; then
-		cp -v Dockerfile-alpine.template "$version/alpine/Dockerfile"
+		{ generated_warning; cat Dockerfile-alpine.template; } > "$version/alpine/Dockerfile"
 		cp -v docker-php-ext-* "$version/alpine/"
 		cp -v docker-php-source "$version/alpine/"
 		dockerfiles+=( "$version/alpine/Dockerfile" )
