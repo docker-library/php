@@ -1,10 +1,12 @@
-RUN apt-get update && apt-get install -y apache2-bin apache2.2-common --no-install-recommends && rm -rf /var/lib/apt/lists/*
-
 ENV APACHE_CONFDIR /etc/apache2
 ENV APACHE_ENVVARS $APACHE_CONFDIR/envvars
+ENV PHP_EXTRA_BUILD_DEPS apache2-dev
+ENV PHP_EXTRA_CONFIGURE_ARGS --with-apxs2
+
+RUN apt-get update && apt-get install -y apache2-bin apache2.2-common --no-install-recommends && rm -rf /var/lib/apt/lists/* \
 
 # setup directories and permissions
-RUN set -ex \
+    && set -ex \
 	&& . "$APACHE_ENVVARS" \
 	&& for dir in \
 		"$APACHE_LOCK_DIR" \
@@ -15,20 +17,20 @@ RUN set -ex \
 		rm -rvf "$dir" \
 		&& mkdir -p "$dir" \
 		&& chown -R "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$dir"; \
-	done
+	done \
 
 # Apache + PHP requires preforking Apache for best results
-RUN a2dismod mpm_event && a2enmod mpm_prefork
+	&& a2dismod mpm_event && a2enmod mpm_prefork \
 
 # logs should go to stdout / stderr
-RUN set -ex \
+    && set -ex \
 	&& . "$APACHE_ENVVARS" \
 	&& ln -sfT /dev/stderr "$APACHE_LOG_DIR/error.log" \
 	&& ln -sfT /dev/stdout "$APACHE_LOG_DIR/access.log" \
-	&& ln -sfT /dev/stdout "$APACHE_LOG_DIR/other_vhosts_access.log"
+	&& ln -sfT /dev/stdout "$APACHE_LOG_DIR/other_vhosts_access.log" \
 
 # PHP files should be handled by PHP, and should be preferred over any other file type
-RUN { \
+    && { \
 		echo '<FilesMatch \.php$>'; \
 		echo '\tSetHandler application/x-httpd-php'; \
 		echo '</FilesMatch>'; \
@@ -42,6 +44,3 @@ RUN { \
 		echo '</Directory>'; \
 	} | tee "$APACHE_CONFDIR/conf-available/docker-php.conf" \
 	&& a2enconf docker-php
-
-ENV PHP_EXTRA_BUILD_DEPS apache2-dev
-ENV PHP_EXTRA_CONFIGURE_ARGS --with-apxs2

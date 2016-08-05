@@ -62,33 +62,33 @@ for version in "${versions[@]}"; do
 			break
 		fi
 	done
-	
+
 	if [ -z "$fullVersion" ]; then
 		echo >&2 "warning: missing full version for $version; skipping"
 		continue
 	fi
-	
+
 	gpgKey="${gpgKeys[$version]}"
 	if [ -z "$gpgKey" ]; then
 		echo >&2 "ERROR: missing GPG key fingerprint for $version"
 		echo >&2 "  try looking on http://php.net/downloads.php#gpg-$version"
 		exit 1
 	fi
-	
+
 	dockerfiles=()
-	
+
 	{ generated_warning; cat Dockerfile-debian.template; } > "$version/Dockerfile"
 	cp -v docker-php-ext-* "$version/"
 	cp -v docker-php-source "$version/"
 	dockerfiles+=( "$version/Dockerfile" )
-	
+
 	if [ -d "$version/alpine" ]; then
 		{ generated_warning; cat Dockerfile-alpine.template; } > "$version/alpine/Dockerfile"
 		cp -v docker-php-ext-* "$version/alpine/"
 		cp -v docker-php-source "$version/alpine/"
 		dockerfiles+=( "$version/alpine/Dockerfile" )
 	fi
-	
+
 	for target in \
 		apache \
 		fpm fpm/alpine \
@@ -110,16 +110,15 @@ for version in "${versions[@]}"; do
 			ia { ac++ }
 			ia && ac == 1 { system("cat '$variant'-Dockerfile-block-" ab) }
 		' "$base" > "$version/$target/Dockerfile"
-		cp -v docker-php-ext-* "$version/$target/"
-		cp -v docker-php-source "$version/$target/"
+		cp -v docker-php-* "$version/$target/"
 		dockerfiles+=( "$version/$target/Dockerfile" )
 	done
-	
+
 	if [ -z "$fullVersion" ]; then
 		echo >&2 "ERROR: missing $version in $packagesUrl"
 		continue
 	fi
-	
+
 	(
 		set -x
 		sed -ri '
@@ -129,7 +128,7 @@ for version in "${versions[@]}"; do
 			s!%%GPG_KEYS%%!'"$gpgKey"'!;
 		' "${dockerfiles[@]}"
 	)
-	
+
 	newTravisEnv=
 	for dockerfile in "${dockerfiles[@]}"; do
 		dir="${dockerfile%Dockerfile}"
