@@ -35,8 +35,17 @@ RUN apt-get update && apt-get install -y apache2-bin apache2.2-common --no-insta
 ENV APACHE_CONFDIR /etc/apache2
 ENV APACHE_ENVVARS $APACHE_CONFDIR/envvars
 
-# setup directories and permissions
 RUN set -ex \
+	\
+# generically convert lines like
+#   export APACHE_RUN_USER=www-data
+# into
+#   : ${APACHE_RUN_USER:=www-data}
+#   export APACHE_RUN_USER
+# so that they can be overridden at runtime ("-e APACHE_RUN_USER=...")
+	&& sed -r 's/^export ([^=]+)=(.*)$/: ${\1:=\2}\nexport \1/' "$APACHE_ENVVARS" \
+	\
+# setup directories and permissions
 	&& . "$APACHE_ENVVARS" \
 	&& for dir in \
 		"$APACHE_LOCK_DIR" \
