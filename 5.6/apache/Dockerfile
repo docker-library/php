@@ -95,7 +95,7 @@ ENV PHP_FILENAME php-5.6.24.tar.xz
 ENV PHP_SHA256 ed7c38c6dac539ade62e08118258f4dac0c49beca04d8603bee4e0ea6ca8250b
 
 RUN set -xe \
-	&& cd /usr/src/ \
+	&& cd /usr/src \
 	&& curl -fSL "http://php.net/get/$PHP_FILENAME/from/this/mirror" -o php.tar.xz \
 	&& echo "$PHP_SHA256 *php.tar.xz" | sha256sum -c - \
 	&& curl -fSL "http://php.net/get/$PHP_FILENAME.asc/from/this/mirror" -o php.tar.xz.asc \
@@ -118,27 +118,35 @@ RUN set -xe \
 		libxml2-dev \
 	" \
 	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
+	\
 	&& docker-php-source extract \
 	&& cd /usr/src/php \
 	&& ./configure \
 		--with-config-file-path="$PHP_INI_DIR" \
 		--with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
+		\
 		--disable-cgi \
-# --enable-mysqlnd is included here because it's harder to compile after the fact than extensions are (since it's a plugin for several extensions, not an extension in itself)
-		--enable-mysqlnd \
+		\
+# --enable-ftp is included here because ftp_ssl_connect() needs ftp to be compiled statically (see https://github.com/docker-library/php/issues/236)
+		--enable-ftp \
 # --enable-mbstring is included here because otherwise there's no way to get pecl to use it properly (see https://github.com/docker-library/php/issues/195)
 		--enable-mbstring \
+# --enable-mysqlnd is included here because it's harder to compile after the fact than extensions are (since it's a plugin for several extensions, not an extension in itself)
+		--enable-mysqlnd \
+		\
 		--with-curl \
 		--with-libedit \
 		--with-openssl \
 		--with-zlib \
+		\
 		$PHP_EXTRA_CONFIGURE_ARGS \
 	&& make -j"$(nproc)" \
 	&& make install \
 	&& { find /usr/local/bin /usr/local/sbin -type f -executable -exec strip --strip-all '{}' + || true; } \
 	&& make clean \
-	&& apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps \
-	&& docker-php-source delete
+	&& docker-php-source delete \
+	\
+	&& apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps
 
 COPY docker-php-ext-* /usr/local/bin/
 
