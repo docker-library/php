@@ -19,7 +19,7 @@ case "$1" in
 			echo >&2 "$dir exists and is not a directory"
 			exit 1
 		fi
-		if [ ! -d "$dir" ]; then
+        if [[ ! -d "$dir" || $(ls -1 "$dir") == "ext" ]]; then
 			mkdir -p "$dir"
 			tar -Jxf /usr/src/php.tar.xz -C "$dir" --strip-components=1
 
@@ -36,6 +36,11 @@ case "$1" in
 		;;
 	delete)
 		rm -rf "$dir"
+		# To maintain BC we create this directory because many people
+		# were extracting some of their custom extensions in this directory
+		# See https://github.com/docker-library/php/issues/266
+		# Was breaked by https://github.com/docker-library/php/pull/256
+		mkdir -p "$dir/ext"
 		;;
 	*)
 		usage
