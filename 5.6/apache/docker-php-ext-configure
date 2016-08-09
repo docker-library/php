@@ -1,13 +1,31 @@
 #!/bin/sh
 set -e
 
+srcExists=
+if [ -d /usr/src/php ]; then
+	srcExists=1
+fi
+docker-php-source extract
+if [ -z "$srcExists" ]; then
+	touch /usr/src/php/.docker-delete-me
+fi
+
 ext="$1"
-if [ -z "$ext" ] || ! grep -qE "^$ext$" /usr/src/php-available-exts; then
+extDir="/usr/src/php/ext/$ext"
+if [ -z "$ext" ] || [ ! -d "$extDir" ]; then
 	echo >&2 "usage: $0 ext-name [configure flags]"
 	echo >&2 "   ie: $0 gd --with-jpeg-dir=/usr/local/something"
 	echo >&2
 	echo >&2 'Possible values for ext-name:'
-	echo $(cat /usr/src/php-available-exts)
+	find /usr/src/php/ext \
+			-mindepth 2 \
+			-maxdepth 2 \
+			-type f \
+			-name 'config.m4' \
+		| xargs -n1 dirname \
+		| xargs -n1 basename \
+		| sort \
+		| xargs
 	exit 1
 fi
 shift
@@ -27,9 +45,7 @@ if [ "$pm" = 'apk' ]; then
 	fi
 fi
 
-docker-php-source extract
-
 set -x
-cd "/usr/src/php/ext/$ext"
+cd "$extDir"
 phpize
 ./configure "$@"

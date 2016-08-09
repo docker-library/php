@@ -1,6 +1,17 @@
 #!/bin/sh
 set -e
 
+srcExists=
+if [ -d /usr/src/php ]; then
+	srcExists=1
+fi
+docker-php-source extract
+if [ -z "$srcExists" ]; then
+	touch /usr/src/php/.docker-delete-me
+fi
+
+cd /usr/src/php/ext
+
 usage() {
 	echo "usage: $0 [-jN] ext-name [ext-name ...]"
 	echo "   ie: $0 gd mysqli"
@@ -10,7 +21,15 @@ usage() {
 	echo 'if custom ./configure arguments are necessary, see docker-php-ext-configure'
 	echo
 	echo 'Possible values for ext-name:'
-	echo $(cat /usr/src/php-available-exts)
+	find . \
+			-mindepth 2 \
+			-maxdepth 2 \
+			-type f \
+			-name 'config.m4' \
+		| xargs -n1 dirname \
+		| xargs -n1 basename \
+		| sort \
+		| xargs
 }
 
 opts="$(getopt -o 'h?j:' --long 'help,jobs:' -- "$@" || { usage >&2 && false; })"
@@ -39,8 +58,8 @@ for ext; do
 	if [ -z "$ext" ]; then
 		continue
 	fi
-	if ! grep -qE "^$ext$" /usr/src/php-available-exts; then
-		echo >&2 "error: /usr/src/php/ext/$ext does not exist"
+	if [ ! -d "$ext" ]; then
+		echo >&2 "error: $PWD/$ext does not exist"
 		echo >&2
 		usage >&2
 		exit 1
@@ -70,9 +89,6 @@ if [ "$pm" = 'apk' ]; then
 	fi
 fi
 
-docker-php-source extract
-cd /usr/src/php/ext
-
 for ext in $exts; do
 	(
 		cd "$ext"
@@ -91,4 +107,7 @@ done
 if [ "$pm" = 'apk' ] && [ -n "$apkDel" ]; then
 	apk del $apkDel
 fi
-docker-php-source delete
+
+if [ -e /usr/src/php/.docker-delete-me ]; then
+	docker-php-source delete
+fi
