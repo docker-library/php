@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+
 dir=/usr/src/php
 
 usage() {
@@ -15,28 +16,17 @@ usage() {
 
 case "$1" in
 	extract)
-		if [ -e "$dir" -a ! -d "$dir" ] ; then
-			echo >&2 "$dir exists and is not a directory"
-			exit 1
-		fi
-		if [ ! -d "$dir" ]; then
-			mkdir -p "$dir"
+		mkdir -p "$dir"
+		if [ ! -f "$dir/.docker-extracted" ]; then
 			tar -Jxf /usr/src/php.tar.xz -C "$dir" --strip-components=1
-
-			if [ ! -f /usr/src/php-available-exts ]; then
-				find "$dir/ext" \
-						-mindepth 2 \
-						-maxdepth 2 \
-						-type f \
-						-name 'config.m4' \
-					| xargs -n1 dirname | xargs -n1 basename | sort \
-				> /usr/src/php-available-exts
-			fi
+			touch "$dir/.docker-extracted"
 		fi
 		;;
+
 	delete)
 		rm -rf "$dir"
 		;;
+
 	*)
 		usage
 		exit 1
