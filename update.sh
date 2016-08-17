@@ -110,6 +110,9 @@ for version in "${versions[@]}"; do
 			ia { ac++ }
 			ia && ac == 1 { system("cat '$variant'-Dockerfile-block-" ab) }
 		' "$base" > "$version/$target/Dockerfile"
+		if [ $target == "apache" ]; then
+		    cp -vr docker-entrypoint.sh docker-entrypoint.d "$version/$target/"
+		fi
 		cp -v docker-php-ext-* "$version/$target/"
 		cp -v docker-php-source "$version/$target/"
 		dockerfiles+=( "$version/$target/Dockerfile" )

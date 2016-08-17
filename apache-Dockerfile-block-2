@@ -1,6 +1,9 @@
+
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+COPY docker-entrypoint.d /docker-entrypoint.d
+
 COPY apache2-foreground /usr/local/bin/
 WORKDIR /var/www/html
 
 EXPOSE 80
-ENTRYPOINT [ "sh", "-c", "usermod --non-unique --uid ${RUN_AS_UID:-33} www-data && chown -R www-data /run/apache2 /run/lock/apache2 /var/cache/apache2/mod_cache_disk /var/log/apache2 && exec apache2-foreground" ]
-
+ENTRYPOINT ["/docker-entrypoint.sh", "apache2-foreground"]
