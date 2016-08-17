@@ -6,4 +6,7 @@ COPY apache2-foreground /usr/local/bin/
 WORKDIR /var/www/html
 
 EXPOSE 80
-ENTRYPOINT ["/docker-entrypoint.sh", "apache2-foreground"]
+
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
+
+CMD [ "apache2-foreground" ]
