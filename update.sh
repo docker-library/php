@@ -6,7 +6,7 @@ declare -A gpgKeys=(
 	[5.6]='0BD78B5F97500D450838F95DFE857D9A90D90EC1 6E4F6AB321FDC07F2C332E3AC2BF0BC433CFC8B3'
 	[5.5]='0B96609E270F565C13292B24C13C70B87267B52D 0BD78B5F97500D450838F95DFE857D9A90D90EC1 F38252826ACD957EF380D39F2F7956BC5DA04B5D'
 )
-# see http://php.net/downloads.php
+# see https://secure.php.net/downloads.php
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
@@ -70,7 +70,7 @@ for version in "${versions[@]}"; do
 	gpgKey="${gpgKeys[$version]}"
 	if [ -z "$gpgKey" ]; then
 		echo >&2 "ERROR: missing GPG key fingerprint for $version"
-		echo >&2 "  try looking on http://php.net/downloads.php#gpg-$version"
+		echo >&2 "  try looking on https://secure.php.net/downloads.php#gpg-$version"
 		exit 1
 	fi
 	
