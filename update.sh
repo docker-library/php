@@ -2,6 +2,10 @@
 set -e
 
 declare -A gpgKeys=(
+	# https://wiki.php.net/todo/php71
+	# davey
+	[7.1]='A917B1ECDA84AEC2B568FED6F50ABC807BD5DCD0'
+
 	# https://wiki.php.net/todo/php70
 	# ab
 	[7.0]='1A4E8B7277C42E53DBA9C7B9BCAA30EA9C0D5763'
