@@ -40,8 +40,8 @@ ENV PHP_EXTRA_CONFIGURE_ARGS --enable-fpm --with-fpm-user=www-data --with-fpm-gr
 
 ENV GPG_KEYS A917B1ECDA84AEC2B568FED6F50ABC807BD5DCD0
 
-ENV PHP_VERSION 7.1.0RC1
-ENV PHP_FILENAME php-7.1.0RC1.tar.xz
+ENV PHP_VERSION 7.1.0RC2
+ENV PHP_FILENAME php-7.1.0RC2.tar.xz
 
 RUN set -xe \
 	&& apk add --no-cache --virtual .fetch-deps \
