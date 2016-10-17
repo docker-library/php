@@ -40,24 +40,39 @@ RUN mkdir -p $PHP_INI_DIR/conf.d
 ENV GPG_KEYS 1A4E8B7277C42E53DBA9C7B9BCAA30EA9C0D5763
 
 ENV PHP_VERSION 7.0.12
-ENV PHP_FILENAME php-7.0.12.tar.xz
-ENV PHP_SHA256 f3d6c49e1c242e5995dec15e503fde996c327eb86cd7ec45c690e93c971b83ff
+ENV PHP_URL="https://secure.php.net/get/php-7.0.12.tar.xz/from/this/mirror" PHP_ASC_URL="https://secure.php.net/get/php-7.0.12.tar.xz.asc/from/this/mirror"
+ENV PHP_SHA256="f3d6c49e1c242e5995dec15e503fde996c327eb86cd7ec45c690e93c971b83ff" PHP_MD5="bdcc4dbdac90c2a39422786653059f70"
 
-RUN set -xe \
-	&& apk add --no-cache --virtual .fetch-deps \
+RUN set -xe; \
+	\
+	apk add --no-cache --virtual .fetch-deps \
 		gnupg \
-	&& mkdir -p /usr/src \
-	&& cd /usr/src \
-	&& curl -fSL "https://secure.php.net/get/$PHP_FILENAME/from/this/mirror" -o php.tar.xz \
-	&& echo "$PHP_SHA256 *php.tar.xz" | sha256sum -c - \
-	&& curl -fSL "https://secure.php.net/get/$PHP_FILENAME.asc/from/this/mirror" -o php.tar.xz.asc \
-	&& export GNUPGHOME="$(mktemp -d)" \
-	&& for key in $GPG_KEYS; do \
-		gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
-	done \
-	&& gpg --batch --verify php.tar.xz.asc php.tar.xz \
-	&& rm -r "$GNUPGHOME" \
-	&& apk del .fetch-deps
+		openssl \
+	; \
+	\
+	mkdir -p /usr/src; \
+	cd /usr/src; \
+	\
+	wget -O php.tar.xz "$PHP_URL"; \
+	\
+	if [ -n "$PHP_SHA256" ]; then \
+		echo "$PHP_SHA256 *php.tar.xz" | sha256sum -c -; \
+	fi; \
+	if [ -n "$PHP_MD5" ]; then \
+		echo "$PHP_MD5 *php.tar.xz" | md5sum -c -; \
+	fi; \
+	\
+	if [ -n "$PHP_ASC_URL" ]; then \
+		wget -O php.tar.xz.asc "$PHP_ASC_URL"; \
+		export GNUPGHOME="$(mktemp -d)"; \
+		for key in $GPG_KEYS; do \
+			gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
+		done; \
+		gpg --batch --verify php.tar.xz.asc php.tar.xz; \
+		rm -r "$GNUPGHOME"; \
+	fi; \
+	\
+	apk del .fetch-deps
 
 COPY docker-php-source /usr/local/bin/
 
@@ -91,7 +106,7 @@ RUN set -xe \
 		--with-zlib \
 		\
 		$PHP_EXTRA_CONFIGURE_ARGS \
-	&& make -j"$(getconf _NPROCESSORS_ONLN)" \
+	&& make -j "$(getconf _NPROCESSORS_ONLN)" \
 	&& make install \
 	&& { find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; } \
 	&& make clean \

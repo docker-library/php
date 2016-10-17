@@ -40,22 +40,39 @@ RUN mkdir -p $PHP_INI_DIR/conf.d
 ENV GPG_KEYS A917B1ECDA84AEC2B568FED6F50ABC807BD5DCD0
 
 ENV PHP_VERSION 7.1.0RC3
-ENV PHP_FILENAME php-7.1.0RC3.tar.xz
+ENV PHP_URL="http://downloads.php.net/~davey/php-7.1.0RC3.tar.xz" PHP_ASC_URL=""
+ENV PHP_SHA256="" PHP_MD5="2bfa0ad51de4fce87d0175d655f6bf69"
 
-RUN set -xe \
-	&& apk add --no-cache --virtual .fetch-deps \
+RUN set -xe; \
+	\
+	apk add --no-cache --virtual .fetch-deps \
 		gnupg \
-	&& mkdir -p /usr/src \
-	&& cd /usr/src \
-	&& curl -fSL "https://downloads.php.net/~davey/$PHP_FILENAME" -o php.tar.xz \
-	&& curl -fSL "https://downloads.php.net/~davey/$PHP_FILENAME.asc" -o php.tar.xz.asc \
-	&& export GNUPGHOME="$(mktemp -d)" \
-	&& for key in $GPG_KEYS; do \
-		gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
-	done \
-	&& gpg --batch --verify php.tar.xz.asc php.tar.xz \
-	&& rm -r "$GNUPGHOME" \
-	&& apk del .fetch-deps
+		openssl \
+	; \
+	\
+	mkdir -p /usr/src; \
+	cd /usr/src; \
+	\
+	wget -O php.tar.xz "$PHP_URL"; \
+	\
+	if [ -n "$PHP_SHA256" ]; then \
+		echo "$PHP_SHA256 *php.tar.xz" | sha256sum -c -; \
+	fi; \
+	if [ -n "$PHP_MD5" ]; then \
+		echo "$PHP_MD5 *php.tar.xz" | md5sum -c -; \
+	fi; \
+	\
+	if [ -n "$PHP_ASC_URL" ]; then \
+		wget -O php.tar.xz.asc "$PHP_ASC_URL"; \
+		export GNUPGHOME="$(mktemp -d)"; \
+		for key in $GPG_KEYS; do \
+			gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
+		done; \
+		gpg --batch --verify php.tar.xz.asc php.tar.xz; \
+		rm -r "$GNUPGHOME"; \
+	fi; \
+	\
+	apk del .fetch-deps
 
 COPY docker-php-source /usr/local/bin/
 
@@ -89,7 +106,7 @@ RUN set -xe \
 		--with-zlib \
 		\
 		$PHP_EXTRA_CONFIGURE_ARGS \
-	&& make -j"$(getconf _NPROCESSORS_ONLN)" \
+	&& make -j "$(getconf _NPROCESSORS_ONLN)" \
 	&& make install \
 	&& { find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; } \
 	&& make clean \
