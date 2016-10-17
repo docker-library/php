@@ -35,7 +35,7 @@ RUN mkdir -p $PHP_INI_DIR/conf.d
 ENV GPG_KEYS A917B1ECDA84AEC2B568FED6F50ABC807BD5DCD0
 
 ENV PHP_VERSION 7.1.0RC3
-ENV PHP_URL="http://downloads.php.net/~davey/php-7.1.0RC3.tar.xz" PHP_ASC_URL=""
+ENV PHP_URL="http://downloads.php.net/~davey/php-7.1.0RC3.tar.xz" PHP_ASC_URL="http://downloads.php.net/~davey/php-7.1.0RC3.tar.xz.asc"
 ENV PHP_SHA256="" PHP_MD5="2bfa0ad51de4fce87d0175d655f6bf69"
 
 RUN set -xe; \

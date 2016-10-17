@@ -98,6 +98,11 @@ for version in "${versions[@]}"; do
 		exit 1
 	fi
 
+	# if we don't have a .asc URL, let's see if we can figure one out :)
+	if [ -z "$ascUrl" ] && wget -q --spider "$url.asc"; then
+		ascUrl="$url.asc"
+	fi
+
 	dockerfiles=()
 
 	{ generated_warning; cat Dockerfile-debian.template; } > "$version/Dockerfile"
