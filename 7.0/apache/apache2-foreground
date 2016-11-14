@@ -10,8 +10,17 @@ if test -f "$APACHE_ENVVARS"; then
 	. "$APACHE_ENVVARS"
 fi
 
-# Apache gets grumpy about PID files pre-existing
 : "${APACHE_PID_FILE:=${APACHE_RUN_DIR:=/var/run/apache2}/apache2.pid}"
+
+# setup directories and permissions
+mkdir -p /run/lock
+for dir in ${APACHE_RUN_DIR} ${APACHE_LOCK_DIR}
+do
+	mkdir -p ${dir}
+	chown -R "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$dir"
+done
+
+# Apache gets grumpy about PID files pre-existing
 rm -f "$APACHE_PID_FILE"
 
 exec apache2 -DFOREGROUND "$@"
