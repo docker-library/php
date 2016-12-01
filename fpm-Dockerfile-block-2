@@ -7,7 +7,7 @@ RUN set -ex \
 		sed 's!=NONE/!=!g' php-fpm.conf.default | tee php-fpm.conf > /dev/null; \
 		cp php-fpm.d/www.conf.default php-fpm.d/www.conf; \
 	else \
-		# PHP 5.x don't use "include=" by default, so we'll create our own simple config that mimics PHP 7+ for consistency
+		# PHP 5.x doesn't use "include=" by default, so we'll create our own simple config that mimics PHP 7+ for consistency
 		mkdir php-fpm.d; \
 		cp php-fpm.conf.default php-fpm.d/www.conf; \
 		{ \
