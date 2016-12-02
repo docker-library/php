@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM debian:jessie
+FROM alpine:3.4
 
 # persistent / runtime deps
 ENV PHPIZE_DEPS \
@@ -14,17 +14,22 @@ ENV PHPIZE_DEPS \
 		gcc \
 		libc-dev \
 		make \
-		pkg-config \
+		pkgconf \
 		re2c
-RUN apt-get update && apt-get install -y \
-		$PHPIZE_DEPS \
+RUN apk add --no-cache --virtual .persistent-deps \
 		ca-certificates \
 		curl \
-		libedit2 \
-		libsqlite3-0 \
-		libxml2 \
-		xz-utils \
-	--no-install-recommends && rm -r /var/lib/apt/lists/*
+		tar \
+		xz
+
+# ensure www-data user exists
+RUN set -x \
+	&& addgroup -g 82 -S www-data \
+	&& adduser -u 82 -D -S -G www-data www-data
+# 82 is the standard uid/gid for "www-data" in Alpine
+# http://git.alpinelinux.org/cgit/aports/tree/main/apache2/apache2.pre-install?h=v3.3.2
+# http://git.alpinelinux.org/cgit/aports/tree/main/lighttpd/lighttpd.pre-install?h=v3.3.2
+# http://git.alpinelinux.org/cgit/aports/tree/main/nginx-initscripts/nginx-initscripts.pre-install?h=v3.3.2
 
 ENV PHP_INI_DIR /usr/local/etc/php
 RUN mkdir -p $PHP_INI_DIR/conf.d
@@ -35,18 +40,16 @@ ENV PHP_EXTRA_CONFIGURE_ARGS --enable-fpm --with-fpm-user=www-data --with-fpm-gr
 
 ENV GPG_KEYS A917B1ECDA84AEC2B568FED6F50ABC807BD5DCD0
 
-ENV PHP_VERSION 7.1.0RC6
-ENV PHP_URL="http://downloads.php.net/~krakjoe/php-7.1.0RC6.tar.xz" PHP_ASC_URL=""
-ENV PHP_SHA256="3812b54ff84b32cb3750994088161e9c6455000499f4716b635b7c1e64a75a2c" PHP_MD5="26bb2d5dc690b3463a0fea3d71fcf935"
+ENV PHP_VERSION 7.1.0
+ENV PHP_URL="https://secure.php.net/get/php-7.1.0.tar.xz/from/this/mirror" PHP_ASC_URL="https://secure.php.net/get/php-7.1.0.tar.xz.asc/from/this/mirror"
+ENV PHP_SHA256="a810b3f29c21407c24caa88f50649320d20ba6892ae1923132598b8a0ca145b6" PHP_MD5="cf36039303c47f493100afea522a8f53"
 
 RUN set -xe; \
 	\
-	fetchDeps=' \
-		wget \
-	'; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends $fetchDeps; \
-	rm -rf /var/lib/apt/lists/*; \
+	apk add --no-cache --virtual .fetch-deps \
+		gnupg \
+		openssl \
+	; \
 	\
 	mkdir -p /usr/src; \
 	cd /usr/src; \
@@ -70,20 +73,18 @@ RUN set -xe; \
 		rm -r "$GNUPGHOME"; \
 	fi; \
 	\
-	apt-get purge -y --auto-remove $fetchDeps
+	apk del .fetch-deps
 
 COPY docker-php-source /usr/local/bin/
 
 RUN set -xe \
-	&& buildDeps=" \
-		$PHP_EXTRA_BUILD_DEPS \
-		libcurl4-openssl-dev \
+	&& apk add --no-cache --virtual .build-deps \
+		$PHPIZE_DEPS \
+		curl-dev \
 		libedit-dev \
-		libsqlite3-dev \
-		libssl-dev \
 		libxml2-dev \
-	" \
-	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
+		openssl-dev \
+		sqlite-dev \
 	\
 	&& docker-php-source extract \
 	&& cd /usr/src/php \
@@ -106,13 +107,22 @@ RUN set -xe \
 		--with-zlib \
 		\
 		$PHP_EXTRA_CONFIGURE_ARGS \
-	&& make -j "$(nproc)" \
+	&& make -j "$(getconf _NPROCESSORS_ONLN)" \
 	&& make install \
-	&& { find /usr/local/bin /usr/local/sbin -type f -executable -exec strip --strip-all '{}' + || true; } \
+	&& { find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; } \
 	&& make clean \
 	&& docker-php-source delete \
 	\
-	&& apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps
+	&& runDeps="$( \
+		scanelf --needed --nobanner --recursive /usr/local \
+			| awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+			| sort -u \
+			| xargs -r apk info --installed \
+			| sort -u \
+	)" \
+	&& apk add --no-cache --virtual .php-rundeps $runDeps \
+	\
+	&& apk del .build-deps
 
 COPY docker-php-ext-* /usr/local/bin/
 
