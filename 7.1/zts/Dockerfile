@@ -35,9 +35,9 @@ ENV PHP_EXTRA_CONFIGURE_ARGS --enable-maintainer-zts
 
 ENV GPG_KEYS A917B1ECDA84AEC2B568FED6F50ABC807BD5DCD0
 
-ENV PHP_VERSION 7.1.0RC6
-ENV PHP_URL="http://downloads.php.net/~krakjoe/php-7.1.0RC6.tar.xz" PHP_ASC_URL=""
-ENV PHP_SHA256="3812b54ff84b32cb3750994088161e9c6455000499f4716b635b7c1e64a75a2c" PHP_MD5="26bb2d5dc690b3463a0fea3d71fcf935"
+ENV PHP_VERSION 7.1.0
+ENV PHP_URL="https://secure.php.net/get/php-7.1.0.tar.xz/from/this/mirror" PHP_ASC_URL="https://secure.php.net/get/php-7.1.0.tar.xz.asc/from/this/mirror"
+ENV PHP_SHA256="a810b3f29c21407c24caa88f50649320d20ba6892ae1923132598b8a0ca145b6" PHP_MD5="cf36039303c47f493100afea522a8f53"
 
 RUN set -xe; \
 	\
