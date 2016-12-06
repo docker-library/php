@@ -89,6 +89,7 @@ if [ "$pm" = 'apk' ]; then
 	fi
 fi
 
+popDir="$PWD"
 for ext in $exts; do
 		cd "$ext"
 		[ -e Makefile ] || docker-php-ext-configure "$ext"
@@ -100,7 +101,7 @@ for ext in $exts; do
 			-exec basename '{}' ';' \
 				| xargs -r docker-php-ext-enable
 		make -j"$j" clean
-		cd ..
+		cd "$popDir"
 done
 
 if [ "$pm" = 'apk' ] && [ -n "$apkDel" ]; then
