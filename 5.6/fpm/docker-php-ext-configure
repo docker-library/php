@@ -10,9 +10,10 @@ if [ -z "$srcExists" ]; then
 	touch /usr/src/php/.docker-delete-me
 fi
 
+cd /usr/src/php/ext
+
 ext="$1"
-extDir="/usr/src/php/ext/$ext"
-if [ -z "$ext" ] || [ ! -d "$extDir" ]; then
+if [ -z "$ext" ] || [ ! -d "$ext" ]; then
 	echo >&2 "usage: $0 ext-name [configure flags]"
 	echo >&2 "   ie: $0 gd --with-jpeg-dir=/usr/local/something"
 	echo >&2
@@ -46,6 +47,6 @@ if [ "$pm" = 'apk' ]; then
 fi
 
 set -x
-cd "$extDir"
+cd "$ext"
 phpize
 ./configure "$@"
