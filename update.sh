@@ -20,7 +20,7 @@ cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 versions=( "$@" )
 if [ ${#versions[@]} -eq 0 ]; then
-	versions=( */ )
+	versions=( 5.6 7.0 )
 fi
 versions=( "${versions[@]%/}" )
 
@@ -107,13 +107,15 @@ for version in "${versions[@]}"; do
 
 	{ generated_warning; cat Dockerfile-debian.template; } > "$version/Dockerfile"
 	cp -v docker-php-ext-* "$version/"
-	cp -v docker-php-source "$version/"
+	cp -v docker-php-source debian-only/php-ext-deps.tsv "$version/"
+  cat debian-only/docker-php-ext-install-helper.sh docker-php-ext-install > "$version/docker-php-ext-install"
 	dockerfiles+=( "$version/Dockerfile" )
 
 	if [ -d "$version/alpine" ]; then
 		{ generated_warning; cat Dockerfile-alpine.template; } > "$version/alpine/Dockerfile"
 		cp -v docker-php-ext-* "$version/alpine/"
-		cp -v docker-php-source "$version/alpine/"
+		cp -v docker-php-source alpine-only/php-ext-deps.tsv "$version/alpine/"
+    cat alpine-only/docker-php-ext-install-helper.sh docker-php-ext-install > "$version/alpine/docker-php-ext-install"
 		dockerfiles+=( "$version/alpine/Dockerfile" )
 	fi
 
@@ -140,6 +142,13 @@ for version in "${versions[@]}"; do
 		' "$base" > "$version/$target/Dockerfile"
 		cp -v docker-php-ext-* "$version/$target/"
 		cp -v docker-php-source "$version/$target/"
+    if [[ "$variant" == 'alpine' ]]; then
+      cp -v alpine-only/php-ext-deps.tsv "$version/$target"
+      cat alpine-only/docker-php-ext-install-helper.sh docker-php-ext-install > "$version/$target/docker-php-ext-install"
+    else
+      cp -v debian-only/php-ext-deps.tsv "$version/$target"
+      cat debian-only/docker-php-ext-install-helper.sh docker-php-ext-install > "$version/$target/docker-php-ext-install"
+    fi
 		dockerfiles+=( "$version/$target/Dockerfile" )
 	done
 

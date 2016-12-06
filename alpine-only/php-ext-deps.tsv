@@ -1,0 +1,15 @@
+curl	curl-dev
+dom	libxml2-dev
+gd	freetype-dev
+gd	jpeg-dev
+gd	libpng-dev
+intl	icu-libs
+mcrypt	libmcrypt-dev
+simplexml	libxml2-dev
+soap	libxml2-dev
+xml	libxml2-dev
+xmlreader	libxml2-dev
+xmlrpc	libxml2-dev
+xmlwriter	libxml2-dev
+xsl	libxslt-dev
+zip	libzip-dev
