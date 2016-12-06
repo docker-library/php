@@ -91,17 +91,17 @@ fi
 
 popDir="$PWD"
 for ext in $exts; do
-		cd "$ext"
-		[ -e Makefile ] || docker-php-ext-configure "$ext"
-		make -j"$j"
-		make -j"$j" install
-		find modules \
-			-maxdepth 1 \
-			-name '*.so' \
-			-exec basename '{}' ';' \
-				| xargs -r docker-php-ext-enable
-		make -j"$j" clean
-		cd "$popDir"
+	cd "$ext"
+	[ -e Makefile ] || docker-php-ext-configure "$ext"
+	make -j"$j"
+	make -j"$j" install
+	find modules \
+		-maxdepth 1 \
+		-name '*.so' \
+		-exec basename '{}' ';' \
+			| xargs -r docker-php-ext-enable
+	make -j"$j" clean
+	cd "$popDir"
 done
 
 if [ "$pm" = 'apk' ] && [ -n "$apkDel" ]; then
