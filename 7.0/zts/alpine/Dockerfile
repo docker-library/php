@@ -50,9 +50,9 @@ ENV LDFLAGS="-Wl,-O1 -Wl,--hash-style=both"
 
 ENV GPG_KEYS 1A4E8B7277C42E53DBA9C7B9BCAA30EA9C0D5763
 
-ENV PHP_VERSION 7.0.13
-ENV PHP_URL="https://secure.php.net/get/php-7.0.13.tar.xz/from/this/mirror" PHP_ASC_URL="https://secure.php.net/get/php-7.0.13.tar.xz.asc/from/this/mirror"
-ENV PHP_SHA256="357ba7f93975d7d836abed0852dc3ed96a988af539e87750613294cbee82f1bf" PHP_MD5="eb117bf1d1efc99c522f132b265a3402"
+ENV PHP_VERSION 7.0.14
+ENV PHP_URL="https://secure.php.net/get/php-7.0.14.tar.xz/from/this/mirror" PHP_ASC_URL="https://secure.php.net/get/php-7.0.14.tar.xz.asc/from/this/mirror"
+ENV PHP_SHA256="0f1dff6392a1cc2ed126b9695f580a2ed77eb09d2c23b41cabfb41e6f27a8c89" PHP_MD5="a51f1d4f03f4e4c745856e9f76fca476"
 
 RUN set -xe; \
 	\
