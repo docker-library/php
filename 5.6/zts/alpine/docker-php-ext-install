@@ -1,6 +1,15 @@
 #!/bin/sh
 set -e
 
+srcExists=
+if [ -d /usr/src/php ]; then
+	srcExists=1
+fi
+docker-php-source extract
+if [ -z "$srcExists" ]; then
+	touch /usr/src/php/.docker-delete-me
+fi
+
 cd /usr/src/php/ext
 
 usage() {
@@ -12,7 +21,15 @@ usage() {
 	echo 'if custom ./configure arguments are necessary, see docker-php-ext-configure'
 	echo
 	echo 'Possible values for ext-name:'
-	echo $(find /usr/src/php/ext -mindepth 2 -maxdepth 2 -type f -name 'config.m4' | cut -d/ -f6 | sort)
+	find . \
+			-mindepth 2 \
+			-maxdepth 2 \
+			-type f \
+			-name 'config.m4' \
+		| xargs -n1 dirname \
+		| xargs -n1 basename \
+		| sort \
+		| xargs
 }
 
 opts="$(getopt -o 'h?j:' --long 'help,jobs:' -- "$@" || { usage >&2 && false; })"
@@ -42,7 +59,7 @@ for ext; do
 		continue
 	fi
 	if [ ! -d "$ext" ]; then
-		echo >&2 "error: $(pwd -P)/$ext does not exist"
+		echo >&2 "error: $PWD/$ext does not exist"
 		echo >&2
 		usage >&2
 		exit 1
@@ -72,21 +89,25 @@ if [ "$pm" = 'apk' ]; then
 	fi
 fi
 
+popDir="$PWD"
 for ext in $exts; do
-	(
-		cd "$ext"
-		[ -e Makefile ] || docker-php-ext-configure "$ext"
-		make -j"$j"
-		make -j"$j" install
-		find modules \
-			-maxdepth 1 \
-			-name '*.so' \
-			-exec basename '{}' ';' \
-				| xargs -r docker-php-ext-enable
-		make -j"$j" clean
-	)
+	cd "$ext"
+	[ -e Makefile ] || docker-php-ext-configure "$ext"
+	make -j"$j"
+	make -j"$j" install
+	find modules \
+		-maxdepth 1 \
+		-name '*.so' \
+		-exec basename '{}' ';' \
+			| xargs -r docker-php-ext-enable
+	make -j"$j" clean
+	cd "$popDir"
 done
 
 if [ "$pm" = 'apk' ] && [ -n "$apkDel" ]; then
 	apk del $apkDel
+fi
+
+if [ -e /usr/src/php/.docker-delete-me ]; then
+	docker-php-source delete
 fi
