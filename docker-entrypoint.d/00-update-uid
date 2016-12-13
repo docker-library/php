@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# current www-data UID
+CURRENT_UID=`id -u www-data`
+WANTED_UID=${RUN_AS_UID:-33}
+
+# check if UID need to be updated
+if [ $CURRENT_UID -ne $WANTED_UID ]; then
+    echo "Updating www-data UID to $WANTED_UID"
+    usermod --non-unique --uid $WANTED_UID www-data
+    chown -R www-data /run/apache2 /run/lock/apache2 /var/cache/apache2/mod_cache_disk /var/log/apache2
+fi
