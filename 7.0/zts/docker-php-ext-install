@@ -1,6 +1,12 @@
 #!/bin/sh
 set -e
 
+# prefer user supplied CFLAGS, but default to our PHP_CFLAGS
+: ${CFLAGS:=$PHP_CFLAGS}
+: ${CPPFLAGS:=$PHP_CPPFLAGS}
+: ${LDFLAGS:=$PHP_LDFLAGS}
+export CFLAGS CPPFLAGS LDFLAGS
+
 srcExists=
 if [ -d /usr/src/php ]; then
 	srcExists=1
