@@ -107,12 +107,14 @@ for version in "${versions[@]}"; do
 
 	{ generated_warning; cat Dockerfile-debian.template; } > "$version/Dockerfile"
 	cp -v docker-php-ext-* "$version/"
+	cp -v docker-php-composer-install "$version/"
 	cp -v docker-php-source "$version/"
 	dockerfiles+=( "$version/Dockerfile" )
 
 	if [ -d "$version/alpine" ]; then
 		{ generated_warning; cat Dockerfile-alpine.template; } > "$version/alpine/Dockerfile"
 		cp -v docker-php-ext-* "$version/alpine/"
+		cp -v docker-php-composer-install "$version/alpine/"
 		cp -v docker-php-source "$version/alpine/"
 		dockerfiles+=( "$version/alpine/Dockerfile" )
 	fi
@@ -139,6 +141,7 @@ for version in "${versions[@]}"; do
 			ia && ac == 1 { system("cat '$variant'-Dockerfile-block-" ab) }
 		' "$base" > "$version/$target/Dockerfile"
 		cp -v docker-php-ext-* "$version/$target/"
+		cp -v docker-php-composer-install "$version/$target/"
 		cp -v docker-php-source "$version/$target/"
 		dockerfiles+=( "$version/$target/Dockerfile" )
 	done
