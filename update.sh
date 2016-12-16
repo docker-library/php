@@ -106,14 +106,20 @@ for version in "${versions[@]}"; do
 	dockerfiles=()
 
 	{ generated_warning; cat Dockerfile-debian.template; } > "$version/Dockerfile"
-	cp -v docker-php-ext-* "$version/"
-	cp -v docker-php-source "$version/"
+	cp -v \
+		docker-php-entrypoint \
+		docker-php-ext-* \
+		docker-php-source \
+		"$version/"
 	dockerfiles+=( "$version/Dockerfile" )
 
 	if [ -d "$version/alpine" ]; then
 		{ generated_warning; cat Dockerfile-alpine.template; } > "$version/alpine/Dockerfile"
-		cp -v docker-php-ext-* "$version/alpine/"
-		cp -v docker-php-source "$version/alpine/"
+		cp -v \
+			docker-php-entrypoint \
+			docker-php-ext-* \
+			docker-php-source \
+			"$version/alpine/"
 		dockerfiles+=( "$version/alpine/Dockerfile" )
 	fi
 
@@ -138,8 +144,11 @@ for version in "${versions[@]}"; do
 			ia { ac++ }
 			ia && ac == 1 { system("cat '$variant'-Dockerfile-block-" ab) }
 		' "$base" > "$version/$target/Dockerfile"
-		cp -v docker-php-ext-* "$version/$target/"
-		cp -v docker-php-source "$version/$target/"
+		cp -v \
+			docker-php-entrypoint \
+			docker-php-ext-* \
+			docker-php-source \
+			"$version/$target/"
 		dockerfiles+=( "$version/$target/Dockerfile" )
 	done
 
@@ -154,6 +163,13 @@ for version in "${versions[@]}"; do
 			-e 's!%%PHP_MD5%%!'"$md5"'!' \
 			"${dockerfiles[@]}"
 	)
+
+	# update entrypoint commands
+	for dockerfile in "${dockerfiles[@]}"; do
+		cmd="$(awk '$1 == "CMD" { $1 = ""; print }' "$dockerfile" | tail -1 | jq --raw-output '.[0]')"
+		entrypoint="$(dirname "$dockerfile")/docker-php-entrypoint"
+		sed -i 's! php ! '"$cmd"' !g' "$entrypoint"
+	done
 
 	newTravisEnv=
 	for dockerfile in "${dockerfiles[@]}"; do
