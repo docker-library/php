@@ -57,7 +57,7 @@ RUN set -xe; \
 	\
 	apk add --no-cache --virtual .fetch-deps \
 		gnupg \
-		openssl \
+		libressl \
 	; \
 	\
 	mkdir -p /usr/src; \
@@ -91,8 +91,8 @@ RUN set -xe \
 		$PHPIZE_DEPS \
 		curl-dev \
 		libedit-dev \
+		libressl-dev \
 		libxml2-dev \
-		openssl-dev \
 		sqlite-dev \
 	\
 	&& export CFLAGS="$PHP_CFLAGS" \
