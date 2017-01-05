@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.5
+FROM alpine:3.4
 
 # persistent / runtime deps
 ENV PHPIZE_DEPS \
@@ -58,7 +58,7 @@ RUN set -xe; \
 	\
 	apk add --no-cache --virtual .fetch-deps \
 		gnupg \
-		libressl \
+		openssl \
 	; \
 	\
 	mkdir -p /usr/src; \
@@ -92,8 +92,8 @@ RUN set -xe \
 		$PHPIZE_DEPS \
 		curl-dev \
 		libedit-dev \
-		libressl-dev \
 		libxml2-dev \
+		openssl-dev \
 		sqlite-dev \
 	\
 	&& export CFLAGS="$PHP_CFLAGS" \
