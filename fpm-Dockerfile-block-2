@@ -1,4 +1,5 @@
 WORKDIR /var/www/html
+VOLUME /usr/local/etc/php/conf.d
 
 RUN set -ex \
 	&& cd /usr/local/etc \
