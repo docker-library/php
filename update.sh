@@ -4,7 +4,7 @@ set -e
 declare -A gpgKeys=(
 	# https://wiki.php.net/todo/php71
 	# davey
-	[7.1]='A917B1ECDA84AEC2B568FED6F50ABC807BD5DCD0'
+	[7.1]='528995BFEDFBA7191D46839EF9BA0ADA31CBD89E'
 
 	# https://wiki.php.net/todo/php70
 	# ab
