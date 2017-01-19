@@ -48,7 +48,7 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2"
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"
 
-ENV GPG_KEYS A917B1ECDA84AEC2B568FED6F50ABC807BD5DCD0
+ENV GPG_KEYS 528995BFEDFBA7191D46839EF9BA0ADA31CBD89E
 
 ENV PHP_VERSION 7.1.1
 ENV PHP_URL="https://secure.php.net/get/php-7.1.1.tar.xz/from/this/mirror" PHP_ASC_URL="https://secure.php.net/get/php-7.1.1.tar.xz.asc/from/this/mirror"
