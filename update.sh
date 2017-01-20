@@ -3,15 +3,18 @@ set -e
 
 declare -A gpgKeys=(
 	# https://wiki.php.net/todo/php71
-	# davey
-	[7.1]='A917B1ECDA84AEC2B568FED6F50ABC807BD5DCD0'
+	# davey & krakjoe
+	# https://secure.php.net/downloads.php#gpg-7.1
+	[7.1]='A917B1ECDA84AEC2B568FED6F50ABC807BD5DCD0 528995BFEDFBA7191D46839EF9BA0ADA31CBD89E'
 
 	# https://wiki.php.net/todo/php70
-	# ab
-	[7.0]='1A4E8B7277C42E53DBA9C7B9BCAA30EA9C0D5763'
+	# ab & tyrael
+	# https://secure.php.net/downloads.php#gpg-7.0
+	[7.0]='1A4E8B7277C42E53DBA9C7B9BCAA30EA9C0D5763 6E4F6AB321FDC07F2C332E3AC2BF0BC433CFC8B3'
 
 	# https://wiki.php.net/todo/php56
 	# jpauli & tyrael
+	# https://secure.php.net/downloads.php#gpg-5.6
 	[5.6]='0BD78B5F97500D450838F95DFE857D9A90D90EC1 6E4F6AB321FDC07F2C332E3AC2BF0BC433CFC8B3'
 )
 # see https://secure.php.net/downloads.php
