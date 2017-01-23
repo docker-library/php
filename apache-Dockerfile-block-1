@@ -49,6 +49,8 @@ RUN { \
 		echo '\tOptions -Indexes'; \
 		echo '\tAllowOverride All'; \
 		echo '</Directory>'; \
+		echo; \
+		echo 'SetEnvIf x-forwarded-proto https HTTPS=on'; \
 	} | tee "$APACHE_CONFDIR/conf-available/docker-php.conf" \
 	&& a2enconf docker-php
 
