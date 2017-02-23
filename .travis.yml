@@ -9,8 +9,16 @@ env:
   - VERSION=7.1 VARIANT=apache
   - VERSION=7.1 VARIANT=fpm
   - VERSION=7.1 VARIANT=fpm/alpine
+  - VERSION=7.1 VARIANT=fpm
+  - VERSION=7.1 VARIANT=fpm/centos
+  - VERSION=7.1 VARIANT=fpm
+  - VERSION=7.1 VARIANT=fpm/amazonlinux
   - VERSION=7.1 VARIANT=zts
   - VERSION=7.1 VARIANT=zts/alpine
+  - VERSION=7.1 VARIANT=zts
+  - VERSION=7.1 VARIANT=zts/centos
+  - VERSION=7.1 VARIANT=zts
+  - VERSION=7.1 VARIANT=zts/amazonlinux
   - VERSION=7.0 VARIANT=
   - VERSION=7.0 VARIANT=alpine
   - VERSION=7.0 VARIANT=amazonlinux
@@ -18,8 +26,16 @@ env:
   - VERSION=7.0 VARIANT=apache
   - VERSION=7.0 VARIANT=fpm
   - VERSION=7.0 VARIANT=fpm/alpine
+  - VERSION=7.0 VARIANT=fpm
+  - VERSION=7.0 VARIANT=fpm/centos
+  - VERSION=7.0 VARIANT=fpm
+  - VERSION=7.0 VARIANT=fpm/amazonlinux
   - VERSION=7.0 VARIANT=zts
   - VERSION=7.0 VARIANT=zts/alpine
+  - VERSION=7.0 VARIANT=zts
+  - VERSION=7.0 VARIANT=zts/centos
+  - VERSION=7.0 VARIANT=zts
+  - VERSION=7.0 VARIANT=zts/amazonlinux
   - VERSION=5.6 VARIANT=
   - VERSION=5.6 VARIANT=alpine
   - VERSION=5.6 VARIANT=amazonlinux
@@ -27,8 +43,16 @@ env:
   - VERSION=5.6 VARIANT=apache
   - VERSION=5.6 VARIANT=fpm
   - VERSION=5.6 VARIANT=fpm/alpine
+  - VERSION=5.6 VARIANT=fpm
+  - VERSION=5.6 VARIANT=fpm/centos
+  - VERSION=5.6 VARIANT=fpm
+  - VERSION=5.6 VARIANT=fpm/amazonlinux
   - VERSION=5.6 VARIANT=zts
   - VERSION=5.6 VARIANT=zts/alpine
+  - VERSION=5.6 VARIANT=zts
+  - VERSION=5.6 VARIANT=zts/centos
+  - VERSION=5.6 VARIANT=zts
+  - VERSION=5.6 VARIANT=zts/amazonlinux
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images

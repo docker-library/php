@@ -149,7 +149,11 @@ for version in "${versions[@]}"; do
 	for target in \
 		apache \
 		fpm fpm/alpine \
+		fpm fpm/centos \
+		fpm fpm/amazonlinux \
 		zts zts/alpine \
+		zts zts/centos \
+		zts zts/amazonlinux \
 	; do
 		[ -d "$version/$target" ] || continue
 		base="$version/Dockerfile"
