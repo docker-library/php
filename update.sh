@@ -126,6 +126,26 @@ for version in "${versions[@]}"; do
 		dockerfiles+=( "$version/alpine/Dockerfile" )
 	fi
 
+    if [ -d "$version/amazonlinux" ]; then
+        { generated_warning; cat Dockerfile-amazonlinux.template; } > "$version/amazonlinux/Dockerfile"
+        cp -v \
+            docker-php-entrypoint \
+            docker-php-ext-* \
+            docker-php-source \
+            "$version/amazonlinux/"
+        dockerfiles+=( "$version/amazonlinux/Dockerfile" )
+    fi
+
+    if [ -d "$version/centos" ]; then
+        { generated_warning; cat Dockerfile-centos.template; } > "$version/centos/Dockerfile"
+        cp -v \
+            docker-php-entrypoint \
+            docker-php-ext-* \
+            docker-php-source \
+            "$version/centos/"
+        dockerfiles+=( "$version/centos/Dockerfile" )
+    fi
+
 	for target in \
 		apache \
 		fpm fpm/alpine \
