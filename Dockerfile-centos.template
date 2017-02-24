@@ -119,7 +119,6 @@ RUN set -xe \
 	&& docker-php-source delete \
 	\
 	&& yum -y grouperase “Development Tools”
-	#&& yum -y remove $buildDeps
 
 COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 
