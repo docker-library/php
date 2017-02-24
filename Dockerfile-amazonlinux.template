@@ -120,6 +120,8 @@ RUN set -xe \
 	\
 	&& yum -y remove $buildDeps
 
+RUN yum clean all
+
 COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 
 ENTRYPOINT ["docker-php-entrypoint"]
