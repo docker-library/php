@@ -54,5 +54,6 @@ fi
 
 set -x
 cd "$ext"
+[[ ! -f "config.m4" && -f "config0.m4" ]] && mv config0.m4 config.m4
 phpize
 ./configure "$@"
