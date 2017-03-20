@@ -119,7 +119,7 @@ RUN set -xe \
 		--with-zlib \
 		\
 		$PHP_EXTRA_CONFIGURE_ARGS \
-	&& make -j "$(getconf _NPROCESSORS_ONLN)" \
+	&& make -j"$(getconf _NPROCESSORS_ONLN)" \
 	&& make install \
 	&& { find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; } \
 	&& make clean \
