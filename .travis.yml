@@ -5,7 +5,9 @@ env:
   - VERSION=7.1 VARIANT=
   - VERSION=7.1 VARIANT=raspbian
   - VERSION=7.1 VARIANT=alpine
+  - VERSION=7.1 VARIANT=apache-alpine
   - VERSION=7.1 VARIANT=apache
+  - VERSION=7.1 VARIANT=apache/raspbian
   - VERSION=7.1 VARIANT=fpm
   - VERSION=7.1 VARIANT=fpm/alpine
   - VERSION=7.1 VARIANT=zts
@@ -13,7 +15,10 @@ env:
   - VERSION=7.0 VARIANT=
   - VERSION=7.0 VARIANT=raspbian
   - VERSION=7.0 VARIANT=alpine
+  - VERSION=7.0 VARIANT=apache-alpine
   - VERSION=7.0 VARIANT=apache
+  - VERSION=7.0 VARIANT=apache/apache-alpine
+  - VERSION=7.0 VARIANT=apache/raspbian
   - VERSION=7.0 VARIANT=fpm
   - VERSION=7.0 VARIANT=fpm/alpine
   - VERSION=7.0 VARIANT=zts
@@ -21,7 +26,10 @@ env:
   - VERSION=5.6 VARIANT=
   - VERSION=5.6 VARIANT=raspbian
   - VERSION=5.6 VARIANT=alpine
+  - VERSION=5.6 VARIANT=apache-alpine
   - VERSION=5.6 VARIANT=apache
+  - VERSION=5.6 VARIANT=apache/apache-alpine
+  - VERSION=5.6 VARIANT=apache/raspbian
   - VERSION=5.6 VARIANT=fpm
   - VERSION=5.6 VARIANT=fpm/alpine
   - VERSION=5.6 VARIANT=zts
