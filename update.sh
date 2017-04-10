@@ -116,6 +116,16 @@ for version in "${versions[@]}"; do
 		"$version/"
 	dockerfiles+=( "$version/Dockerfile" )
 
+	if [ -d "$version/raspbian" ]; then
+		{ generated_warning; cat Dockerfile-raspbian.template; } > "$version/raspbian/Dockerfile"
+		cp -v \
+			docker-php-entrypoint \
+			docker-php-ext-* \
+			docker-php-source \
+			"$version/raspbian/"
+		dockerfiles+=( "$version/raspbian/Dockerfile" )
+	fi
+
 	if [ -d "$version/alpine" ]; then
 		{ generated_warning; cat Dockerfile-alpine.template; } > "$version/alpine/Dockerfile"
 		cp -v \

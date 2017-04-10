@@ -3,6 +3,7 @@ services: docker
 
 env:
   - VERSION=7.1 VARIANT=
+  - VERSION=7.1 VARIANT=raspbian
   - VERSION=7.1 VARIANT=alpine
   - VERSION=7.1 VARIANT=apache
   - VERSION=7.1 VARIANT=fpm
@@ -10,6 +11,7 @@ env:
   - VERSION=7.1 VARIANT=zts
   - VERSION=7.1 VARIANT=zts/alpine
   - VERSION=7.0 VARIANT=
+  - VERSION=7.0 VARIANT=raspbian
   - VERSION=7.0 VARIANT=alpine
   - VERSION=7.0 VARIANT=apache
   - VERSION=7.0 VARIANT=fpm
@@ -17,6 +19,7 @@ env:
   - VERSION=7.0 VARIANT=zts
   - VERSION=7.0 VARIANT=zts/alpine
   - VERSION=5.6 VARIANT=
+  - VERSION=5.6 VARIANT=raspbian
   - VERSION=5.6 VARIANT=alpine
   - VERSION=5.6 VARIANT=apache
   - VERSION=5.6 VARIANT=fpm
