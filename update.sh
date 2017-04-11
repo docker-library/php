@@ -116,6 +116,16 @@ for version in "${versions[@]}"; do
 		"$version/"
 	dockerfiles+=( "$version/Dockerfile" )
 
+	if [ -d "$version/raspbian" ]; then
+		{ generated_warning; cat Dockerfile-raspbian.template; } > "$version/raspbian/Dockerfile"
+		cp -v \
+			docker-php-entrypoint \
+			docker-php-ext-* \
+			docker-php-source \
+			"$version/raspbian/"
+		dockerfiles+=( "$version/raspbian/Dockerfile" )
+	fi
+
 	if [ -d "$version/alpine" ]; then
 		{ generated_warning; cat Dockerfile-alpine.template; } > "$version/alpine/Dockerfile"
 		cp -v \
@@ -126,10 +136,20 @@ for version in "${versions[@]}"; do
 		dockerfiles+=( "$version/alpine/Dockerfile" )
 	fi
 
+	if [ -d "$version/apache-alpine" ]; then
+		{ generated_warning; cat Dockerfile-alpine.template; } > "$version/apache-alpine/Dockerfile"
+		cp -v \
+			docker-php-entrypoint \
+			docker-php-ext-* \
+			docker-php-source \
+			"$version/apache-alpine/"
+		dockerfiles+=( "$version/apache-alpine/Dockerfile" )
+	fi
+
 	for target in \
-		apache \
-		fpm fpm/alpine \
-		zts zts/alpine \
+		apache apache-alpine/apache-alpine apache/raspbian \
+		fpm fpm/alpine fpm/raspbian \
+		zts zts/alpine fpm/raspbian \
 	; do
 		[ -d "$version/$target" ] || continue
 		base="$version/Dockerfile"
