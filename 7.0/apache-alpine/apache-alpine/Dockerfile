@@ -102,6 +102,13 @@ RUN set -x \
 	\
     && { \
         echo ' '; \
+        echo '<IfModule php5_module>'; \
+        echo '    DirectoryIndex index.html index.htm index.php'; \
+        echo '    AddHandler application/x-httpd-php .php'; \
+        echo '    AddHandler application/x-httpd-php-source .phps'; \
+        echo '</IfModule>'; \
+
+        echo ' '; \
         echo '<IfModule php7_module>'; \
         echo '    DirectoryIndex index.html index.htm index.php'; \
         echo '    AddHandler application/x-httpd-php .php'; \
