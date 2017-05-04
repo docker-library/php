@@ -57,6 +57,23 @@ if [ -z "$modules" ]; then
 	exit 1
 fi
 
+pm='unknown'
+if [ -e /lib/apk/db/installed ]; then
+	pm='apk'
+fi
+
+apkDel=
+if [ "$pm" = 'apk' ]; then
+	if \
+		[ -n "$PHPIZE_DEPS" ] \
+		&& ! apk info --installed .phpize-deps > /dev/null \
+		&& ! apk info --installed .phpize-deps-configure > /dev/null \
+	; then
+		apk add --no-cache --virtual '.docker-php-ext-enable-deps' binutils
+		apkDel='.docker-php-ext-enable-deps'
+	fi
+fi
+
 for module in $modules; do
 	if nm -g "$module" | grep -q ' zend_extension_entry$'; then
 		# https://wiki.php.net/internals/extensions#loading_zend_extensions
@@ -81,3 +98,7 @@ for module in $modules; do
 		echo "$line" >> "$ini"
 	fi
 done
+
+if [ "$pm" = 'apk' ] && [ -n "$apkDel" ]; then
+	apk del $apkDel
+fi
