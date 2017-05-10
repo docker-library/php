@@ -9,6 +9,7 @@ FROM alpine:3.4
 # persistent / runtime deps
 ENV PHPIZE_DEPS \
 		autoconf \
+		dpkg-dev dpkg \
 		file \
 		g++ \
 		gcc \
@@ -89,10 +90,12 @@ COPY docker-php-source /usr/local/bin/
 RUN set -xe \
 	&& apk add --no-cache --virtual .build-deps \
 		$PHPIZE_DEPS \
+		coreutils \
 		curl-dev \
 		libedit-dev \
 		libxml2-dev \
 		openssl-dev \
+		pcre-dev \
 		sqlite-dev \
 	\
 	&& export CFLAGS="$PHP_CFLAGS" \
@@ -100,7 +103,9 @@ RUN set -xe \
 		LDFLAGS="$PHP_LDFLAGS" \
 	&& docker-php-source extract \
 	&& cd /usr/src/php \
+	&& gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
 	&& ./configure \
+		--build="$gnuArch" \
 		--with-config-file-path="$PHP_INI_DIR" \
 		--with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
 		\
@@ -118,8 +123,12 @@ RUN set -xe \
 		--with-openssl \
 		--with-zlib \
 		\
+# bundled pcre is too old for s390x (which isn't exactly a good sign)
+# /usr/src/php/ext/pcre/pcrelib/pcre_jit_compile.c:65:2: error: #error Unsupported architecture
+		--with-pcre-regex=/usr \
+		\
 		$PHP_EXTRA_CONFIGURE_ARGS \
-	&& make -j "$(getconf _NPROCESSORS_ONLN)" \
+	&& make -j "$(nproc)" \
 	&& make install \
 	&& { find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; } \
 	&& make clean \
