@@ -52,6 +52,11 @@ if [ "$pm" = 'apk' ]; then
 	fi
 fi
 
+if command -v dpkg-architecture > /dev/null; then
+	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"
+	set -- --build="$gnuArch" "$@"
+fi
+
 set -x
 cd "$ext"
 phpize
