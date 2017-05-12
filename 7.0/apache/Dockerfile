@@ -14,9 +14,9 @@ ENV PHPIZE_DEPS \
 		g++ \
 		gcc \
 		libc-dev \
+		libpcre3-dev \
 		make \
 		pkg-config \
-		libpcre3-dev \
 		re2c
 RUN apt-get update && apt-get install -y \
 		$PHPIZE_DEPS \
