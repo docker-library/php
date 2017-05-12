@@ -16,6 +16,7 @@ ENV PHPIZE_DEPS \
 		libc-dev \
 		make \
 		pkg-config \
+		libpcre3-dev \
 		re2c
 RUN apt-get update && apt-get install -y \
 		$PHPIZE_DEPS \
@@ -90,7 +91,6 @@ RUN set -xe \
 		$PHP_EXTRA_BUILD_DEPS \
 		libcurl4-openssl-dev \
 		libedit-dev \
-		libpcre3-dev \
 		libsqlite3-dev \
 		libssl-dev \
 		libxml2-dev \
