@@ -14,6 +14,7 @@ ENV PHPIZE_DEPS \
 		g++ \
 		gcc \
 		libc-dev \
+		libpcre3-dev \
 		make \
 		pkg-config \
 		re2c
@@ -90,7 +91,6 @@ RUN set -xe \
 		$PHP_EXTRA_BUILD_DEPS \
 		libcurl4-openssl-dev \
 		libedit-dev \
-		libpcre3-dev \
 		libsqlite3-dev \
 		libssl-dev \
 		libxml2-dev \

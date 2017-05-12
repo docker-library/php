@@ -15,6 +15,7 @@ ENV PHPIZE_DEPS \
 		gcc \
 		libc-dev \
 		make \
+		pcre-dev \
 		pkgconf \
 		re2c
 RUN apk add --no-cache --virtual .persistent-deps \
@@ -95,7 +96,6 @@ RUN set -xe \
 		libedit-dev \
 		libxml2-dev \
 		openssl-dev \
-		pcre-dev \
 		sqlite-dev \
 	\
 	&& export CFLAGS="$PHP_CFLAGS" \
