@@ -132,6 +132,7 @@ RUN set -xe \
 	&& make install \
 	&& { find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; } \
 	&& make clean \
+	&& cd / \
 	&& docker-php-source delete \
 	\
 	&& runDeps="$( \
@@ -143,7 +144,11 @@ RUN set -xe \
 	)" \
 	&& apk add --no-cache --virtual .php-rundeps $runDeps \
 	\
-	&& apk del .build-deps
+	&& apk del .build-deps \
+	\
+# https://github.com/docker-library/php/issues/443
+	&& pecl update-channels \
+	&& rm -rf /tmp/pear ~/.pearrc
 
 COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 
