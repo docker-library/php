@@ -78,9 +78,11 @@ for version in "${versions[@]}"; do
 
 	for variant in \
 		alpine \
+		centos \
+		amazonlinux \
 		apache \
-		fpm fpm/alpine \
-		zts zts/alpine \
+		fpm fpm/alpine fpm/centos fpm/amazonlinux \
+		zts zts/alpine zts/centos zts/amazonlinux \
 	; do
 		[ -f "$version/$variant/Dockerfile" ] || continue
 
