@@ -1,7 +1,8 @@
 #!/bin/sh
 set -e
 
-dir=/usr/src/php
+dir='/usr/src/php'
+tarball='/usr/src/php.tar.xz'
 
 usage() {
 	echo "usage: $0 COMMAND"
@@ -18,7 +19,40 @@ case "$1" in
 	extract)
 		mkdir -p "$dir"
 		if [ ! -f "$dir/.docker-extracted" ]; then
-			tar -Jxf /usr/src/php.tar.xz -C "$dir" --strip-components=1
+			tar --extract \
+				--file "$tarball" --xz \
+				--directory "$dir" --strip-components 1
+
+			# modify built-in extension "config.m4" files to have the correct "PHP_ALWAYS_SHARED"
+			#
+			#   /usr/src/php/configure.in:137:AC_DEFUN([PHP_ALWAYS_SHARED],[])dnl
+			#
+			# vs
+			#
+			#   /usr/src/php/scripts/phpize.m4:13:AC_DEFUN([PHP_ALWAYS_SHARED],[
+			#   /usr/src/php/scripts/phpize.m4-14-  ext_output="yes, shared"
+			#   /usr/src/php/scripts/phpize.m4-15-  ext_shared=yes
+			#   /usr/src/php/scripts/phpize.m4-16-  test "[$]$1" = "no" && $1=yes
+			#   /usr/src/php/scripts/phpize.m4-17-])dnl
+			#
+			# see https://github.com/docker-library/php/issues/103#issuecomment-271413933
+			for ext in $(
+				tar --list \
+					--file "$tarball" --xz \
+					--wildcards '*/ext/*/config.m4' \
+				| xargs -n1 dirname \
+				| xargs -n1 basename
+			); do
+				config="$dir/ext/$ext/config.m4"
+				cp "$config" "$config.orig"
+				{
+					echo '# https://github.com/docker-library/php/issues/103#issuecomment-271413933'
+					echo 'AC_DEFUN([PHP_ALWAYS_SHARED],[])dnl'
+					echo
+					cat "$config.orig"
+				} > "$config"
+			done
+
 			touch "$dir/.docker-extracted"
 		fi
 		;;
