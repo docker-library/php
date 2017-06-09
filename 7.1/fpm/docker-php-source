@@ -20,11 +20,17 @@ case "$1" in
 		if [ ! -f "$dir/.docker-extracted" ]; then
 			tar -Jxf /usr/src/php.tar.xz -C "$dir" --strip-components=1
 			touch "$dir/.docker-extracted"
+			if [ -e /etc/debian_version ]; then
+				apt-get update && apt-get install -y $PHPIZE_DEPS --no-install-recommends && rm -r /var/lib/apt/lists/*
+			fi
 		fi
 		;;
 
 	delete)
 		rm -rf "$dir"
+		if [ -e /etc/debian_version ]; then
+			apt-get purge -y --auto-remove $PHPIZE_DEPS
+		fi
 		;;
 
 	*)

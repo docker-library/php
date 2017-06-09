@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM debian:jessie
+FROM debian:jessie-slim
 
 # persistent / runtime deps
 ENV PHPIZE_DEPS \
@@ -19,7 +19,6 @@ ENV PHPIZE_DEPS \
 		pkg-config \
 		re2c
 RUN apt-get update && apt-get install -y \
-		$PHPIZE_DEPS \
 		ca-certificates \
 		curl \
 		libedit2 \
