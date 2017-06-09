@@ -29,6 +29,12 @@ declare -A gpgKeys=(
 )
 # see https://secure.php.net/downloads.php
 
+defaultDebianSuite='stretch'
+declare -A debianSuites=(
+	[5.6]='jessie'
+	[7.0]='jessie'
+	[7.1]='jessie'
+)
 defaultAlpineVersion='3.6'
 declare -A alpineVersions=(
 	[5.6]='3.4'
@@ -172,6 +178,7 @@ for version in "${versions[@]}"; do
 		dockerfiles+=( "$version/$target/Dockerfile" )
 	done
 
+	debianSuite="${debianSuites[$rcVersion]:-$defaultDebianSuite}"
 	alpineVersion="${alpineVersions[$rcVersion]:-$defaultAlpineVersion}"
 
 	(
@@ -183,6 +190,7 @@ for version in "${versions[@]}"; do
 			-e 's!%%PHP_ASC_URL%%!'"$ascUrl"'!' \
 			-e 's!%%PHP_SHA256%%!'"$sha256"'!' \
 			-e 's!%%PHP_MD5%%!'"$md5"'!' \
+			-e 's!%%DEBIAN_SUITE%%!'"$debianSuite"'!' \
 			-e 's!%%ALPINE_VERSION%%!'"$alpineVersion"'!' \
 			"${dockerfiles[@]}"
 	)

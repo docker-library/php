@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:%%DEBIAN_SUITE%%
 
 # persistent / runtime deps
 ENV PHPIZE_DEPS \
