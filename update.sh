@@ -2,6 +2,11 @@
 set -e
 
 declare -A gpgKeys=(
+	# https://wiki.php.net/todo/php72
+	# pollita & remi
+	# https://secure.php.net/downloads.php#gpg-7.2
+	[7.2]='1729F83938DA44E27BA0F4D3DBDB397470D12172 B1B44D8F021E4E2D6021E995DC9FF8D3EE5AF27F'
+
 	# https://wiki.php.net/todo/php71
 	# davey & krakjoe
 	# https://secure.php.net/downloads.php#gpg-7.1
@@ -60,7 +65,7 @@ for version in "${versions[@]}"; do
 		apiUrl='https://qa.php.net/api.php?type=qa-releases&format=json'
 		apiJqExpr='
 			.releases[]
-			| select(.version | startswith("7.1."))
+			| select(.version | startswith("'"$rcVersion"'."))
 			| [
 				.version,
 				.files.xz.path // "",
