@@ -48,7 +48,7 @@ ENV GPG_KEYS 1A4E8B7277C42E53DBA9C7B9BCAA30EA9C0D5763 6E4F6AB321FDC07F2C332E3AC2
 
 ENV PHP_VERSION 7.0.20
 ENV PHP_URL="https://secure.php.net/get/php-7.0.20.tar.xz/from/this/mirror" PHP_ASC_URL="https://secure.php.net/get/php-7.0.20.tar.xz.asc/from/this/mirror"
-ENV PHP_SHA256="31b9cf1fb83fe3cd82c2f6603a0ae81ae6abacb5286827e362d8f85e68908e0a" PHP_MD5="e84615871c1c6dbd0860746a31f3a7c8"
+ENV PHP_SHA256="31b9cf1fb83fe3cd82c2f6603a0ae81ae6abacb5286827e362d8f85e68908e0a" PHP_MD5=""
 
 RUN set -xe; \
 	\
