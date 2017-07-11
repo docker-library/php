@@ -29,7 +29,7 @@ declare -A gpgKeys=(
 )
 # see https://secure.php.net/downloads.php
 
-defaultDebianSuite='stretch'
+defaultDebianSuite='stretch-slim'
 declare -A debianSuites=(
 	[5.6]='jessie'
 	[7.0]='jessie'
