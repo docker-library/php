@@ -105,9 +105,9 @@ ENV PHP_LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"
 
 ENV GPG_KEYS 1729F83938DA44E27BA0F4D3DBDB397470D12172 B1B44D8F021E4E2D6021E995DC9FF8D3EE5AF27F
 
-ENV PHP_VERSION 7.2.0beta1
-ENV PHP_URL="http://downloads.php.net/~pollita/php-7.2.0beta1.tar.xz" PHP_ASC_URL="http://downloads.php.net/~pollita/php-7.2.0beta1.tar.xz.asc"
-ENV PHP_SHA256="8d7d839cb20ba48f8c947ef44274ef625630f06c7e6d13f3f64b9d17205324db" PHP_MD5=""
+ENV PHP_VERSION 7.2.0beta2
+ENV PHP_URL="http://downloads.php.net/~pollita/php-7.2.0beta2.tar.xz" PHP_ASC_URL="http://downloads.php.net/~pollita/php-7.2.0beta2.tar.xz.asc"
+ENV PHP_SHA256="0e2ac8e68c6fa92e9e14c610d78e162a711ba0e83987ecc9d02a6b898616c92d" PHP_MD5=""
 
 RUN set -xe; \
 	\
