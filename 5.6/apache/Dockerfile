@@ -21,12 +21,25 @@ ENV PHPIZE_DEPS \
 RUN apt-get update && apt-get install -y \
 		$PHPIZE_DEPS \
 		ca-certificates \
-		curl \
 		libedit2 \
 		libsqlite3-0 \
+		libssl-dev \
 		libxml2 \
 		xz-utils \
 	--no-install-recommends && rm -r /var/lib/apt/lists/*
+
+# install newer curl from source
+RUN apt-get update \
+    && apt-get install -y libssl-dev wget \
+    && wget https://curl.haxx.se/download/curl-7.49.1.tar.gz \
+    && tar -xzf curl-7.49.1.tar.gz \
+    && cd curl-7.49.1 \
+    && ./configure --with-ssl --prefix=/usr \
+    && make \
+    && make install \
+    && ldconfig \
+    && rm -rf curl-7.49.1 \
+    && rm -rf /var/lib/apt/lists/*
 
 ENV PHP_INI_DIR /usr/local/etc/php
 RUN mkdir -p $PHP_INI_DIR/conf.d
@@ -106,8 +119,8 @@ ENV PHP_LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"
 ENV GPG_KEYS 0BD78B5F97500D450838F95DFE857D9A90D90EC1 6E4F6AB321FDC07F2C332E3AC2BF0BC433CFC8B3
 
 ENV PHP_VERSION 5.6.31
-ENV PHP_URL="https://secure.php.net/get/php-5.6.31.tar.xz/from/this/mirror" PHP_ASC_URL="https://secure.php.net/get/php-5.6.31.tar.xz.asc/from/this/mirror"
-ENV PHP_SHA256="c464af61240a9b7729fabe0314cdbdd5a000a4f0c9bd201f89f8628732fe4ae4" PHP_MD5=""
+ENV PHP_URL="https://secure.php.net/get/php-5.6.31.tar.xz/from/this/mirror"
+ENV PHP_SHA256="c464af61240a9b7729fabe0314cdbdd5a000a4f0c9bd201f89f8628732fe4ae4"
 
 RUN set -xe; \
 	\
@@ -129,23 +142,7 @@ RUN set -xe; \
 	\
 	wget -O php.tar.xz "$PHP_URL"; \
 	\
-	if [ -n "$PHP_SHA256" ]; then \
-		echo "$PHP_SHA256 *php.tar.xz" | sha256sum -c -; \
-	fi; \
-	if [ -n "$PHP_MD5" ]; then \
-		echo "$PHP_MD5 *php.tar.xz" | md5sum -c -; \
-	fi; \
-	\
-	if [ -n "$PHP_ASC_URL" ]; then \
-		wget -O php.tar.xz.asc "$PHP_ASC_URL"; \
-		export GNUPGHOME="$(mktemp -d)"; \
-		for key in $GPG_KEYS; do \
-			gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
-		done; \
-		gpg --batch --verify php.tar.xz.asc php.tar.xz; \
-		rm -rf "$GNUPGHOME"; \
-	fi; \
-	\
+	echo "$PHP_SHA256 *php.tar.xz" | sha256sum -c -; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $fetchDeps
 
 COPY docker-php-source /usr/local/bin/
@@ -153,10 +150,8 @@ COPY docker-php-source /usr/local/bin/
 RUN set -xe \
 	&& buildDeps=" \
 		$PHP_EXTRA_BUILD_DEPS \
-		libcurl4-openssl-dev \
 		libedit-dev \
 		libsqlite3-dev \
-		libssl-dev \
 		libxml2-dev \
 		zlib1g-dev \
 	" \
