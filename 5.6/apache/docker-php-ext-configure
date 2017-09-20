@@ -18,13 +18,12 @@ fi
 
 cd /usr/src/php/ext
 
-ext="$1"
-if [ -z "$ext" ] || [ ! -d "$ext" ]; then
-	echo >&2 "usage: $0 ext-name [configure flags]"
-	echo >&2 "   ie: $0 gd --with-jpeg-dir=/usr/local/something"
-	echo >&2
-	echo >&2 'Possible values for ext-name:'
-	find /usr/src/php/ext \
+usage() {
+	echo "usage: $0 ext-name [configure flags]"
+	echo "   ie: $0 gd --with-jpeg-dir=/usr/local/something"
+	echo
+	echo 'Possible values for ext-name:'
+	find . \
 			-mindepth 2 \
 			-maxdepth 2 \
 			-type f \
@@ -33,6 +32,14 @@ if [ -z "$ext" ] || [ ! -d "$ext" ]; then
 		| xargs -n1 basename \
 		| sort \
 		| xargs
+	echo
+	echo 'Some of the above modules are already compiled into PHP; please check'
+	echo 'the ouptut of "php -i" to see which modules are already loaded.'
+}
+
+ext="$1"
+if [ -z "$ext" ] || [ ! -d "$ext" ]; then
+	usage >&2
 	exit 1
 fi
 shift

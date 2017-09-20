@@ -36,6 +36,9 @@ usage() {
 		| xargs -n1 basename \
 		| sort \
 		| xargs
+	echo
+	echo 'Some of the above modules are already compiled into PHP; please check'
+	echo 'the ouptut of "php -i" to see which modules are already loaded.'
 }
 
 opts="$(getopt -o 'h?j:' --long 'help,jobs:' -- "$@" || { usage >&2 && false; })"
