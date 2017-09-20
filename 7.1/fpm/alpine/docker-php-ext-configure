@@ -34,7 +34,7 @@ usage() {
 		| xargs
 	echo
 	echo 'Some of the above modules are already compiled into PHP; please check'
-	echo 'the ouptut of "php -i" to see which modules are already loaded.'
+	echo 'the output of "php -i" to see which modules are already loaded.'
 }
 
 ext="$1"
