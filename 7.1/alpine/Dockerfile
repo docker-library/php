@@ -94,8 +94,8 @@ RUN set -xe \
 		coreutils \
 		curl-dev \
 		libedit-dev \
-		libxml2-dev \
 		openssl-dev \
+		libxml2-dev \
 		sqlite-dev \
 	\
 	&& export CFLAGS="$PHP_CFLAGS" \

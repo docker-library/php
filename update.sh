@@ -195,6 +195,10 @@ for version in "${versions[@]}"; do
 			"${dockerfiles[@]}"
 	)
 
+	if [ "$alpineVersion" = '3.4' ]; then
+		sed -ri 's!libressl!openssl!g' "${dockerfiles[@]}"
+	fi
+
 	# update entrypoint commands
 	for dockerfile in "${dockerfiles[@]}"; do
 		cmd="$(awk '$1 == "CMD" { $1 = ""; print }' "$dockerfile" | tail -1 | jq --raw-output '.[0]')"
