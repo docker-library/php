@@ -136,11 +136,10 @@ RUN set -xe \
 	&& docker-php-source delete \
 	\
 	&& runDeps="$( \
-		scanelf --needed --nobanner --recursive /usr/local \
-			| awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
+			| tr ',' '\n' \
 			| sort -u \
-			| xargs -r apk info --installed \
-			| sort -u \
+			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)" \
 	&& apk add --no-cache --virtual .php-rundeps $runDeps \
 	\
