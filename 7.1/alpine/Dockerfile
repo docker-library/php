@@ -22,7 +22,9 @@ RUN apk add --no-cache --virtual .persistent-deps \
 		ca-certificates \
 		curl \
 		tar \
-		xz
+		xz \
+# https://github.com/docker-library/php/issues/494
+		openssl
 
 # ensure www-data user exists
 RUN set -x \
@@ -59,7 +61,6 @@ RUN set -xe; \
 	\
 	apk add --no-cache --virtual .fetch-deps \
 		gnupg \
-		openssl \
 	; \
 	\
 	mkdir -p /usr/src; \
