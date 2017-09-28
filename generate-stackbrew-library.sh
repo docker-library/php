@@ -108,9 +108,6 @@ for version in "${versions[@]}"; do
 			variantArches="$(echo " $variantArches " | sed -r -e 's/ s390x//g')"
 		fi
 
-		# arm32v5 takes _way_ too long to build (on the order of days)
-		variantArches="$(echo " $variantArches " | sed -r -e 's/ arm32v5//g')"
-
 		echo
 		cat <<-EOE
 			Tags: $(join ', ' "${variantAliases[@]}")
