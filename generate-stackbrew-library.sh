@@ -1,6 +1,19 @@
 #!/bin/bash
 set -eu
 
+defaultDebianSuite='stretch-slim'
+declare -A debianSuite=(
+	[5.6]='jessie'
+	[7.0]='jessie'
+	[7.1]='jessie'
+)
+defaultAlpineVersion='3.6'
+declare -A alpineVersion=(
+	[5.6]='3.4'
+	[7.0]='3.4'
+	[7.1]='3.4'
+)
+
 declare -A aliases=(
 	[5.6]='5'
 	[7.1]='7 latest'
@@ -70,50 +83,63 @@ join() {
 }
 
 for version in "${versions[@]}"; do
-	commit="$(dirCommit "$version")"
-
-	fullVersion="$(git show "$commit":"$version/Dockerfile" | awk '$1 == "ENV" && $2 == "PHP_VERSION" { print $3; exit }')"
 
 	versionAliases=(
-		$fullVersion
 		$version
 		${aliases[$version]:-}
 	)
 
-	for variant in \
-		'' \
-		alpine \
-		apache \
-		fpm fpm/alpine \
-		zts zts/alpine \
+	# order here controls the order of the library/ file
+	for suite in \
+		stretch-slim \
+		jessie \
+		alpine3.6 \
+		alpine3.4 \
 	; do
-		dir="$version${variant:+/$variant}"
-		[ -f "$dir/Dockerfile" ] || continue
-		variant="${variant:-cli}"
+		for variant in \
+			cli \
+			apache \
+			fpm \
+			zts \
+		; do
+			dir="$version/$suite/$variant"
+			[ -f "$dir/Dockerfile" ] || continue
 
-		commit="$(dirCommit "$dir")"
+			commit="$(dirCommit "$dir")"
+			versionSuite="${debianSuite[$version]:-$defaultDebianSuite}"
+			fullVersion="$(git show "$commit":"$dir/Dockerfile" | awk '$1 == "ENV" && $2 == "PHP_VERSION" { print $3; exit }')"
 
-		slash='/'
-		variantAliases=( "${versionAliases[@]/%/-${variant//$slash/-}}" )
-		variantAliases=( "${variantAliases[@]//latest-/}" )
-		if [ "$variant" = 'cli' ]; then
-			variantAliases+=( "${versionAliases[@]}" )
-		fi
+			baseAliases=( $fullVersion "${versionAliases[@]}" )
+			variantAliases=( "${baseAliases[@]/%/-$variant}" )
+			variantAliases=( "${variantAliases[@]//latest-/}" )
 
-		variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
-		variantArches="${parentRepoToArches[$variantParent]}"
+			if [ "$variant" = 'cli' ]; then
+				variantAliases+=( "${baseAliases[@]}" )
+			fi
+			if [ "$suite" = "$versionSuite" ]; then
+				variantAliases=( "${variantAliases[@]/%/-${suite%-slim}}" "${variantAliases[@]}" )
+			elif [ "${suite#alpine}" = "${alpineVersion[$version]:-$defaultAlpineVersion}" ] ; then
+				variantAliases=( "${variantAliases[@]/%/-$suite}" "${variantAliases[@]/%/-alpine}" )
+				variantAliases=( "${variantAliases[@]//latest-/}" )
+			else
+				variantAliases=( "${variantAliases[@]/%/-$suite}" )
+			fi
 
-		# 7.2 no longer supports s390x
-		if [[ "$version" = 7.* ]] && [ "$version" != '7.0' ] && [ "$version" != '7.1' ]; then
-			variantArches="$(echo " $variantArches " | sed -r -e 's/ s390x//g')"
-		fi
+			variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
+			variantArches="${parentRepoToArches[$variantParent]}"
 
-		echo
-		cat <<-EOE
-			Tags: $(join ', ' "${variantAliases[@]}")
-			Architectures: $(join ', ' $variantArches)
-			GitCommit: $commit
-			Directory: $dir
-		EOE
+			# 7.2 no longer supports s390x
+			if [[ "$version" = 7.* ]] && [ "$version" != '7.0' ] && [ "$version" != '7.1' ]; then
+				variantArches="$(echo " $variantArches " | sed -r -e 's/ s390x//g')"
+			fi
+
+			echo
+			cat <<-EOE
+				Tags: $(join ', ' "${variantAliases[@]}")
+				Architectures: $(join ', ' $variantArches)
+				GitCommit: $commit
+				Directory: $dir
+			EOE
+		done
 	done
 done
