@@ -120,10 +120,10 @@ for version in "${versions[@]}"; do
 				variantAliases=( "${variantAliases[@]/%/-${suite%-slim}}" "${variantAliases[@]}" )
 			elif [ "${suite#alpine}" = "${alpineVersion[$version]:-$defaultAlpineVersion}" ] ; then
 				variantAliases=( "${variantAliases[@]/%/-$suite}" "${variantAliases[@]/%/-alpine}" )
-				variantAliases=( "${variantAliases[@]//latest-/}" )
 			else
 				variantAliases=( "${variantAliases[@]/%/-$suite}" )
 			fi
+			variantAliases=( "${variantAliases[@]//latest-/}" )
 
 			variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
 			variantArches="${parentRepoToArches[$variantParent]}"
