@@ -118,7 +118,7 @@ for version in "${versions[@]}"; do
 
 	dockerfiles=()
 
-	for suite in alpine3.4 alpine3.6 jessie stretch-slim; do
+	for suite in stretch jessie alpine3.6 alpine3.4; do
 		[ -d "$version/$suite" ] || continue
 		alpineVer="${suite#alpine}"
 
@@ -127,7 +127,7 @@ for version in "${versions[@]}"; do
 			baseDockerfile=Dockerfile-alpine.template
 		fi
 
-		for variant in apache cli fpm zts; do
+		for variant in cli apache fpm zts; do
 			[ -d "$version/$suite/$variant" ] || continue
 			{ generated_warning; cat "$baseDockerfile"; } > "$version/$suite/$variant/Dockerfile"
 			if [ -f "$variant-Dockerfile-block-1" ]; then
@@ -151,8 +151,10 @@ for version in "${versions[@]}"; do
 				sed -ri 's!libressl!openssl!g' "$version/$suite/$variant/Dockerfile"
 			fi
 
+			# automatic `-slim` for stretch
+			# TODO always add slim once jessie is removed
 			sed -ri \
-				-e 's!%%DEBIAN_SUITE%%!'"$suite"'!' \
+				-e 's!%%DEBIAN_SUITE%%!'"${suite/stretch/stretch-slim}"'!' \
 				-e 's!%%ALPINE_VERSION%%!'"$alpineVer"'!' \
 				"$version/$suite/$variant/Dockerfile"
 			dockerfiles+=( "$version/$suite/$variant/Dockerfile" )

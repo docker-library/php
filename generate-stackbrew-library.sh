@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-defaultDebianSuite='stretch-slim'
+defaultDebianSuite='stretch'
 declare -A debianSuite=(
 	[5.6]='jessie'
 	[7.0]='jessie'
@@ -91,7 +91,7 @@ for version in "${versions[@]}"; do
 
 	# order here controls the order of the library/ file
 	for suite in \
-		stretch-slim \
+		stretch \
 		jessie \
 		alpine3.6 \
 		alpine3.4 \
@@ -116,13 +116,14 @@ for version in "${versions[@]}"; do
 			if [ "$variant" = 'cli' ]; then
 				variantAliases+=( "${baseAliases[@]}" )
 			fi
-			if [ "$suite" = "$versionSuite" ]; then
-				variantAliases=( "${variantAliases[@]/%/-${suite%-slim}}" "${variantAliases[@]}" )
-			elif [ "${suite#alpine}" = "${alpineVersion[$version]:-$defaultAlpineVersion}" ] ; then
-				variantAliases=( "${variantAliases[@]/%/-$suite}" "${variantAliases[@]/%/-alpine}" )
-			else
-				variantAliases=( "${variantAliases[@]/%/-$suite}" )
+
+			suiteVariantAliases=( "${variantAliases[@]/%/-$suite}" )
+			if [ "${suite#alpine}" = "${alpineVersion[$version]:-$defaultAlpineVersion}" ] ; then
+				variantAliases=( "${variantAliases[@]/%/-alpine}" )
+			elif [ "$suite" != "$versionSuite" ]; then
+				variantAliases=()
 			fi
+			variantAliases=( "${suiteVariantAliases[@]}" "${variantAliases[@]}" )
 			variantAliases=( "${variantAliases[@]//latest-/}" )
 
 			variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
