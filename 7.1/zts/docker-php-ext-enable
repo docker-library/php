@@ -72,7 +72,7 @@ if [ "$pm" = 'apk' ]; then
 		&& ! apk info --installed .phpize-deps > /dev/null \
 		&& ! apk info --installed .phpize-deps-configure > /dev/null \
 	; then
-		apk add --no-cache --virtual '.docker-php-ext-enable-deps' binutils
+		apk add --progress --no-cache --virtual '.docker-php-ext-enable-deps' binutils
 		apkDel='.docker-php-ext-enable-deps'
 	fi
 fi
