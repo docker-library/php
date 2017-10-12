@@ -2,46 +2,46 @@ language: bash
 services: docker
 
 env:
-  - VERSION=7.2-rc VARIANT=
-  - VERSION=7.2-rc VARIANT=alpine
-  - VERSION=7.2-rc VARIANT=apache
-  - VERSION=7.2-rc VARIANT=fpm
-  - VERSION=7.2-rc VARIANT=fpm/alpine
-  - VERSION=7.2-rc VARIANT=zts
-  - VERSION=7.2-rc VARIANT=zts/alpine
-  - VERSION=7.1 VARIANT=
-  - VERSION=7.1 VARIANT=alpine
-  - VERSION=7.1 VARIANT=apache
-  - VERSION=7.1 VARIANT=fpm
-  - VERSION=7.1 VARIANT=fpm/alpine
-  - VERSION=7.1 VARIANT=zts
-  - VERSION=7.1 VARIANT=zts/alpine
-  - VERSION=7.0 VARIANT=
-  - VERSION=7.0 VARIANT=alpine
-  - VERSION=7.0 VARIANT=apache
-  - VERSION=7.0 VARIANT=fpm
-  - VERSION=7.0 VARIANT=fpm/alpine
-  - VERSION=7.0 VARIANT=zts
-  - VERSION=7.0 VARIANT=zts/alpine
-  - VERSION=5.6 VARIANT=
-  - VERSION=5.6 VARIANT=alpine
-  - VERSION=5.6 VARIANT=apache
-  - VERSION=5.6 VARIANT=fpm
-  - VERSION=5.6 VARIANT=fpm/alpine
-  - VERSION=5.6 VARIANT=zts
-  - VERSION=5.6 VARIANT=zts/alpine
+  - VERSION=7.2-rc VARIANT=stretch/cli
+  - VERSION=7.2-rc VARIANT=stretch/apache
+  - VERSION=7.2-rc VARIANT=stretch/fpm
+  - VERSION=7.2-rc VARIANT=stretch/zts
+  - VERSION=7.2-rc VARIANT=alpine3.6/cli
+  - VERSION=7.2-rc VARIANT=alpine3.6/fpm
+  - VERSION=7.2-rc VARIANT=alpine3.6/zts
+  - VERSION=7.1 VARIANT=jessie/cli
+  - VERSION=7.1 VARIANT=jessie/apache
+  - VERSION=7.1 VARIANT=jessie/fpm
+  - VERSION=7.1 VARIANT=jessie/zts
+  - VERSION=7.1 VARIANT=alpine3.4/cli
+  - VERSION=7.1 VARIANT=alpine3.4/fpm
+  - VERSION=7.1 VARIANT=alpine3.4/zts
+  - VERSION=7.0 VARIANT=jessie/cli
+  - VERSION=7.0 VARIANT=jessie/apache
+  - VERSION=7.0 VARIANT=jessie/fpm
+  - VERSION=7.0 VARIANT=jessie/zts
+  - VERSION=7.0 VARIANT=alpine3.4/cli
+  - VERSION=7.0 VARIANT=alpine3.4/fpm
+  - VERSION=7.0 VARIANT=alpine3.4/zts
+  - VERSION=5.6 VARIANT=jessie/cli
+  - VERSION=5.6 VARIANT=jessie/apache
+  - VERSION=5.6 VARIANT=jessie/fpm
+  - VERSION=5.6 VARIANT=jessie/zts
+  - VERSION=5.6 VARIANT=alpine3.4/cli
+  - VERSION=5.6 VARIANT=alpine3.4/fpm
+  - VERSION=5.6 VARIANT=alpine3.4/zts
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
 
 before_script:
   - env | sort
-  - cd "$VERSION"
-  - image="php:${VERSION}${VARIANT:+-$VARIANT}"
-  - image="${image//'/'/-}"
+  - cd "$VERSION/$VARIANT"
+  - SUBVARIANT="${VARIANT#*/}"
+  - image="php:${VERSION}-${SUBVARIANT}-${VARIANT%/*}"
 
 script:
-  - travis_retry docker build -t "$image" "${VARIANT:-.}"
+  - travis_retry docker build -t "$image" .
   - ~/official-images/test/run.sh "$image"
 
 after_script:
