@@ -58,7 +58,7 @@ RUN set -xe; \
 	if ! command -v gpg > /dev/null; then \
 		fetchDeps="$fetchDeps \
 			dirmngr \
-			gnupg2 \
+			gnupg \
 		"; \
 	fi; \
 	apt-get update; \
