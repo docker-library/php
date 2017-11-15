@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y \
 		$PHPIZE_DEPS \
 		ca-certificates \
 		curl \
+		libargon2-0 \
 		libedit2 \
 		libsqlite3-0 \
 		libxml2 \
@@ -94,6 +95,7 @@ COPY docker-php-source /usr/local/bin/
 RUN set -xe \
 	&& buildDeps=" \
 		$PHP_EXTRA_BUILD_DEPS \
+		libargon2-0-dev \
 		libcurl4-openssl-dev \
 		libedit-dev \
 		libsqlite3-dev \
@@ -127,6 +129,8 @@ RUN set -xe \
 		--enable-mbstring \
 # --enable-mysqlnd is included here because it's harder to compile after the fact than extensions are (since it's a plugin for several extensions, not an extension in itself)
 		--enable-mysqlnd \
+# https://wiki.php.net/rfc/argon2_password_hash (7.2+)
+		--with-password-argon2 \
 		\
 		--with-curl \
 		--with-libedit \

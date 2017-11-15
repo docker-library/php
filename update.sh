@@ -52,6 +52,12 @@ travisEnv=
 for version in "${versions[@]}"; do
 	rcVersion="${version%-rc}"
 
+	# "7", "5", etc
+	majorVersion="${rcVersion%%.*}"
+	# "2", "1", "6", etc
+	minorVersion="${rcVersion#$majorVersion.}"
+	minorVersion="${minorVersion%%.*}"
+
 	# scrape the relevant API based on whether we're looking for pre-releases
 	apiUrl="https://secure.php.net/releases/index.php?json&max=100&version=${rcVersion%%.*}"
 	apiJqExpr='
@@ -149,6 +155,11 @@ for version in "${versions[@]}"; do
 
 			if [ "$alpineVer" = '3.4' ]; then
 				sed -ri 's!libressl!openssl!g' "$version/$suite/$variant/Dockerfile"
+			fi
+			if [ "$majorVersion" = '5' ] || [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ] || [ "$suite" = 'jessie' ]; then
+				# argon2 password hashing is only supported in 7.2+ and stretch+
+				sed -ri '/argon2/d' "$version/$suite/$variant/Dockerfile"
+				# Alpine 3.7+ _should_ include an "argon2-dev" package, but we should cross that bridge when we come to it
 			fi
 
 			# automatic `-slim` for stretch
