@@ -8,6 +8,8 @@ set -e
 export CFLAGS CPPFLAGS LDFLAGS  
 /**/
 
+segunda alteração
+
 srcExists=
 if [ -d /usr/src/php ]; then
 	srcExists=1
