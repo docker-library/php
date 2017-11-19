@@ -5,7 +5,8 @@ set -e
 : ${CFLAGS:=$PHP_CFLAGS}
 : ${CPPFLAGS:=$PHP_CPPFLAGS}
 : ${LDFLAGS:=$PHP_LDFLAGS}
-export CFLAGS CPPFLAGS LDFLAGS
+export CFLAGS CPPFLAGS LDFLAGS  
+/**/
 
 srcExists=
 if [ -d /usr/src/php ]; then
