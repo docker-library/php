@@ -14,7 +14,6 @@ ENV PHPIZE_DEPS \
 		g++ \
 		gcc \
 		libc-dev \
-		libpcre3-dev \
 		make \
 		pkg-config \
 		re2c
@@ -192,9 +191,9 @@ RUN set -xe \
 		--with-openssl \
 		--with-zlib \
 		\
-# bundled pcre is too old for s390x (which isn't exactly a good sign)
-# /usr/src/php/ext/pcre/pcrelib/pcre_jit_compile.c:65:2: error: #error Unsupported architecture
-		--with-pcre-regex=/usr \
+# bundled pcre does not support JIT on s390x
+# https://manpages.debian.org/stretch/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
+		$(test "$gnuArch" = 's390x-linux-gnu' && echo '--without-pcre-jit') \
 		--with-libdir="lib/$debMultiarch" \
 		\
 		$PHP_EXTRA_CONFIGURE_ARGS \
