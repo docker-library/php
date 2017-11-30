@@ -16,8 +16,8 @@ declare -A alpineVersion=(
 
 declare -A aliases=(
 	[5.6]='5'
-	[7.1]='7 latest'
-	[7.2-rc]='rc'
+	[7.2]='7 latest'
+	[7.3-rc]='rc'
 )
 
 self="$(basename "$BASH_SOURCE")"
