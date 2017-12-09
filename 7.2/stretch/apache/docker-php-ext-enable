@@ -78,7 +78,7 @@ if [ "$pm" = 'apk' ]; then
 fi
 
 for module in $modules; do
-	if nm -g "$module" | grep -q ' zend_extension_entry$'; then
+	if readelf --wide --syms "$module" | grep -q ' zend_extension_entry$'; then
 		# https://wiki.php.net/internals/extensions#loading_zend_extensions
 		line="zend_extension=$(readlink -f "$module")"
 	else
