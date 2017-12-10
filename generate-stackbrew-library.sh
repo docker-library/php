@@ -7,11 +7,12 @@ declare -A debianSuite=(
 	[7.0]='jessie'
 	[7.1]='jessie'
 )
-defaultAlpineVersion='3.6'
+defaultAlpineVersion='3.7'
 declare -A alpineVersion=(
 	[5.6]='3.4'
 	[7.0]='3.4'
 	[7.1]='3.4'
+	[7.2]='3.6'
 )
 
 declare -A aliases=(
@@ -93,8 +94,7 @@ for version in "${versions[@]}"; do
 	for suite in \
 		stretch \
 		jessie \
-		alpine3.6 \
-		alpine3.4 \
+		alpine{3.7,3.6,3.4} \
 	; do
 		for variant in \
 			cli \
