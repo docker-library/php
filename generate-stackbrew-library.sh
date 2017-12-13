@@ -123,7 +123,7 @@ for version in "${versions[@]}"; do
 			elif [ "$suite" != "$versionSuite" ]; then
 				variantAliases=()
 			fi
-			variantAliases=( "${suiteVariantAliases[@]}" "${variantAliases[@]}" )
+			variantAliases=( "${suiteVariantAliases[@]}" ${variantAliases[@]+"${variantAliases[@]}"} )
 			variantAliases=( "${variantAliases[@]//latest-/}" )
 
 			variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
