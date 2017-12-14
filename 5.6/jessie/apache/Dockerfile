@@ -6,6 +6,14 @@
 
 FROM debian:jessie
 
+# prevent Debian's PHP packages from being installed
+RUN set -eux; \
+	{ \
+		echo 'Package: php*'; \
+		echo 'Pin: release  *'; \
+		echo 'Pin-Priority: -1'; \
+	} > /etc/apt/preferences.d/no-debian-php
+
 # persistent / runtime deps
 ENV PHPIZE_DEPS \
 		autoconf \
