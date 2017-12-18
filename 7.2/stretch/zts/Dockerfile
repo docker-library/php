@@ -11,7 +11,7 @@ FROM debian:stretch-slim
 RUN set -eux; \
 	{ \
 		echo 'Package: php*'; \
-		echo 'Pin: release  *'; \
+		echo 'Pin: release *'; \
 		echo 'Pin-Priority: -1'; \
 	} > /etc/apt/preferences.d/no-debian-php
 
