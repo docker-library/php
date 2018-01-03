@@ -30,10 +30,6 @@ RUN apt-get update && apt-get install -y \
 		$PHPIZE_DEPS \
 		ca-certificates \
 		curl \
-		libargon2-0 \
-		libedit2 \
-		libsqlite3-0 \
-		libxml2 \
 		xz-utils \
 	--no-install-recommends && rm -r /var/lib/apt/lists/*
 
@@ -159,9 +155,11 @@ RUN set -xe; \
 
 COPY docker-php-source /usr/local/bin/
 
-RUN set -xe \
-	&& buildDeps=" \
-		$PHP_EXTRA_BUILD_DEPS \
+RUN set -eux; \
+	\
+	savedAptMark="$(apt-mark showmanual)"; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
 		libargon2-0-dev \
 		libcurl4-openssl-dev \
 		libedit-dev \
@@ -169,21 +167,24 @@ RUN set -xe \
 		libssl-dev \
 		libxml2-dev \
 		zlib1g-dev \
-	" \
-	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
+		${PHP_EXTRA_BUILD_DEPS:-} \
+	; \
+	rm -rf /var/lib/apt/lists/*; \
 	\
-	&& export CFLAGS="$PHP_CFLAGS" \
+	export \
+		CFLAGS="$PHP_CFLAGS" \
 		CPPFLAGS="$PHP_CPPFLAGS" \
 		LDFLAGS="$PHP_LDFLAGS" \
-	&& docker-php-source extract \
-	&& cd /usr/src/php \
-	&& gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
-	&& debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)" \
+	; \
+	docker-php-source extract; \
+	cd /usr/src/php; \
+	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+	debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
 # https://bugs.php.net/bug.php?id=74125
-	&& if [ ! -d /usr/include/curl ]; then \
+	if [ ! -d /usr/include/curl ]; then \
 		ln -sT "/usr/include/$debMultiarch/curl" /usr/local/include/curl; \
-	fi \
-	&& ./configure \
+	fi; \
+	./configure \
 		--build="$gnuArch" \
 		--with-config-file-path="$PHP_INI_DIR" \
 		--with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
@@ -209,19 +210,33 @@ RUN set -xe \
 		$(test "$gnuArch" = 's390x-linux-gnu' && echo '--without-pcre-jit') \
 		--with-libdir="lib/$debMultiarch" \
 		\
-		$PHP_EXTRA_CONFIGURE_ARGS \
-	&& make -j "$(nproc)" \
-	&& make install \
-	&& { find /usr/local/bin /usr/local/sbin -type f -executable -exec strip --strip-all '{}' + || true; } \
-	&& make clean \
-	&& cd / \
-	&& docker-php-source delete \
+		${PHP_EXTRA_CONFIGURE_ARGS:-} \
+	; \
+	make -j "$(nproc)"; \
+	make install; \
+	find /usr/local/bin /usr/local/sbin -type f -executable -exec strip --strip-all '{}' + || true; \
+	make clean; \
+	cd /; \
+	docker-php-source delete; \
 	\
-	&& apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps \
+# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
+	apt-mark auto '.*' > /dev/null; \
+	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; \
+	find /usr/local -type f -executable -exec ldd '{}' ';' \
+		| awk '/=>/ { print $(NF-1) }' \
+		| sort -u \
+		| xargs -r dpkg-query --search \
+		| cut -d: -f1 \
+		| sort -u \
+		| xargs -r apt-mark manual \
+	; \
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+	\
+	php --version; \
 	\
 # https://github.com/docker-library/php/issues/443
-	&& pecl update-channels \
-	&& rm -rf /tmp/pear ~/.pearrc
+	pecl update-channels; \
+	rm -rf /tmp/pear ~/.pearrc
 
 COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 
