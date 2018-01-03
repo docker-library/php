@@ -64,7 +64,6 @@ if command -v dpkg-architecture > /dev/null; then
 	set -- --build="$gnuArch" "$@"
 fi
 
-set -x
 cd "$ext"
 phpize
 ./configure "$@"
