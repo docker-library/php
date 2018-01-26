@@ -25,6 +25,8 @@ RUN apk add --no-cache --virtual .persistent-deps \
 # https://github.com/docker-library/php/issues/494
 		libressl
 
+RUN sed -i 's/#default_bits/default_bits/g; s/#default_md/default_md/g' /etc/ssl/openssl.cnf
+
 # ensure www-data user exists
 RUN set -x \
 	&& addgroup -g 82 -S www-data \
