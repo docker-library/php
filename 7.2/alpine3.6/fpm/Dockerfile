@@ -96,6 +96,7 @@ RUN set -xe \
 		curl-dev \
 		libedit-dev \
 		libressl-dev \
+		libsodium-dev \
 		libxml2-dev \
 		sqlite-dev \
 	\
@@ -118,6 +119,8 @@ RUN set -xe \
 		--enable-mbstring \
 # --enable-mysqlnd is included here because it's harder to compile after the fact than extensions are (since it's a plugin for several extensions, not an extension in itself)
 		--enable-mysqlnd \
+# https://wiki.php.net/rfc/libsodium
+		--with-sodium \
 		\
 		--with-curl \
 		--with-libedit \
