@@ -163,6 +163,7 @@ RUN set -eux; \
 		libargon2-0-dev \
 		libcurl4-openssl-dev \
 		libedit-dev \
+		libsodium-dev \
 		libsqlite3-dev \
 		libssl-dev \
 		libxml2-dev \
@@ -199,6 +200,8 @@ RUN set -eux; \
 		--enable-mysqlnd \
 # https://wiki.php.net/rfc/argon2_password_hash (7.2+)
 		--with-password-argon2 \
+# https://wiki.php.net/rfc/libsodium
+		--with-sodium \
 		\
 		--with-curl \
 		--with-libedit \
