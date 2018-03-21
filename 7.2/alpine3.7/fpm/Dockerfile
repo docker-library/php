@@ -6,7 +6,8 @@
 
 FROM alpine:3.7
 
-# persistent / runtime deps
+# dependencies required for running "phpize"
+# these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
 ENV PHPIZE_DEPS \
 		autoconf \
 		dpkg-dev dpkg \
@@ -17,6 +18,8 @@ ENV PHPIZE_DEPS \
 		make \
 		pkgconf \
 		re2c
+
+# persistent / runtime deps
 RUN apk add --no-cache --virtual .persistent-deps \
 		ca-certificates \
 		curl \

@@ -9,7 +9,8 @@ RUN set -eux; \
 		echo 'Pin-Priority: -1'; \
 	} > /etc/apt/preferences.d/no-debian-php
 
-# persistent / runtime deps
+# dependencies required for running "phpize"
+# (see persistent deps below)
 ENV PHPIZE_DEPS \
 		autoconf \
 		dpkg-dev \
@@ -20,6 +21,8 @@ ENV PHPIZE_DEPS \
 		make \
 		pkg-config \
 		re2c
+
+# persistent / runtime deps
 RUN apt-get update && apt-get install -y \
 		$PHPIZE_DEPS \
 		ca-certificates \
