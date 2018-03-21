@@ -166,6 +166,14 @@ for version in "${versions[@]}"; do
 				sed -ri '/sodium/d' "$version/$suite/$variant/Dockerfile"
 			fi
 
+			# remove any _extra_ blank lines created by the deletions above
+			awk '
+				NF > 0 { blank = 0 }
+				NF == 0 { ++blank }
+				blank < 2 { print }
+			' "$version/$suite/$variant/Dockerfile" > "$version/$suite/$variant/Dockerfile.new"
+			mv "$version/$suite/$variant/Dockerfile.new" "$version/$suite/$variant/Dockerfile"
+
 			# automatic `-slim` for stretch
 			# TODO always add slim once jessie is removed
 			sed -ri \
