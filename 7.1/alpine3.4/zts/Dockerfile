@@ -116,7 +116,7 @@ RUN set -xe \
 		--disable-cgi \
 		\
 # https://github.com/docker-library/php/issues/439
-		--disable-hash \
+		--with-mhash \
 		\
 # --enable-ftp is included here because ftp_ssl_connect() needs ftp to be compiled statically (see https://github.com/docker-library/php/issues/236)
 		--enable-ftp \
