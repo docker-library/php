@@ -147,11 +147,14 @@ for version in "${versions[@]}"; do
 				ia && ac == 1 { system("cat " variant "-Dockerfile-block-" ab) }
 			' "$version/$suite/$variant/Dockerfile"
 
-			cp \
+			cp -a \
 				docker-php-entrypoint \
 				docker-php-ext-* \
 				docker-php-source \
 				"$version/$suite/$variant/"
+			if [ "$variant" = 'apache' ]; then
+				cp -a apache2-foreground "$version/$suite/$variant/"
+			fi
 
 			if [ "$alpineVer" = '3.4' ]; then
 				sed -ri 's!libressl!openssl!g' "$version/$suite/$variant/Dockerfile"
