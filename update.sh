@@ -168,6 +168,10 @@ for version in "${versions[@]}"; do
 				# sodium is part of php core 7.2+ https://wiki.php.net/rfc/libsodium
 				sed -ri '/sodium/d' "$version/$suite/$variant/Dockerfile"
 			fi
+			if [ "$majorVersion" = '5' -a "$suite" = 'stretch' ]; then
+				# php 5 still needs older ssl
+				sed -ri 's/libssl-dev/libssl1.0-dev/g' "$version/$suite/$variant/Dockerfile"
+			fi
 
 			# remove any _extra_ blank lines created by the deletions above
 			awk '

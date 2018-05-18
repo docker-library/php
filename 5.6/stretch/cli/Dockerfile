@@ -107,7 +107,7 @@ RUN set -eux; \
 		libcurl4-openssl-dev \
 		libedit-dev \
 		libsqlite3-dev \
-		libssl-dev \
+		libssl1.0-dev \
 		libxml2-dev \
 		zlib1g-dev \
 		${PHP_EXTRA_BUILD_DEPS:-} \
