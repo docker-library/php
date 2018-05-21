@@ -12,24 +12,45 @@ env:
   - VERSION=7.2 VARIANT=alpine3.6/cli
   - VERSION=7.2 VARIANT=alpine3.6/fpm
   - VERSION=7.2 VARIANT=alpine3.6/zts
+  - VERSION=7.1 VARIANT=stretch/cli
+  - VERSION=7.1 VARIANT=stretch/apache
+  - VERSION=7.1 VARIANT=stretch/fpm
+  - VERSION=7.1 VARIANT=stretch/zts
   - VERSION=7.1 VARIANT=jessie/cli
   - VERSION=7.1 VARIANT=jessie/apache
   - VERSION=7.1 VARIANT=jessie/fpm
   - VERSION=7.1 VARIANT=jessie/zts
+  - VERSION=7.1 VARIANT=alpine3.7/cli
+  - VERSION=7.1 VARIANT=alpine3.7/fpm
+  - VERSION=7.1 VARIANT=alpine3.7/zts
   - VERSION=7.1 VARIANT=alpine3.4/cli
   - VERSION=7.1 VARIANT=alpine3.4/fpm
   - VERSION=7.1 VARIANT=alpine3.4/zts
+  - VERSION=7.0 VARIANT=stretch/cli
+  - VERSION=7.0 VARIANT=stretch/apache
+  - VERSION=7.0 VARIANT=stretch/fpm
+  - VERSION=7.0 VARIANT=stretch/zts
   - VERSION=7.0 VARIANT=jessie/cli
   - VERSION=7.0 VARIANT=jessie/apache
   - VERSION=7.0 VARIANT=jessie/fpm
   - VERSION=7.0 VARIANT=jessie/zts
+  - VERSION=7.0 VARIANT=alpine3.7/cli
+  - VERSION=7.0 VARIANT=alpine3.7/fpm
+  - VERSION=7.0 VARIANT=alpine3.7/zts
   - VERSION=7.0 VARIANT=alpine3.4/cli
   - VERSION=7.0 VARIANT=alpine3.4/fpm
   - VERSION=7.0 VARIANT=alpine3.4/zts
+  - VERSION=5.6 VARIANT=stretch/cli
+  - VERSION=5.6 VARIANT=stretch/apache
+  - VERSION=5.6 VARIANT=stretch/fpm
+  - VERSION=5.6 VARIANT=stretch/zts
   - VERSION=5.6 VARIANT=jessie/cli
   - VERSION=5.6 VARIANT=jessie/apache
   - VERSION=5.6 VARIANT=jessie/fpm
   - VERSION=5.6 VARIANT=jessie/zts
+  - VERSION=5.6 VARIANT=alpine3.7/cli
+  - VERSION=5.6 VARIANT=alpine3.7/fpm
+  - VERSION=5.6 VARIANT=alpine3.7/zts
   - VERSION=5.6 VARIANT=alpine3.4/cli
   - VERSION=5.6 VARIANT=alpine3.4/fpm
   - VERSION=5.6 VARIANT=alpine3.4/zts
