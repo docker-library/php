@@ -125,7 +125,7 @@ for version in "${versions[@]}"; do
 
 	dockerfiles=()
 
-	for suite in stretch jessie alpine{3.7,3.6,3.4}; do
+	for suite in stretch jessie alpine{3.7,3.6}; do
 		[ -d "$version/$suite" ] || continue
 		alpineVer="${suite#alpine}"
 
@@ -154,10 +154,6 @@ for version in "${versions[@]}"; do
 				"$version/$suite/$variant/"
 			if [ "$variant" = 'apache' ]; then
 				cp -a apache2-foreground "$version/$suite/$variant/"
-			fi
-
-			if [ "$alpineVer" = '3.4' ]; then
-				sed -ri 's!libressl!openssl!g' "$version/$suite/$variant/Dockerfile"
 			fi
 			if [ "$majorVersion" = '5' ] || [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ] || [ "$suite" = 'jessie' ]; then
 				# argon2 password hashing is only supported in 7.2+ and stretch+
