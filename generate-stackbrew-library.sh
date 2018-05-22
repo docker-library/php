@@ -1,25 +1,14 @@
-#!/bin/bash
-set -eu
-
-defaultDebianSuite='stretch'
-declare -A debianSuite=(
-	[5.6]='jessie'
-	[7.0]='jessie'
-	[7.1]='jessie'
-)
-defaultAlpineVersion='3.7'
-declare -A alpineVersion=(
-	[5.6]='3.4'
-	[7.0]='3.4'
-	[7.1]='3.4'
-	[7.2]='3.6'
-)
+#!/usr/bin/env bash
+set -Eeuo pipefail
 
 declare -A aliases=(
 	[5.6]='5'
 	[7.2]='7 latest'
 	[7.3-rc]='rc'
 )
+
+defaultDebianSuite='stretch'
+defaultAlpineVersion='3.7'
 
 self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
@@ -94,7 +83,7 @@ for version in "${versions[@]}"; do
 	for suite in \
 		stretch \
 		jessie \
-		alpine{3.7,3.6,3.4} \
+		alpine{3.7,3.6} \
 	; do
 		for variant in \
 			cli \
@@ -106,7 +95,6 @@ for version in "${versions[@]}"; do
 			[ -f "$dir/Dockerfile" ] || continue
 
 			commit="$(dirCommit "$dir")"
-			versionSuite="${debianSuite[$version]:-$defaultDebianSuite}"
 			fullVersion="$(git show "$commit":"$dir/Dockerfile" | awk '$1 == "ENV" && $2 == "PHP_VERSION" { print $3; exit }')"
 
 			baseAliases=( $fullVersion "${versionAliases[@]}" )
@@ -118,9 +106,9 @@ for version in "${versions[@]}"; do
 			fi
 
 			suiteVariantAliases=( "${variantAliases[@]/%/-$suite}" )
-			if [ "${suite#alpine}" = "${alpineVersion[$version]:-$defaultAlpineVersion}" ] ; then
+			if [ "${suite#alpine}" = "$defaultAlpineVersion" ] ; then
 				variantAliases=( "${variantAliases[@]/%/-alpine}" )
-			elif [ "$suite" != "$versionSuite" ]; then
+			elif [ "$suite" != "$defaultDebianSuite" ]; then
 				variantAliases=()
 			fi
 			variantAliases=( "${suiteVariantAliases[@]}" ${variantAliases[@]+"${variantAliases[@]}"} )
