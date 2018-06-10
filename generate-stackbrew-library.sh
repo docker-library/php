@@ -86,6 +86,7 @@ for version in "${versions[@]}"; do
 		alpine{3.7,3.6} \
 	; do
 		for variant in \
+			cgi \
 			cli \
 			apache \
 			fpm \
