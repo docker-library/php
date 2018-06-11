@@ -56,4 +56,4 @@ RUN { \
 	&& a2enconf docker-php
 
 ENV PHP_EXTRA_BUILD_DEPS apache2-dev
-ENV PHP_EXTRA_CONFIGURE_ARGS --with-apxs2
+ENV PHP_EXTRA_CONFIGURE_ARGS --with-apxs2 --disable-cgi
