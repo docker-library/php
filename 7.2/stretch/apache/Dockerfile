@@ -151,6 +151,7 @@ RUN set -xe; \
 			gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
 		done; \
 		gpg --batch --verify php.tar.xz.asc php.tar.xz; \
+		command -v gpgconf > /dev/null && gpgconf --kill all; \
 		rm -rf "$GNUPGHOME"; \
 	fi; \
 	\

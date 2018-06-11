@@ -51,13 +51,19 @@ install:
 
 before_script:
   - env | sort
+  - wget -qO- 'https://github.com/tianon/pgp-happy-eyeballs/raw/master/hack-my-builds.sh' | bash
   - cd "$VERSION/$VARIANT"
   - SUBVARIANT="${VARIANT#*/}"
   - image="php:${VERSION}-${SUBVARIANT}-${VARIANT%/*}"
 
 script:
-  - travis_retry docker build -t "$image" .
-  - ~/official-images/test/run.sh "$image"
+  - |
+    (
+      set -Eeuo pipefail
+      set -x
+      docker build -t "$image" .
+      ~/official-images/test/run.sh "$image"
+    )
 
 after_script:
   - docker images
