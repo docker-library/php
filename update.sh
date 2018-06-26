@@ -3,6 +3,11 @@ set -e
 
 # https://secure.php.net/gpg-keys.php
 declare -A gpgKeys=(
+	# https://wiki.php.net/todo/php73
+	# cmb & stas
+	# https://secure.php.net/gpg-keys.php#gpg-7.3
+	[7.3]='CBAF69F173A0FEA4B537F470D66C9593118BCCB6 F38252826ACD957EF380D39F2F7956BC5DA04B5D'
+
 	# https://wiki.php.net/todo/php72
 	# pollita & remi
 	# https://secure.php.net/downloads.php#gpg-7.2
