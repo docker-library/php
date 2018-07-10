@@ -15,7 +15,6 @@ RUN set -eux; \
 		echo 'Pin-Priority: -1'; \
 	} > /etc/apt/preferences.d/no-debian-php
 
-# Argon2-Start
 RUN	set -eux; \
 	{ \
 		echo 'deb http://deb.debian.org/debian buster main'; \
@@ -32,7 +31,6 @@ RUN	set -eux; \
 		echo 'Pin: release n=buster'; \
 		echo 'Pin-Priority: 990'; \
 	} > /etc/apt/preferences.d/argon-buster
-# Argon2-End
 
 # dependencies required for running "phpize"
 # (see persistent deps below)
@@ -124,9 +122,7 @@ RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
-# Argon2-Start
 		libargon2-0-dev \
-# Argon2-End
 		libcurl4-openssl-dev \
 		libedit-dev \
 		libsodium-dev \
@@ -168,10 +164,8 @@ RUN set -eux; \
 		--enable-mbstring \
 # --enable-mysqlnd is included here because it's harder to compile after the fact than extensions are (since it's a plugin for several extensions, not an extension in itself)
 		--enable-mysqlnd \
-# Argon2-Start
 # https://wiki.php.net/rfc/argon2_password_hash (7.2+)
 		--with-password-argon2 \
-# Argon2-End
 # https://wiki.php.net/rfc/libsodium
 		--with-sodium=shared \
 		\

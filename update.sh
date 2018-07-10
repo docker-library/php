@@ -160,10 +160,11 @@ for version in "${versions[@]}"; do
 			if [ "$variant" = 'apache' ]; then
 				cp -a apache2-foreground "$version/$suite/$variant/"
 			fi
-			if [ "$majorVersion" = '5' ] || [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ] || [ "$suite" = 'jessie' ]; then
-				# argon2 password hashing is only supported in 7.2+ and stretch+
+			if [ "$majorVersion" = '5' ] || [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ] || [ "$suite" = 'jessie' ] || [ "$suite" = 'alpine3.6' ] || [ "$suite" = 'alpine3.7' ]; then
+				# argon2 password hashing is only supported in 7.2+ and stretch+ / alpine 3.8+
 				sed -ri '/Argon2-Start/,/Argon2-End/d' "$version/$suite/$variant/Dockerfile"
-				# Alpine 3.7+ _should_ include an "argon2-dev" package, but we should cross that bridge when we come to it
+			else
+				sed -ri '/Argon2-Start/d;/Argon2-End/d' "$version/$suite/$variant/Dockerfile"
 			fi
 			if [ "$majorVersion" = '5' ] || [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ]; then
 				# sodium is part of php core 7.2+ https://wiki.php.net/rfc/libsodium
