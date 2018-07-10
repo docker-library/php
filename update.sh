@@ -130,7 +130,7 @@ for version in "${versions[@]}"; do
 
 	dockerfiles=()
 
-	for suite in stretch jessie alpine{3.7,3.6}; do
+	for suite in stretch jessie alpine{3.8,3.7,3.6}; do
 		[ -d "$version/$suite" ] || continue
 		alpineVer="${suite#alpine}"
 
