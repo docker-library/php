@@ -53,8 +53,7 @@ before_script:
   - env | sort
   - wget -qO- 'https://github.com/tianon/pgp-happy-eyeballs/raw/master/hack-my-builds.sh' | bash
   - cd "$VERSION/$VARIANT"
-  - SUBVARIANT="${VARIANT#*/}"
-  - image="php:${VERSION}-${SUBVARIANT}-${VARIANT%/*}"
+  - slash='/'; image="php:${VERSION}-${VARIANT//$slash/-}"
 
 script:
   - |
