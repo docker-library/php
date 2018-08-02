@@ -17,20 +17,18 @@ RUN set -eux; \
 
 RUN	set -eux; \
 	{ \
-		echo 'deb http://deb.debian.org/debian buster main'; \
-		echo 'deb http://deb.debian.org/debian buster-updates main'; \
-		echo 'deb http://security.debian.org buster/updates main'; \
+		echo 'deb http://deb.debian.org/debian sid main'; \
 	} >> /etc/apt/sources.list; \
 	{ \
 		echo 'Package: *'; \
-		echo 'Pin: release n=buster'; \
+		echo 'Pin: release n=sid'; \
 		echo 'Pin-Priority: 100'; \
-	} > /etc/apt/preferences.d/no-buster; \
+	} > /etc/apt/preferences.d/no-sid; \
 	{ \
-		echo 'Package: libargon2-0*'; \
-		echo 'Pin: release n=buster'; \
+		echo 'Package: libargon2*'; \
+		echo 'Pin: release n=sid'; \
 		echo 'Pin-Priority: 990'; \
-	} > /etc/apt/preferences.d/argon-buster
+	} > /etc/apt/preferences.d/argon-sid
 
 # dependencies required for running "phpize"
 # (see persistent deps below)
@@ -181,7 +179,7 @@ RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
-		libargon2-0-dev \
+		libargon2-dev \
 		libcurl4-openssl-dev \
 		libedit-dev \
 		libsodium-dev \
