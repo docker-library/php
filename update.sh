@@ -162,9 +162,10 @@ for version in "${versions[@]}"; do
 			fi
 			if [ "$majorVersion" = '5' ] || [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ] || [ "$suite" = 'jessie' ] || [ "$suite" = 'alpine3.6' ] || [ "$suite" = 'alpine3.7' ]; then
 				# argon2 password hashing is only supported in 7.2+ and stretch+ / alpine 3.8+
-				sed -ri '/Argon2-Start/,/Argon2-End/d' "$version/$suite/$variant/Dockerfile"
-			else
-				sed -ri '/Argon2-Start/d;/Argon2-End/d' "$version/$suite/$variant/Dockerfile"
+				sed -ri \
+					-e '/##<argon2>##/,/##<\/argon2>##/d' \
+					-e '/argon2/d' \
+					"$version/$suite/$variant/Dockerfile"
 			fi
 			if [ "$majorVersion" = '5' ] || [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ]; then
 				# sodium is part of php core 7.2+ https://wiki.php.net/rfc/libsodium
@@ -186,7 +187,8 @@ for version in "${versions[@]}"; do
 			# automatic `-slim` for stretch
 			# TODO always add slim once jessie is removed
 			sed -ri \
-				-e 's!%%DEBIAN_SUITE%%!'"${suite/stretch/stretch-slim}"'!' \
+				-e 's!%%DEBIAN_TAG%%!'"${suite/stretch/stretch-slim}"'!' \
+				-e 's!%%DEBIAN_SUITE%%!'"$suite"'!' \
 				-e 's!%%ALPINE_VERSION%%!'"$alpineVer"'!' \
 				"$version/$suite/$variant/Dockerfile"
 			dockerfiles+=( "$version/$suite/$variant/Dockerfile" )

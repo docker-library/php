@@ -96,9 +96,9 @@ COPY docker-php-source /usr/local/bin/
 RUN set -xe \
 	&& apk add --no-cache --virtual .build-deps \
 		$PHPIZE_DEPS \
+		argon2-dev \
 		coreutils \
 		curl-dev \
-		argon2-dev \
 		libedit-dev \
 		libressl-dev \
 		libsodium-dev \
