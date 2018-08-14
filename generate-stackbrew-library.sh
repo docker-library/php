@@ -8,7 +8,7 @@ declare -A aliases=(
 )
 
 defaultDebianSuite='stretch'
-defaultAlpineVersion='3.7'
+defaultAlpineVersion='3.8'
 
 self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
@@ -83,7 +83,7 @@ for version in "${versions[@]}"; do
 	for suite in \
 		stretch \
 		jessie \
-		alpine{3.7,3.6} \
+		alpine{3.8,3.7,3.6} \
 	; do
 		for variant in \
 			cli \

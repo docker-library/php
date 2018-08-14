@@ -3,6 +3,11 @@ set -e
 
 # https://secure.php.net/gpg-keys.php
 declare -A gpgKeys=(
+	# https://wiki.php.net/todo/php73
+	# cmb & stas
+	# https://secure.php.net/gpg-keys.php#gpg-7.3
+	[7.3]='CBAF69F173A0FEA4B537F470D66C9593118BCCB6 F38252826ACD957EF380D39F2F7956BC5DA04B5D'
+
 	# https://wiki.php.net/todo/php72
 	# pollita & remi
 	# https://secure.php.net/downloads.php#gpg-7.2
@@ -125,7 +130,7 @@ for version in "${versions[@]}"; do
 
 	dockerfiles=()
 
-	for suite in stretch jessie alpine{3.7,3.6}; do
+	for suite in stretch jessie alpine{3.8,3.7,3.6}; do
 		[ -d "$version/$suite" ] || continue
 		alpineVer="${suite#alpine}"
 
@@ -155,10 +160,12 @@ for version in "${versions[@]}"; do
 			if [ "$variant" = 'apache' ]; then
 				cp -a apache2-foreground "$version/$suite/$variant/"
 			fi
-			if [ "$majorVersion" = '5' ] || [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ] || [ "$suite" = 'jessie' ]; then
-				# argon2 password hashing is only supported in 7.2+ and stretch+
-				sed -ri '/argon2/d' "$version/$suite/$variant/Dockerfile"
-				# Alpine 3.7+ _should_ include an "argon2-dev" package, but we should cross that bridge when we come to it
+			if [ "$majorVersion" = '5' ] || [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ] || [ "$suite" = 'jessie' ] || [ "$suite" = 'alpine3.6' ] || [ "$suite" = 'alpine3.7' ]; then
+				# argon2 password hashing is only supported in 7.2+ and stretch+ / alpine 3.8+
+				sed -ri \
+					-e '/##<argon2>##/,/##<\/argon2>##/d' \
+					-e '/argon2/d' \
+					"$version/$suite/$variant/Dockerfile"
 			fi
 			if [ "$majorVersion" = '5' ] || [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ]; then
 				# sodium is part of php core 7.2+ https://wiki.php.net/rfc/libsodium
@@ -180,7 +187,8 @@ for version in "${versions[@]}"; do
 			# automatic `-slim` for stretch
 			# TODO always add slim once jessie is removed
 			sed -ri \
-				-e 's!%%DEBIAN_SUITE%%!'"${suite/stretch/stretch-slim}"'!' \
+				-e 's!%%DEBIAN_TAG%%!'"${suite/stretch/stretch-slim}"'!' \
+				-e 's!%%DEBIAN_SUITE%%!'"$suite"'!' \
 				-e 's!%%ALPINE_VERSION%%!'"$alpineVer"'!' \
 				"$version/$suite/$variant/Dockerfile"
 			dockerfiles+=( "$version/$suite/$variant/Dockerfile" )
