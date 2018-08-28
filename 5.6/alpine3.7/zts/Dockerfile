@@ -142,6 +142,10 @@ RUN set -xe \
 	&& make install \
 	&& { find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; } \
 	&& make clean \
+	\
+# https://github.com/docker-library/php/issues/692 (copy default example "php.ini" files somewhere easily discoverable)
+	&& cp -v php.ini-* "$PHP_INI_DIR/" \
+	\
 	&& cd / \
 	&& docker-php-source delete \
 	\
