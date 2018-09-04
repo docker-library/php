@@ -55,5 +55,8 @@ RUN { \
 	} | tee "$APACHE_CONFDIR/conf-available/docker-php.conf" \
 	&& a2enconf docker-php
 
+# Listen on localhost
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
 ENV PHP_EXTRA_BUILD_DEPS apache2-dev
 ENV PHP_EXTRA_CONFIGURE_ARGS --with-apxs2 --disable-cgi
