@@ -1,5 +1,8 @@
 FROM alpine:%%ALPINE_VERSION%%
 
+# Allow extend build parameters
+ARG PHP_EXTRA_CONFIGURE_ARGS
+
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
 ENV PHPIZE_DEPS \
