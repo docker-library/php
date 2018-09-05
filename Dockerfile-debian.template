@@ -1,5 +1,8 @@
 FROM debian:%%DEBIAN_TAG%%
 
+# Allow extend build parameters
+ARG PHP_EXTRA_CONFIGURE_ARGS
+
 # prevent Debian's PHP packages from being installed
 # https://github.com/docker-library/php/pull/542
 RUN set -eux; \
@@ -169,7 +172,7 @@ RUN set -eux; \
 		$(test "$gnuArch" = 's390x-linux-gnu' && echo '--without-pcre-jit') \
 		--with-libdir="lib/$debMultiarch" \
 		\
-		${PHP_EXTRA_CONFIGURE_ARGS:-} \
+		$PHP_EXTRA_CONFIGURE_ARGS \
 	; \
 	make -j "$(nproc)"; \
 	make install; \
