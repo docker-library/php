@@ -1,12 +1,11 @@
 #!/bin/bash
+
+./buildconf -force
+
+
 sed 's/PHP_EXTRA_VERSION=.*/PHP_EXTRA_VERSION=-polyscripted/' configure > configure.polyscripted
 yes | cp configure.polyscripted configure
 
-./configure \
-  --exec-prefix=/polyscripted-php \
-  --prefix=/polyscripted-php \
-  --with-apxs2 \
-  --with-pdo-mysql \
-  --with-mysqli; \
-
+make -j "$(nproc)"
 make install
+make clean
