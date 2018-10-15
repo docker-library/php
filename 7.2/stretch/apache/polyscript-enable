@@ -1,10 +1,10 @@
 #!/bin/bash
 
-./buildconf -force
-
-
-sed 's/PHP_EXTRA_VERSION=.*/PHP_EXTRA_VERSION=-polyscripted/' configure > configure.polyscripted
-yes | cp configure.polyscripted configure
+sed -i '/^PHP_EXTRA_VERSION/s/"$/-poly"/' configure
+sed -i '/^PHP_EXTRA_VERSION/s/"$/-poly"/' configure.ac
+sed -i '/^PHP_EXTRA_VERSION/s"$/-poly"/' Makefile
+sed -i '/PHP_EXTRA_VERSION/s/""/"-poly"/' main/php_version.h
+sed -i '/PHP_VERSION "/s/"$/-poly"/' main/php_version.h
 
 make -j "$(nproc)"
 make install
