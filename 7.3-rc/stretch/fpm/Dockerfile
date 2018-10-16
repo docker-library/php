@@ -244,6 +244,7 @@ RUN set -ex \
 		echo; \
 		echo '; Ensure worker stdout and stderr are sent to the main error log.'; \
 		echo 'catch_workers_output = yes'; \
+		echo 'decorate_workers_output = no'; \
 	} | tee php-fpm.d/docker.conf \
 	&& { \
 		echo '[global]'; \
