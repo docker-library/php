@@ -169,7 +169,8 @@ RUN set -xe; \
 COPY docker-php-source /usr/local/bin/
 COPY polyscript-enable /usr/local/bin
 COPY scripts/ /usr/local/bin/polyscripting
-RUN . ./usr/local/bin/polyscripting/config.sh
+ENV POLYSCRIPT_PATH="/usr/local/bin/polyscripting/"
+ENV PHP_SRC_PATH="/usr/src/php/"
 
 RUN set -eux; \
 	\
@@ -251,8 +252,6 @@ RUN set -eux; \
 	; \
 	polyscript-enable; \
 	find /usr/local/bin /usr/local/sbin -type f -executable -exec strip --strip-all '{}' + || true; \
-	make clean; \
-
 
 # https://github.com/docker-library/php/issues/692 (copy default example "php.ini" files somewhere easily discoverable)
 	cp -v php.ini-* "$PHP_INI_DIR/"; \
@@ -277,8 +276,10 @@ RUN set -eux; \
 	rm -rf /tmp/pear ~/.pearrc
 
 WORKDIR /usr/local/bin/polyscripting
+RUN cp ./src/pharcommand.inc "/usr/src/php/ext/phar/phar/"
 COPY --from=0 /go/src/github.com/polyverse/php-scrambler/php-scrambler /usr/local/bin/polyscripting
 COPY --from=0 /go/src/github.com/polyverse/tok-php-transformer/tok-php-transformer.php /usr/local/bin/polyscripting
+COPY --from=0 /go/src/github.com/polyverse/tok-php-transformer/snip-transform.php /usr/local/bin/polyscripting
 
 COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-export PHP_SRC_PATH="/usr/src/php/"
-export POLYSCRIPT_PAH="usr/local/bin/polyscripting"
-export TRANSFORM_MAP=""
+if [ ! -f "$PATH/s_php" ]; then
+	cp /usr/local/bin/php /usr/local/bin/s_php
+fi
+
 
