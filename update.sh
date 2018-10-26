@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+
 # https://secure.php.net/gpg-keys.php
 declare -A gpgKeys=(
 	# https://wiki.php.net/todo/php73
@@ -48,7 +49,7 @@ generated_warning() {
 		#
 		# NOTE: THIS DOCKERFILE IS GENERATED VIA "update.sh"
 		#
-		# PLEASE DO NOT EDIT IT DIRECTLY.
+		# PLEASE please DO NOT EDIT IT DIRECTLY.
 		#
 
 	EOH
