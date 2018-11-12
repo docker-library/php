@@ -68,8 +68,10 @@ RUN set -ex \
 	; do \
 		rm -rvf "$dir" \
 		&& mkdir -p "$dir" \
-		&& chown -R "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$dir"; \
-	done
+		&& chown -R "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$dir" \
+# allow running as an arbitrary user (https://github.com/docker-library/php/issues/743)
+		&& chmod 1777 "$dir" \
+	; done
 
 # Apache + PHP requires preforking Apache for best results
 RUN a2dismod mpm_event && a2enmod mpm_prefork
