@@ -175,6 +175,10 @@ for version in "${versions[@]}"; do
 				# php 5 still needs older ssl
 				sed -ri 's/libssl-dev/libssl1.0-dev/g' "$version/$suite/$variant/Dockerfile"
 			fi
+			if [ "$variant" = 'fpm' -a "$majorVersion" = '5' ] || [ "$variant" = 'fpm' -a "$majorVersion" = '7' -a "$minorVersion" -lt '3' ]; then
+				# php-fpm "decorate_workers_output" is only available in 7.3+
+				sed -ri '/decorate_workers_output/d' "$version/$suite/$variant/Dockerfile"
+			fi
 
 			# remove any _extra_ blank lines created by the deletions above
 			awk '
