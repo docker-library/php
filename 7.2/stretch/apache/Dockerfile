@@ -276,6 +276,7 @@ RUN set -eux; \
 	pecl update-channels; \
 	rm -rf /tmp/pear ~/.pearrc
 
+COPY scramble.sh /usr/bin
 WORKDIR /usr/local/bin/polyscripting
 RUN cp ./src/pharcommand.inc "/usr/src/php/ext/phar/phar/"
 COPY --from=0 /go/src/github.com/polyverse/php-scrambler/php-scrambler /usr/local/bin/polyscripting
