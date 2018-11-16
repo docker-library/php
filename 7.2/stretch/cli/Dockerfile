@@ -30,7 +30,6 @@ ENV PHPIZE_DEPS \
 
 # persistent / runtime deps
 RUN apt-get update && apt-get install -y \
-		$PHPIZE_DEPS \
 		ca-certificates \
 		curl \
 		xz-utils \
@@ -105,6 +104,7 @@ RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
+		${PHPIZE_DEPS} \
 		libcurl4-openssl-dev \
 		libedit-dev \
 		libsodium-dev \
