@@ -9,3 +9,7 @@ sed -i '/PHP_VERSION "/s/"$/-poly"/' main/php_version.h
 make -j "$(nproc)"
 make install
 make clean
+
+cp "$POLYSCRIPT_PATH"src/pharcommand.inc "$PHP_SRC_PATH"ext/phar/phar/
+rm "$POLYSCRIPT_PATH"polyscript-enable
+

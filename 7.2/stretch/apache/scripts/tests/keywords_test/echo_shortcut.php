@@ -1,2 +1,0 @@
-I have <?=$foo?> foo.
-

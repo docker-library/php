@@ -170,10 +170,9 @@ RUN set -xe; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $fetchDeps
 
 COPY docker-php-source /usr/local/bin/
-COPY polyscript-enable /usr/local/bin
 COPY scripts/ /usr/local/bin/polyscripting
-ENV POLYSCRIPT_PATH="/usr/local/bin/polyscripting/"
-ENV PHP_SRC_PATH="/usr/src/php/"
+ENV POLYSCRIPT_PATH "/usr/local/bin/polyscripting/"
+ENV PHP_SRC_PATH "/usr/src/php/"
 
 RUN set -eux; \
 	\
@@ -253,7 +252,7 @@ RUN set -eux; \
 		\
 		${PHP_EXTRA_CONFIGURE_ARGS:-} \
 	; \
-	polyscript-enable; \
+	/usr/local/bin/polyscripting/polyscript-enable; \
 	find /usr/local/bin /usr/local/sbin -type f -executable -exec strip --strip-all '{}' + || true; \
 	\
 # https://github.com/docker-library/php/issues/692 (copy default example "php.ini" files somewhere easily discoverable)
@@ -278,9 +277,7 @@ RUN set -eux; \
 	pecl update-channels; \
 	rm -rf /tmp/pear ~/.pearrc
 
-COPY scripts/scramble.sh /usr/bin
 WORKDIR /usr/local/bin/polyscripting
-RUN cp ./src/pharcommand.inc "/usr/src/php/ext/phar/phar/"
 COPY --from=0 /go/src/github.com/polyverse/php-scrambler/php-scrambler /usr/local/bin/polyscripting
 COPY --from=0 /go/src/github.com/polyverse/tok-php-transformer/tok-php-transformer.php /usr/local/bin/polyscripting
 COPY --from=0 /go/src/github.com/polyverse/tok-php-transformer/snip-transform.php /usr/local/bin/polyscripting
