@@ -94,9 +94,9 @@ for version in "${versions[@]}"; do
 			cli \
 			apache \
 			fpm \
-			zts \
 		; do
 			dir="$version/$suite/$variant"
+
 			[ -f "$dir/Dockerfile" ] || continue
 
 			commit="$(dirCommit "$dir")"
@@ -104,6 +104,14 @@ for version in "${versions[@]}"; do
 
 			baseAliases=( $fullVersion "${versionAliases[@]}" )
 			variantAliases=( "${baseAliases[@]/%/-$variant}" )
+			# zts (thread safe php) is available in the apache image, so lets keep a compatability tag for zts on old versions
+			# https://github.com/docker-library/php/issues/742
+			# TODO remove zts tags completely
+			if [ "$variant" = 'apache' ]; then
+				if [ "$version" = '7.2' ] || [ "$version" = '7.1' ] || [ "$version" = '7.0' ] || [ "$version" = '5.6' ]; then
+					variantAliases+=( "${baseAliases[@]/%/-zts}" )
+				fi
+			fi
 			variantAliases=( "${variantAliases[@]//latest-/}" )
 
 			if [ "$variant" = 'cli' ]; then
