@@ -6,7 +6,7 @@ RUN apt-get update \
 ENV APACHE_CONFDIR /etc/apache2
 ENV APACHE_ENVVARS $APACHE_CONFDIR/envvars
 
-RUN set -ex \
+RUN set -eux; \
 	\
 # generically convert lines like
 #   export APACHE_RUN_USER=www-data
@@ -14,32 +14,31 @@ RUN set -ex \
 #   : ${APACHE_RUN_USER:=www-data}
 #   export APACHE_RUN_USER
 # so that they can be overridden at runtime ("-e APACHE_RUN_USER=...")
-	&& sed -ri 's/^export ([^=]+)=(.*)$/: ${\1:=\2}\nexport \1/' "$APACHE_ENVVARS" \
+	sed -ri 's/^export ([^=]+)=(.*)$/: ${\1:=\2}\nexport \1/' "$APACHE_ENVVARS"; \
 	\
 # setup directories and permissions
-	&& . "$APACHE_ENVVARS" \
-	&& for dir in \
+	. "$APACHE_ENVVARS"; \
+	for dir in \
 		"$APACHE_LOCK_DIR" \
 		"$APACHE_RUN_DIR" \
 		"$APACHE_LOG_DIR" \
 		/var/www/html \
 	; do \
-		rm -rvf "$dir" \
-		&& mkdir -p "$dir" \
-		&& chown -R "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$dir" \
+		rm -rvf "$dir"; \
+		mkdir -p "$dir"; \
+		chown "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$dir"; \
 # allow running as an arbitrary user (https://github.com/docker-library/php/issues/743)
-		&& chmod 1777 "$dir" \
-	; done
+		chmod 777 "$dir"; \
+	done; \
+	\
+# logs should go to stdout / stderr
+	ln -sfT /dev/stderr "$APACHE_LOG_DIR/error.log"; \
+	ln -sfT /dev/stdout "$APACHE_LOG_DIR/access.log"; \
+	ln -sfT /dev/stdout "$APACHE_LOG_DIR/other_vhosts_access.log"; \
+	chown -R --no-dereference "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$APACHE_LOG_DIR"
 
 # Apache + PHP requires preforking Apache for best results
 RUN a2dismod mpm_event && a2enmod mpm_prefork
-
-# logs should go to stdout / stderr
-RUN set -ex \
-	&& . "$APACHE_ENVVARS" \
-	&& ln -sfT /dev/stderr "$APACHE_LOG_DIR/error.log" \
-	&& ln -sfT /dev/stdout "$APACHE_LOG_DIR/access.log" \
-	&& ln -sfT /dev/stdout "$APACHE_LOG_DIR/other_vhosts_access.log"
 
 # PHP files should be handled by PHP, and should be preferred over any other file type
 RUN { \
