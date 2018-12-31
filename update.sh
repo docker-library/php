@@ -177,7 +177,10 @@ for version in "${versions[@]}"; do
 			fi
 			if [ "$variant" = 'fpm' -a "$majorVersion" = '5' ] || [ "$variant" = 'fpm' -a "$majorVersion" = '7' -a "$minorVersion" -lt '3' ]; then
 				# php-fpm "decorate_workers_output" is only available in 7.3+
-				sed -ri '/decorate_workers_output/d' "$version/$suite/$variant/Dockerfile"
+				sed -ri \
+					-e '/decorate_workers_output/d' \
+					-e '/log_limit/d' \
+					"$version/$suite/$variant/Dockerfile"
 			fi
 
 			# remove any _extra_ blank lines created by the deletions above
