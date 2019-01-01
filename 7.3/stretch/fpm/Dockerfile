@@ -235,6 +235,7 @@ RUN set -ex \
 	&& { \
 		echo '[global]'; \
 		echo 'error_log = /proc/self/fd/2'; \
+		echo; echo '; https://github.com/docker-library/php/pull/725#issuecomment-443540114'; echo 'log_limit = 8192'; \
 		echo; \
 		echo '[www]'; \
 		echo '; if we send this to /proc/self/fd/1, it never appears'; \
