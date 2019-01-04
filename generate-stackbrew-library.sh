@@ -2,7 +2,6 @@
 set -Eeuo pipefail
 
 declare -A aliases=(
-	[5.6]='5'
 	[7.3]='7 latest'
 	[7.4-rc]='rc'
 )
@@ -12,7 +11,7 @@ defaultAlpineVersion='3.8'
 declare -A alpineVersions=(
 	# /usr/src/php/ext/openssl/openssl.c:551:12: error: static declaration of 'RSA_set0_key' follows non-static declaration
 	# https://github.com/docker-library/php/pull/702#issuecomment-413341743
-	[7.0]='3.7'
+	#[7.0]='3.7'
 )
 
 self="$(basename "$BASH_SOURCE")"
@@ -88,7 +87,7 @@ for version in "${versions[@]}"; do
 	for suite in \
 		stretch \
 		jessie \
-		alpine{3.8,3.7,3.6} \
+		alpine3.8 \
 	; do
 		for variant in \
 			cli \
@@ -125,7 +124,7 @@ for version in "${versions[@]}"; do
 			# 7.2 no longer supports s390x
 			# #error "Not yet implemented"
 			# https://github.com/docker-library/php/pull/487#issue-254755661
-			if [[ "$version" = 7.* ]] && [ "$version" != '7.0' ] && [ "$version" != '7.1' ]; then
+			if [[ "$version" = 7.* ]] && [ "$version" != '7.1' ]; then
 				variantArches="$(echo " $variantArches " | sed -r -e 's/ s390x//g')"
 			fi
 
