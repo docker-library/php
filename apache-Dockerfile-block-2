@@ -22,9 +22,6 @@ RUN set -ex \
 		echo; echo '; https://github.com/docker-library/php/pull/725#issuecomment-443540114'; echo 'log_limit = 8192'; \
 		echo; \
 		echo '[www]'; \
-		echo '; if we send this to /proc/self/fd/1, it never appears'; \
-		echo 'access.log = /proc/self/fd/2'; \
-		echo; \
 		echo 'clear_env = no'; \
 		echo; \
 		echo '; Ensure worker stdout and stderr are sent to the main error log.'; \
@@ -36,8 +33,27 @@ RUN set -ex \
 		echo 'daemonize = no'; \
 		echo; \
 		echo '[www]'; \
-		echo 'listen = 9000'; \
-	} | tee php-fpm.d/zz-docker.conf
+		echo 'listen = /var/run/php-fpm/fpm.sock'; \
+		echo 'listen.mode = 666'; \
+	} | tee php-fpm.d/zz-docker.conf \
+	&& mkdir -p /var/run/php-fpm && chmod 777 /var/run/php-fpm
+
+# Command that launches Apache and FPM simultaneously
+RUN	{ \
+		echo '#!/bin/bash'; \
+		echo 'if [ -z "$APACHE_KEEP_MODS" ]; then'; \
+		echo '  a2dismod -q mpm_prefork php7 && a2enmod -q mpm_event proxy_fcgi || exit 1'; \
+		echo 'fi'; \
+		echo 'php-fpm $FPM_ARGS &'; \
+		echo 'apache2-foreground -DFPM $APACHE_ARGS &'; \
+		echo; \
+		echo 'trap "stopped=1" TERM INT'; \
+		echo 'wait -n					# wait until container is stopped, or a process exits'; \
+		echo 'kill %1 %2 2> /dev/null			# send sigterm to remaining processes'; \
+		echo 'if [ -z "$stopped" ]; then exit 2; fi	# if it was a crash, container fails immediately'; \
+		echo 'until wait; do true; done			# otherwise, wait for processes to finish'; \
+	} | tee /usr/local/bin/apache-fpm \
+	&& chmod +x /usr/local/bin/apache-fpm
 
 EXPOSE 80
 CMD ["apache2-foreground"]
