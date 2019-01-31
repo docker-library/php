@@ -118,7 +118,7 @@ for version in "${versions[@]}"; do
 
 	dockerfiles=()
 
-	for suite in stretch jessie alpine{3.8,3.7,3.6}; do
+	for suite in stretch jessie alpine{3.9,3.8}; do
 		[ -d "$version/$suite" ] || continue
 		alpineVer="${suite#alpine}"
 
@@ -183,6 +183,12 @@ for version in "${versions[@]}"; do
 				-e 's!%%ALPINE_VERSION%%!'"$alpineVer"'!' \
 				"$version/$suite/$variant/Dockerfile"
 			dockerfiles+=( "$version/$suite/$variant/Dockerfile" )
+
+			if [ "$suite" = 'alpine3.8' ]; then
+				# Alpine 3.9+ uses OpenSSL, but 3.8 still uses LibreSSL
+				sed -ri -e 's!(\s)openssl!\1libressl!g' "$version/$suite/$variant/Dockerfile"
+				# (matching whitespace to avoid "--with-openssl" being replaced with the non-existent "--with-libressl" flag)
+			fi
 		done
 	done
 

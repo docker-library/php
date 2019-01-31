@@ -7,7 +7,7 @@ declare -A aliases=(
 )
 
 defaultDebianSuite='stretch'
-defaultAlpineVersion='3.8'
+defaultAlpineVersion='3.9'
 declare -A alpineVersions=(
 	# /usr/src/php/ext/openssl/openssl.c:551:12: error: static declaration of 'RSA_set0_key' follows non-static declaration
 	# https://github.com/docker-library/php/pull/702#issuecomment-413341743
@@ -87,7 +87,7 @@ for version in "${versions[@]}"; do
 	for suite in \
 		stretch \
 		jessie \
-		alpine3.8 \
+		alpine{3.9,3.8} \
 	; do
 		for variant in \
 			cli \

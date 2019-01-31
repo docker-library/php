@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.8
+FROM alpine:3.9
 
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
@@ -26,7 +26,7 @@ RUN apk add --no-cache --virtual .persistent-deps \
 		tar \
 		xz \
 # https://github.com/docker-library/php/issues/494
-		libressl
+		openssl
 
 # ensure www-data user exists
 RUN set -x \
@@ -60,11 +60,11 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2"
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"
 
-ENV GPG_KEYS CBAF69F173A0FEA4B537F470D66C9593118BCCB6 F38252826ACD957EF380D39F2F7956BC5DA04B5D
+ENV GPG_KEYS 1729F83938DA44E27BA0F4D3DBDB397470D12172 B1B44D8F021E4E2D6021E995DC9FF8D3EE5AF27F
 
-ENV PHP_VERSION 7.3.1
-ENV PHP_URL="https://secure.php.net/get/php-7.3.1.tar.xz/from/this/mirror" PHP_ASC_URL="https://secure.php.net/get/php-7.3.1.tar.xz.asc/from/this/mirror"
-ENV PHP_SHA256="cfe93e40be0350cd53c4a579f52fe5d8faf9c6db047f650a4566a2276bf33362" PHP_MD5=""
+ENV PHP_VERSION 7.2.14
+ENV PHP_URL="https://secure.php.net/get/php-7.2.14.tar.xz/from/this/mirror" PHP_ASC_URL="https://secure.php.net/get/php-7.2.14.tar.xz.asc/from/this/mirror"
+ENV PHP_SHA256="ee3f1cc102b073578a3c53ba4420a76da3d9f0c981c02b1664ae741ca65af84f" PHP_MD5=""
 
 RUN set -xe; \
 	\
@@ -109,7 +109,7 @@ RUN set -xe \
 		libedit-dev \
 		libsodium-dev \
 		libxml2-dev \
-		libressl-dev \
+		openssl-dev \
 		sqlite-dev \
 	\
 	&& export CFLAGS="$PHP_CFLAGS" \
