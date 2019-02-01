@@ -27,17 +27,6 @@ env:
   - VERSION=7.1 VARIANT=alpine3.8/cli
   - VERSION=7.1 VARIANT=alpine3.8/fpm
   - VERSION=7.1 VARIANT=alpine3.8/zts
-  - VERSION=5.6 VARIANT=stretch/cli
-  - VERSION=5.6 VARIANT=stretch/apache
-  - VERSION=5.6 VARIANT=stretch/fpm
-  - VERSION=5.6 VARIANT=stretch/zts
-  - VERSION=5.6 VARIANT=jessie/cli
-  - VERSION=5.6 VARIANT=jessie/apache
-  - VERSION=5.6 VARIANT=jessie/fpm
-  - VERSION=5.6 VARIANT=jessie/zts
-  - VERSION=5.6 VARIANT=alpine3.8/cli
-  - VERSION=5.6 VARIANT=alpine3.8/fpm
-  - VERSION=5.6 VARIANT=alpine3.8/zts
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images

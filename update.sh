@@ -20,12 +20,6 @@ declare -A gpgKeys=(
 	# https://secure.php.net/downloads.php#gpg-7.1
 	# https://secure.php.net/gpg-keys.php#gpg-7.1
 	[7.1]='A917B1ECDA84AEC2B568FED6F50ABC807BD5DCD0 528995BFEDFBA7191D46839EF9BA0ADA31CBD89E 1729F83938DA44E27BA0F4D3DBDB397470D12172'
-
-	# https://wiki.php.net/todo/php56
-	# jpauli & tyrael
-	# https://secure.php.net/downloads.php#gpg-5.6
-	# https://secure.php.net/gpg-keys.php#gpg-5.6
-	[5.6]='0BD78B5F97500D450838F95DFE857D9A90D90EC1 6E4F6AB321FDC07F2C332E3AC2BF0BC433CFC8B3'
 )
 # see https://secure.php.net/downloads.php
 
@@ -154,22 +148,18 @@ for version in "${versions[@]}"; do
 			if [ "$variant" = 'apache' ]; then
 				cp -a apache2-foreground "$version/$suite/$variant/"
 			fi
-			if [ "$majorVersion" = '5' ] || [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ] || [ "$suite" = 'jessie' ]; then
+			if [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ] || [ "$suite" = 'jessie' ]; then
 				# argon2 password hashing is only supported in 7.2+ and stretch+ / alpine 3.8+
 				sed -ri \
 					-e '/##<argon2>##/,/##<\/argon2>##/d' \
 					-e '/argon2/d' \
 					"$version/$suite/$variant/Dockerfile"
 			fi
-			if [ "$majorVersion" = '5' ] || [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ]; then
+			if [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ]; then
 				# sodium is part of php core 7.2+ https://wiki.php.net/rfc/libsodium
 				sed -ri '/sodium/d' "$version/$suite/$variant/Dockerfile"
 			fi
-			if [ "$majorVersion" = '5' -a "$suite" = 'stretch' ]; then
-				# php 5 still needs older ssl
-				sed -ri 's/libssl-dev/libssl1.0-dev/g' "$version/$suite/$variant/Dockerfile"
-			fi
-			if [ "$variant" = 'fpm' -a "$majorVersion" = '5' ] || [ "$variant" = 'fpm' -a "$majorVersion" = '7' -a "$minorVersion" -lt '3' ]; then
+			if [ "$variant" = 'fpm' -a "$majorVersion" = '7' -a "$minorVersion" -lt '3' ]; then
 				# php-fpm "decorate_workers_output" is only available in 7.3+
 				sed -ri \
 					-e '/decorate_workers_output/d' \
