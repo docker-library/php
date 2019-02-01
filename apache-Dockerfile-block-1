@@ -1,12 +1,10 @@
-RUN apt-get update \
-	&& apt-get install -y --no-install-recommends \
-		apache2 \
-	&& rm -rf /var/lib/apt/lists/*
-
 ENV APACHE_CONFDIR /etc/apache2
 ENV APACHE_ENVVARS $APACHE_CONFDIR/envvars
 
 RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends apache2; \
+	rm -rf /var/lib/apt/lists/*; \
 	\
 # generically convert lines like
 #   export APACHE_RUN_USER=www-data
@@ -22,7 +20,6 @@ RUN set -eux; \
 		"$APACHE_LOCK_DIR" \
 		"$APACHE_RUN_DIR" \
 		"$APACHE_LOG_DIR" \
-		/var/www/html \
 	; do \
 		rm -rvf "$dir"; \
 		mkdir -p "$dir"; \
@@ -30,6 +27,9 @@ RUN set -eux; \
 # allow running as an arbitrary user (https://github.com/docker-library/php/issues/743)
 		chmod 777 "$dir"; \
 	done; \
+	\
+# delete the "index.html" that installing Apache drops in here
+	rm -rvf /var/www/html/*; \
 	\
 # logs should go to stdout / stderr
 	ln -sfT /dev/stderr "$APACHE_LOG_DIR/error.log"; \
