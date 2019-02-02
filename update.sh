@@ -146,7 +146,7 @@ for version in "${versions[@]}"; do
 				docker-php-source \
 				"$version/$suite/$variant/"
 			if [ "$variant" = 'apache' ]; then
-				cp -a apache2-foreground "$version/$suite/$variant/"
+				cp -a apache2-foreground apache-fpm "$version/$suite/$variant/"
 			fi
 			if [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ] || [ "$suite" = 'jessie' ]; then
 				# argon2 password hashing is only supported in 7.2+ and stretch+ / alpine 3.8+
