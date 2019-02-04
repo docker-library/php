@@ -15,7 +15,7 @@ if [ -z "$APACHE_KEEP_MODS" ]; then
 	a2dismod -q mpm_prefork php7 && a2enmod -q mpm_event proxy_fcgi || exit 1
 fi
 php-fpm $FPM_ARGS &
-apache2-foreground -DFPM $APACHE_ARGS &
+apache2-foreground -DFPM "$@" &
 
 trap "stopped=1" TERM INT
 wait -n					# wait until container is stopped, or a process exits
