@@ -1,4 +1,16 @@
 #!/bin/bash
+
+# By default, FPM will run as the same user as Apache
+. "$APACHE_ENVVARS"
+: ${FPM_RUN_USER:=$APACHE_RUN_USER}
+: ${FPM_RUN_GROUP:=$APACHE_RUN_GROUP}
+export FPM_RUN_USER FPM_RUN_GROUP
+
+# Strip off any '#' symbol ('#1000' is valid syntax for Apache)
+pound='#'
+FPM_RUN_USER="${FPM_RUN_USER#$pound}"
+FPM_RUN_GROUP="${FPM_RUN_GROUP#$pound}"
+
 if [ -z "$APACHE_KEEP_MODS" ]; then
 	a2dismod -q mpm_prefork php7 && a2enmod -q mpm_event proxy_fcgi || exit 1
 fi

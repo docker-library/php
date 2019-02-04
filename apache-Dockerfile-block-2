@@ -33,6 +33,8 @@ RUN set -ex \
 		echo 'daemonize = no'; \
 		echo; \
 		echo '[www]'; \
+		echo 'user = ${FPM_RUN_USER}'; \
+		echo 'group = ${FPM_RUN_GROUP}'; \
 		echo 'listen = /var/run/php-fpm/fpm.sock'; \
 		echo 'listen.mode = 666'; \
 	} | tee php-fpm.d/zz-docker.conf \
