@@ -11,14 +11,20 @@ pound='#'
 FPM_RUN_USER="${FPM_RUN_USER#$pound}"
 FPM_RUN_GROUP="${FPM_RUN_GROUP#$pound}"
 
+# Setup Apache modules and launch!
 if [ -z "$APACHE_KEEP_MODS" ]; then
 	a2dismod -q mpm_prefork php7 && a2enmod -q mpm_event proxy_fcgi || exit 1
 fi
 php-fpm $FPM_ARGS &
 apache2-foreground -DFPM "$@" &
 
+# Wait until container is stopped, or a process crashes
 trap "stopped=1" TERM INT
-wait -n					# wait until container is stopped, or a process exits
-kill %1 %2 2> /dev/null			# send sigterm to remaining processes
-if [ -z "$stopped" ]; then exit 2; fi	# if it was a crash, container fails immediately
-until wait; do true; done		# otherwise, wait for processes to finish
+wait -n
+
+# Tell processes to terminate
+kill %1 %2 2> /dev/null
+# If there was a crash, container fails immediately
+if [ -z "$stopped" ]; then exit 2; fi
+# If the container was stopped, wait for processes to finish
+until wait; do true; done

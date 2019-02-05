@@ -1,6 +1,7 @@
 COPY apache2-foreground /usr/local/bin/
 WORKDIR /var/www/html
 
+# Set up FPM
 RUN set -ex \
 	&& cd /usr/local/etc \
 	&& if [ -d php-fpm.d ]; then \
