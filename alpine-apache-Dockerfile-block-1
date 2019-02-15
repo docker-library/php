@@ -1,0 +1,65 @@
+ENV APACHE_CONFDIR /etc/apache2
+
+RUN set -eux; \
+	apk update; \
+	apk add apache2 apache2-dev; \
+	\
+	: ${APACHE_RUN_USER:=www-data}; \
+	export APACHE_RUN_USER; \
+	: ${APACHE_RUN_GROUP:=www-data}; \
+	export APACHE_RUN_GROUP; \
+	: ${APACHE_PID_FILE:=/var/run/apache2/apache2.pid}; \
+	export APACHE_PID_FILE; \
+	: ${APACHE_RUN_DIR:=/var/run/apache2}; \
+	export APACHE_RUN_DIR; \
+	: ${APACHE_LOCK_DIR:=/var/lock/apache2}; \
+	export APACHE_LOCK_DIR; \
+	: ${APACHE_LOG_DIR:=/var/log/apache2}; \
+	export APACHE_LOG_DIR; \
+	\
+# setup directories and permissions
+	for dir in \
+		"$APACHE_LOCK_DIR" \
+		"$APACHE_RUN_DIR" \
+		"$APACHE_LOG_DIR" \
+	; do \
+		rm -rvf "$dir"; \
+		mkdir -p "$dir"; \
+		chown "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$dir"; \
+# allow running as an arbitrary user (https://github.com/docker-library/php/issues/743)
+		chmod 777 "$dir"; \
+	done; \
+	\
+# delete the "index.html" that installing Apache drops in here
+	rm -rvf /var/www/html/*; \
+	\
+# logs should go to stdout / stderr
+	ln -sfT /dev/stderr "$APACHE_LOG_DIR/error.log"; \
+	ln -sfT /dev/stdout "$APACHE_LOG_DIR/access.log"; \
+	ln -sfT /dev/stdout "$APACHE_LOG_DIR/other_vhosts_access.log"; \
+	chown -R --no-dereference "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$APACHE_LOG_DIR"
+
+# Apache + PHP requires preforking Apache for best results
+RUN sed -i 's@^#LoadModule mpm_event_module modules/mod_mpm_event\.so@LoadModule mpm_event_module modules/mod_mpm_event.so@' /etc/apache2/httpd.conf
+RUN sed -i '/^LoadModule mpm_prefork_module/s//#LoadModule mpm_prefork_module/g' /etc/apache2/httpd.conf
+
+# PHP files should be handled by PHP, and should be preferred over any other file type
+RUN { \
+		echo '<FilesMatch \.php$>'; \
+		echo '  SetHandler application/x-httpd-php'; \
+		echo '</FilesMatch>'; \
+		echo; \
+		echo 'DirectoryIndex disabled'; \
+		echo 'DirectoryIndex index.php index.html'; \
+		echo; \
+		echo '<Directory /var/www/>'; \
+		echo '  Options -Indexes'; \
+		echo '  AllowOverride All'; \
+		echo '</Directory>'; \
+	} | tee "$APACHE_CONFDIR/conf.d/docker-php.conf"
+
+ENV PHP_EXTRA_BUILD_DEPS apache2-dev
+ENV PHP_EXTRA_CONFIGURE_ARGS --with-apxs2 --disable-cgi
+
+# correct the path to the php module
+RUN sed -i 's@^LoadModule php7_module .*@LoadModule php7_module /usr/lib/apache2/libphp7.so@' /etc/apache2/httpd.conf

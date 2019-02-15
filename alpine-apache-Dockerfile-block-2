@@ -1,0 +1,8 @@
+# correct the path to the PHP module
+RUN sed -i 's@^LoadModule php7_module .*@LoadModule php7_module /usr/lib/apache2/libphp7.so@' /etc/apache2/httpd.conf
+
+COPY apache2-foreground /usr/local/bin/
+WORKDIR /var/www/html
+
+EXPOSE 80
+CMD ["apache2-foreground"]
