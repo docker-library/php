@@ -165,6 +165,7 @@ RUN set -eux; \
 		${PHP_EXTRA_CONFIGURE_ARGS:-} \
 	; \
 	make -j "$(nproc)"; \
+	find -type f -name '*.a' -delete; \
 	make install; \
 	find /usr/local/bin /usr/local/sbin -type f -executable -exec strip --strip-all '{}' + || true; \
 	make clean; \
