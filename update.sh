@@ -153,7 +153,7 @@ for version in "${versions[@]}"; do
 				docker-php-source \
 				"$version/$suite/$variant/"
 			if [ "$variant" = 'apache' ]; then
-                if [ "${suite/alpine*/alpine}" = 'alpine' ]; then
+				if [ "${suite/alpine*/alpine}" = 'alpine' ]; then
 					cp -a httpd-foreground "$version/$suite/$variant/"
 				else
 					cp -a apache2-foreground "$version/$suite/$variant/"
