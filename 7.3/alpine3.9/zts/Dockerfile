@@ -20,7 +20,7 @@ ENV PHPIZE_DEPS \
 		re2c
 
 # persistent / runtime deps
-RUN apk add --no-cache --virtual .persistent-deps \
+RUN apk add --no-cache \
 		ca-certificates \
 		curl \
 		tar \
@@ -96,7 +96,7 @@ RUN set -xe; \
 		rm -rf "$GNUPGHOME"; \
 	fi; \
 	\
-	apk del .fetch-deps
+	apk del --no-network .fetch-deps
 
 COPY docker-php-source /usr/local/bin/
 
@@ -168,9 +168,9 @@ RUN set -xe \
 			| sort -u \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)" \
-	&& apk add --no-cache --virtual .php-rundeps $runDeps \
+	&& apk add --no-cache $runDeps \
 	\
-	&& apk del .build-deps \
+	&& apk del --no-network .build-deps \
 	\
 # https://github.com/docker-library/php/issues/443
 	&& pecl update-channels \
