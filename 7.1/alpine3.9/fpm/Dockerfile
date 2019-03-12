@@ -20,7 +20,7 @@ ENV PHPIZE_DEPS \
 		re2c
 
 # persistent / runtime deps
-RUN apk add --no-cache --virtual .persistent-deps \
+RUN apk add --no-cache \
 		ca-certificates \
 		curl \
 		tar \
@@ -62,9 +62,9 @@ ENV PHP_LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"
 
 ENV GPG_KEYS A917B1ECDA84AEC2B568FED6F50ABC807BD5DCD0 528995BFEDFBA7191D46839EF9BA0ADA31CBD89E 1729F83938DA44E27BA0F4D3DBDB397470D12172
 
-ENV PHP_VERSION 7.1.26
-ENV PHP_URL="https://secure.php.net/get/php-7.1.26.tar.xz/from/this/mirror" PHP_ASC_URL="https://secure.php.net/get/php-7.1.26.tar.xz.asc/from/this/mirror"
-ENV PHP_SHA256="10b7ae634c12852fae52a22dc2262e5f12418ad59fd20da2d00d71a212235d31" PHP_MD5=""
+ENV PHP_VERSION 7.1.27
+ENV PHP_URL="https://secure.php.net/get/php-7.1.27.tar.xz/from/this/mirror" PHP_ASC_URL="https://secure.php.net/get/php-7.1.27.tar.xz.asc/from/this/mirror"
+ENV PHP_SHA256="25672a3a6060eff37c865a0c84e284da50b7ee8cd57174c78f0ae244b90a96a8" PHP_MD5=""
 
 RUN set -xe; \
 	\
@@ -96,7 +96,7 @@ RUN set -xe; \
 		rm -rf "$GNUPGHOME"; \
 	fi; \
 	\
-	apk del .fetch-deps
+	apk del --no-network .fetch-deps
 
 COPY docker-php-source /usr/local/bin/
 
@@ -145,6 +145,7 @@ RUN set -xe \
 		\
 		$PHP_EXTRA_CONFIGURE_ARGS \
 	&& make -j "$(nproc)" \
+	&& find -type f -name '*.a' -delete \
 	&& make install \
 	&& { find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; } \
 	&& make clean \
@@ -161,9 +162,9 @@ RUN set -xe \
 			| sort -u \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)" \
-	&& apk add --no-cache --virtual .php-rundeps $runDeps \
+	&& apk add --no-cache $runDeps \
 	\
-	&& apk del .build-deps \
+	&& apk del --no-network .build-deps \
 	\
 # https://github.com/docker-library/php/issues/443
 	&& pecl update-channels \

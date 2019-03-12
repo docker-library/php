@@ -114,7 +114,7 @@ for ext in $exts; do
 done
 
 if [ "$pm" = 'apk' ] && [ -n "$apkDel" ]; then
-	apk del $apkDel
+	apk del --no-network $apkDel
 fi
 
 if [ -e /usr/src/php/.docker-delete-me ]; then
