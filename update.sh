@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# https://secure.php.net/gpg-keys.php
+# https://www.php.net/gpg-keys.php
 declare -A gpgKeys=(
 	# https://wiki.php.net/todo/php73
 	# cmb & stas
-	# https://secure.php.net/gpg-keys.php#gpg-7.3
+	# https://www.php.net/gpg-keys.php#gpg-7.3
 	[7.3]='CBAF69F173A0FEA4B537F470D66C9593118BCCB6 F38252826ACD957EF380D39F2F7956BC5DA04B5D'
 
 	# https://wiki.php.net/todo/php72
 	# pollita & remi
-	# https://secure.php.net/downloads.php#gpg-7.2
-	# https://secure.php.net/gpg-keys.php#gpg-7.2
+	# https://www.php.net/downloads.php#gpg-7.2
+	# https://www.php.net/gpg-keys.php#gpg-7.2
 	[7.2]='1729F83938DA44E27BA0F4D3DBDB397470D12172 B1B44D8F021E4E2D6021E995DC9FF8D3EE5AF27F'
 
 	# https://wiki.php.net/todo/php71
 	# davey & krakjoe
 	# pollita for 7.1.13 for some reason
-	# https://secure.php.net/downloads.php#gpg-7.1
-	# https://secure.php.net/gpg-keys.php#gpg-7.1
+	# https://www.php.net/downloads.php#gpg-7.1
+	# https://www.php.net/gpg-keys.php#gpg-7.1
 	[7.1]='A917B1ECDA84AEC2B568FED6F50ABC807BD5DCD0 528995BFEDFBA7191D46839EF9BA0ADA31CBD89E 1729F83938DA44E27BA0F4D3DBDB397470D12172'
 )
-# see https://secure.php.net/downloads.php
+# see https://www.php.net/downloads.php
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
@@ -53,15 +53,15 @@ for version in "${versions[@]}"; do
 	minorVersion="${minorVersion%%.*}"
 
 	# scrape the relevant API based on whether we're looking for pre-releases
-	apiUrl="https://secure.php.net/releases/index.php?json&max=100&version=${rcVersion%%.*}"
+	apiUrl="https://www.php.net/releases/index.php?json&max=100&version=${rcVersion%%.*}"
 	apiJqExpr='
 		(keys[] | select(startswith("'"$rcVersion"'."))) as $version
 		| [ $version, (
 			.[$version].source[]
 			| select(.filename | endswith(".xz"))
 			|
-				"https://secure.php.net/get/" + .filename + "/from/this/mirror",
-				"https://secure.php.net/get/" + .filename + ".asc/from/this/mirror",
+				"https://www.php.net/get/" + .filename + "/from/this/mirror",
+				"https://www.php.net/get/" + .filename + ".asc/from/this/mirror",
 				.sha256 // "",
 				.md5 // ""
 		) ]
@@ -107,7 +107,7 @@ for version in "${versions[@]}"; do
 	gpgKey="${gpgKeys[$rcVersion]}"
 	if [ -z "$gpgKey" ]; then
 		echo >&2 "ERROR: missing GPG key fingerprint for $version"
-		echo >&2 "  try looking on https://secure.php.net/downloads.php#gpg-$version"
+		echo >&2 "  try looking on https://www.php.net/downloads.php#gpg-$version"
 		exit 1
 	fi
 
