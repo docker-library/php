@@ -1,0 +1,15 @@
+#!/bin/sh
+# ##
+# file name: docker-php-entrypoint-nginx
+# Author: Malanik Jan
+# Email: malanik (_dot_) jan (_at_) gmail (_dot_) com
+# Description: For release we can merge it with main one
+# ##
+set -e
+
+# first arg is `-f` or `--some-option`
+if [ "${1#-}" != "$1" ]; then
+	set -- nginx-foreground "$@"
+fi
+
+exec "$@"

@@ -127,7 +127,7 @@ for version in "${versions[@]}"; do
 			baseDockerfile=Dockerfile-alpine.template
 		fi
 
-		for variant in cli apache fpm zts; do
+		for variant in nginxFPM cli apache fpm zts; do
 			[ -d "$version/$suite/$variant" ] || continue
 			{ generated_warning; cat "$baseDockerfile"; } > "$version/$suite/$variant/Dockerfile"
 
@@ -221,6 +221,8 @@ for version in "${versions[@]}"; do
 	done
 	travisEnv="$newTravisEnv$travisEnv"
 done
+# for testing purposes only.
+travisEnv='\n  - VERSION=7.3 VARIANT=stretch/nginxFPM'
 
 travis="$(awk -v 'RS=\n\n' '$1 == "env:" { $0 = "env:'"$travisEnv"'" } { printf "%s%s", $0, RS }' .travis.yml)"
 echo "$travis" > .travis.yml

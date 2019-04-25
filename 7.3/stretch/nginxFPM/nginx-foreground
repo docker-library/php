@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# ##
+# file name: nginx-foreground 
+# Author: Malanik Jan
+# Email: malanik (_dot_) jan (_at_) gmail (_dot_) com
+# Description: Handle ENV Variables for nginx and start php-fpm & nginx
+# ## 
+# TODO: check dynamic user handling for php 
+set -xe
+# those vars can't be changed
+: "${NGINX_TMPL=/usr/local/bin/nginx.conf.tmpl}"
+: "${NGINX_CFG=/etc/nginx/nginx.conf}"
+
+# those can be changed by user
+# they are already defined in Dockerfile
+# demonstration only
+: "${NGINX_USER:=dummy}"
+: "${NGINX_PIDFILE:=/var/run/nginx.pid}"
+
+declare NGINX_VARS=(
+  NGINX_USER
+  NGINX_PIDFILE
+)
+
+cp ${NGINX_TMPL} ${NGINX_CFG}
+for VAR in ${NGINX_VARS[@]}; do 
+  echo "${VAR}"
+  echo  "${!VAR}"
+  sed -i "s@$VAR@${!VAR}@" "${NGINX_CFG}"
+done
+
+php-fpm
+exec nginx -g 'daemon off;'

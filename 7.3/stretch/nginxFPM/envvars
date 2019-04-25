@@ -1,0 +1,63 @@
+# ##
+# file name: envvars
+# Author: Malanik Jan
+# Email: malanik (_dot_) jan (_at_) gmail (_dot_) com
+# Description: envvars, we can consider if we need them for nginx to simulate Apache
+# ##
+
+# this won't be correct after changing uid
+unset HOME
+
+# for supporting multiple nginx instances
+if [ "${NGINX_CONFDIR##/etc/nginx-}" != "${NGINX_CONFDIR}" ] ; then
+        SUFFIX="-${NGINX_CONFDIR##/etc/nginx-}"
+else
+        SUFFIX=
+fi
+
+# Since there is no sane way to get the parsed nginx config in scripts, some
+# settings are defined via environment variables and then used in nginxctl,
+# /etc/init.d/nginx, /etc/logrotate.d/nginx, etc.
+NGINX_RUN_USER=www-data
+export NGINX_RUN_USER
+NGINX_RUN_GROUP=www-data
+export NGINX_RUN_GROUP
+# temporary state file location. This might be changed to /run in Wheezy+1
+NGINX_PID_FILE=/var/run/nginx$SUFFIX/nginx.pid
+export NGINX_PID_FILE
+NGINX_RUN_DIR=/var/run/nginx$SUFFIX
+export NGINX_RUN_DIR
+NGINX_LOCK_DIR=/var/lock/nginx$SUFFIX
+export NGINX_LOCK_DIR
+# Only /var/log/nginx is handled by /etc/logrotate.d/nginx.
+NGINX_LOG_DIR=/var/log/nginx$SUFFIX
+export NGINX_LOG_DIR
+
+## The locale used by some modules like mod_dav
+LANG=C
+export LANG
+## Uncomment the following line to use the system default locale instead:
+#. /etc/default/locale
+
+export LANG
+
+## The command to get the status for 'nginxctl status'.
+## Some packages providing 'www-browser' need '--dump' instead of '-dump'.
+#export NGINX_LYNX='www-browser -dump'
+
+## If you need a higher file descriptor limit, uncomment and adjust the
+## following line (default is 8192):
+#NGINX_ULIMIT_MAX_FILES='ulimit -n 65536'
+
+## If you would like to pass arguments to the web server, add them below
+## to the NGINX_ARGUMENTS environment.
+#export NGINX_ARGUMENTS=''
+
+## Enable the debug mode for maintainer scripts.
+## This will produce a verbose output on package installations of web server modules and web application
+## installations which interact with Apache
+#export NGINX_MAINTSCRIPT_DEBUG=1
+
+#TODO
+#ENV PHP_EXTRA_BUILD_DEPS 
+#ENV PHP_EXTRA_CONFIGURE_ARGS 

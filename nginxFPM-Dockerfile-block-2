@@ -1,0 +1,39 @@
+# ##
+# file name: nginxFPM-Dockerfile-block-2
+# Author: Malanik Jan
+# Email: malanik (_dot_) jan (_at_) gmail (_dot_) com
+# Description: 2nd Dockerfile snippet with Nginx installation & configuration
+# [WARNING]: Empty continuation lines will become errors in a future release.
+# ##
+ENV NGINX_USER www-data
+ENV NGINX_PIDFILE /var/run/nginx.pid
+
+# Introduce new script nginx-foreground
+# Introduce template for nginx.con
+# Introduce custome version of entrypoint
+COPY docker-php-entrypoint-nginx nginx.conf.tmpl nginx-foreground /usr/local/bin/
+
+# COPY php-fpm.conf with updated include for www.conf
+COPY php-fpm.conf /usr/local/etc
+# COPY www.conf without .default extension
+COPY www.conf /usr/local/etc/php-fpm.d
+
+# COPY php extension support for nginx
+COPY nginx.conf mime.types /etc/nginx/
+
+# COPY site with php support
+COPY sitePHP /etc/nginx/sites-enabled
+
+#testing webpage
+COPY index.php /var/www/html
+
+RUN  set -eux; \
+  chown -R www-data:www-data /var/www/html; \
+  rm /etc/nginx/sites-enabled/default;
+
+WORKDIR /var/www/html
+
+EXPOSE 80
+# will be changed to upstream for release
+ENTRYPOINT [ "docker-php-entrypoint-nginx" ]
+CMD [ "nginx-foreground" ]

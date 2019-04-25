@@ -1,0 +1,54 @@
+# ##
+# file name: nginxFPM-Dockerfile-block-1
+# Author: Malanik Jan
+# Email: malanik (_dot_) jan (_at_) gmail (_dot_) com
+# Description: First Dockerfile snippet with Nginx installation
+#TODO: [WARNING]: Empty continuation lines will become errors in a future release.
+# ##
+
+
+ENV NGINX_CONFDIR /etc/nginx
+ENV NGINX_ENVVARS $NGINX_CONFDIR/envvars
+
+RUN set -eux; \
+  apt-get update; \
+  apt-get install -y --no-install-recommends nginx libnginx-mod-http-perl psmisc vim apt-file procps;
+
+COPY envvars ${NGINX_CONFDIR}
+
+RUN set -eux; \
+# generically convert lines like
+#   export NGINX_RUN_USER=nginx
+# into
+#   : ${NGINX_RUN_USER:=nginx}
+#   export NGINX_RUN_USER
+# so that they can be overridden at runtime ("-e NGINX_RUN_USER=...")
+	sed -ri 's/^export ([^=]+)=(.*)$/: ${\1:=\2}\nexport \1/' "$NGINX_ENVVARS";  \
+\
+# setup directories and permissions
+	. "$NGINX_ENVVARS"; \
+	for dir in \
+		"$NGINX_LOCK_DIR" \
+		"$NGINX_RUN_DIR" \
+		"$NGINX_LOG_DIR" \
+	; do \
+		rm -rvf "$dir"; \
+		mkdir -p "$dir"; \
+		chown "$NGINX_RUN_USER:$NGINX_RUN_GROUP" "$dir"; \
+# allow running as an arbitrary user (https://github.com/docker-library/php/issues/743)
+		chmod 777 "$dir"; \
+	done; \
+	\
+# delete the "index.html" that installing Nginx drops in here
+	rm -rvf /var/www/html/*; \
+	\
+# logs should go to stdout / stderr
+	ln -sfT /dev/stderr "$NGINX_LOG_DIR/error.log"; \
+	ln -sfT /dev/stdout "$NGINX_LOG_DIR/access.log"; \
+	ln -sfT /dev/stdout "$NGINX_LOG_DIR/other_vhosts_access.log"; \
+	chown -R --no-dereference "$NGINX_RUN_USER:$NGINX_RUN_GROUP" "$NGINX_LOG_DIR"
+RUN set -eux; \
+  sed -i '3 a    application/x-httpd-php  php;' "${NGINX_CONFDIR}/mime.types"
+
+#ENV PHP_EXTRA_BUILD_DEPS 
+ENV PHP_EXTRA_CONFIGURE_ARGS  --enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data --disable-cgi
