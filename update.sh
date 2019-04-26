@@ -1,6 +1,20 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+suites=(
+stretch
+jessie
+alpine3.9
+alpine3.8
+)
+
+variants=(
+cli
+apache
+fpm
+zts
+)
+
 # https://www.php.net/gpg-keys.php
 declare -A gpgKeys=(
 	# https://wiki.php.net/todo/php73
@@ -118,7 +132,7 @@ for version in "${versions[@]}"; do
 
 	dockerfiles=()
 
-	for suite in stretch jessie alpine{3.9,3.8}; do
+	for suite in ${suites[@]}; do
 		[ -d "$version/$suite" ] || continue
 		alpineVer="${suite#alpine}"
 
@@ -127,7 +141,7 @@ for version in "${versions[@]}"; do
 			baseDockerfile=Dockerfile-alpine.template
 		fi
 
-		for variant in cli apache fpm zts; do
+		for variant in ${variants[@]}; do
 			[ -d "$version/$suite/$variant" ] || continue
 			{ generated_warning; cat "$baseDockerfile"; } > "$version/$suite/$variant/Dockerfile"
 
