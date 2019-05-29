@@ -27,21 +27,6 @@ RUN apk add --no-cache --virtual .persistent-deps \
 		xz \
 # https://github.com/docker-library/php/issues/494
 		libressl
-RUN apk add --no-cache --virtual=.build-dependencies \
-		gcc \
-		g++ \
-		autoconf \
-		make \
-		dpkg \
-		dpkg-dev \
-		coreutils \
-		curl-dev \
-		libedit-dev \
-		libsodium-dev \
-		libxml2-dev \
-		libressl-dev \
-		sqlite-dev
-
 # ensure www-data user exists
 RUN set -x \
 	&& addgroup -g 82 -S www-data \
