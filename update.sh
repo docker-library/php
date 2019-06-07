@@ -42,6 +42,7 @@ generated_warning() {
 	EOH
 }
 
+azureEnv=
 travisEnv=
 for version in "${versions[@]}"; do
 	rcVersion="${version%-rc}"
@@ -211,16 +212,23 @@ for version in "${versions[@]}"; do
 		sed -i 's! php ! '"$cmd"' !g' "$entrypoint"
 	done
 
+	newAzureEnv=
 	newTravisEnv=
 	for dockerfile in "${dockerfiles[@]}"; do
 		dir="${dockerfile%Dockerfile}"
 		dir="${dir%/}"
 		variant="${dir#$version}"
 		variant="${variant#/}"
+		azureTag="$(sed 's!/!-!g' <<<"$dir")"
+		newAzureEnv+="\n    $azureTag:\n      azureImage: 'ubuntu-16.04'\n      buildContext: '$dir'"
 		newTravisEnv+='\n  - VERSION='"$version VARIANT=$variant"
 	done
+	azureEnv="$newAzureEnv$azureEnv"
 	travisEnv="$newTravisEnv$travisEnv"
 done
 
-travis="$(awk -v 'RS=\n\n' '$1 == "env:" { $0 = "env:'"$travisEnv"'" } { printf "%s%s", $0, RS }' .travis.yml)"
-echo "$travis" > .travis.yml
+azure="$(awk -v 'RS=\n\n' -v azureEnv="$azureEnv" '$1 == "strategy:" { $0 = "strategy:\n  matrix:" azureEnv } { printf "%s%s", $0, RS }' .azure.yml)"
+cat <<<"$azure" > .azure.yml
+
+travis="$(awk -v 'RS=\n\n' -v travisEnv="$travisEnv" '$1 == "matrix:" { $0 = "matrix:\n  include:" travisEnv } { printf "%s%s", $0, RS }' .travis.yml)"
+cat <<<"$travis" > .travis.yml

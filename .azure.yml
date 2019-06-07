@@ -1,0 +1,141 @@
+strategy:
+  matrix:
+    7.3-stretch-cli:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.3/stretch/cli'
+    7.3-stretch-apache:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.3/stretch/apache'
+    7.3-stretch-fpm:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.3/stretch/fpm'
+    7.3-stretch-zts:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.3/stretch/zts'
+    7.3-alpine3.9-cli:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.3/alpine3.9/cli'
+    7.3-alpine3.9-fpm:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.3/alpine3.9/fpm'
+    7.3-alpine3.9-zts:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.3/alpine3.9/zts'
+    7.3-alpine3.8-cli:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.3/alpine3.8/cli'
+    7.3-alpine3.8-fpm:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.3/alpine3.8/fpm'
+    7.3-alpine3.8-zts:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.3/alpine3.8/zts'
+    7.2-stretch-cli:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.2/stretch/cli'
+    7.2-stretch-apache:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.2/stretch/apache'
+    7.2-stretch-fpm:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.2/stretch/fpm'
+    7.2-stretch-zts:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.2/stretch/zts'
+    7.2-alpine3.9-cli:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.2/alpine3.9/cli'
+    7.2-alpine3.9-fpm:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.2/alpine3.9/fpm'
+    7.2-alpine3.9-zts:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.2/alpine3.9/zts'
+    7.2-alpine3.8-cli:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.2/alpine3.8/cli'
+    7.2-alpine3.8-fpm:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.2/alpine3.8/fpm'
+    7.2-alpine3.8-zts:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.2/alpine3.8/zts'
+    7.1-stretch-cli:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.1/stretch/cli'
+    7.1-stretch-apache:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.1/stretch/apache'
+    7.1-stretch-fpm:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.1/stretch/fpm'
+    7.1-stretch-zts:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.1/stretch/zts'
+    7.1-jessie-cli:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.1/jessie/cli'
+    7.1-jessie-apache:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.1/jessie/apache'
+    7.1-jessie-fpm:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.1/jessie/fpm'
+    7.1-jessie-zts:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.1/jessie/zts'
+    7.1-alpine3.9-cli:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.1/alpine3.9/cli'
+    7.1-alpine3.9-fpm:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.1/alpine3.9/fpm'
+    7.1-alpine3.9-zts:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.1/alpine3.9/zts'
+    7.1-alpine3.8-cli:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.1/alpine3.8/cli'
+    7.1-alpine3.8-fpm:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.1/alpine3.8/fpm'
+    7.1-alpine3.8-zts:
+      azureImage: 'ubuntu-16.04'
+      buildContext: '7.1/alpine3.8/zts'
+
+pool:
+  vmImage: $(azureImage)
+
+steps:
+- bash: |
+    set -Eeuo pipefail -x
+    #git clone --depth 1 https://github.com/docker-library/official-images.git ~/oi
+    git clone --depth 1 https://github.com/tianon/stackbrew.git -b azure ~/oi
+    ~/oi/.azure/wait-for-docker.sh
+    ~/oi/.azure/set-docker-tag.sh
+  displayName: 'Prepare environment'
+
+- bash: |
+    set -Eeuo pipefail -x
+    source <(wget -qO- 'https://github.com/tianon/pgp-happy-eyeballs/raw/master/hack-my-builds.sh')
+  displayName: 'Apply pgp-happy-eyeballs'
+  condition: eq( variables['Agent.OS'], 'Linux' )
+
+- bash: |
+    set -Eeuo pipefail -x
+    docker build -t '$(dockerTag)' .
+  workingDirectory: $(buildContext)
+  displayName: '"docker build"'
+
+- bash: |
+    set -Eeuo pipefail -x
+    docker run --rm '$(dockerTag)' php --version
+  displayName: 'Basic smoke tests'
+
+- bash: |
+    set -Eeuo pipefail -x
+    ~/oi/test/run.sh '$(dockerTag)'
+  displayName: 'Run tests'
+  condition: eq( variables['Agent.OS'], 'Linux' )
+
+# vim:set tabstop=2 shiftwidth=2:
