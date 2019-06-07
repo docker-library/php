@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-extDir="$(php -r 'echo ini_get("extension_dir");')"
+extDir="$(php -d 'display_errors=stderr' -r 'echo ini_get("extension_dir");')"
 cd "$extDir"
 
 usage() {
@@ -94,7 +94,7 @@ for module in $modules; do
 
 	ext="$(basename "$module")"
 	ext="${ext%.*}"
-	if php -r 'exit(extension_loaded("'"$ext"'") ? 0 : 1);'; then
+	if php -d 'display_errors=stderr' -r 'exit(extension_loaded("'"$ext"'") ? 0 : 1);'; then
 		# this isn't perfect, but it's better than nothing
 		# (for example, 'opcache.so' presents inside PHP as 'Zend OPcache', not 'opcache')
 		echo >&2
