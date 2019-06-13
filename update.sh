@@ -3,6 +3,11 @@ set -Eeuo pipefail
 
 # https://www.php.net/gpg-keys.php
 declare -A gpgKeys=(
+	# https://wiki.php.net/todo/php74
+	# petk & derick
+	# https://www.php.net/gpg-keys.php#gpg-7.4
+	[7.4]='42670A7FE4D0441C8E4632349E4FDC074A4EF02D 5A52880781F755608BF815FC910DEB46F53EA312'
+
 	# https://wiki.php.net/todo/php73
 	# cmb & stas
 	# https://www.php.net/gpg-keys.php#gpg-7.3
