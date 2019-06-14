@@ -86,8 +86,7 @@ for version in "${versions[@]}"; do
 	# order here controls the order of the library/ file
 	for suite in \
 		stretch \
-		jessie \
-		alpine{3.9,3.8} \
+		alpine{3.10,3.9} \
 	; do
 		for variant in \
 			cli \
