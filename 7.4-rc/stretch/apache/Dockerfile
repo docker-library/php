@@ -173,6 +173,7 @@ RUN set -eux; \
 	apt-get install -y --no-install-recommends \
 		libcurl4-openssl-dev \
 		libedit-dev \
+		libonig-dev \
 		libsodium-dev \
 		libsqlite3-dev \
 		libssl-dev \
@@ -268,11 +269,8 @@ RUN set -eux; \
 	; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	\
-	php --version; \
-	\
-# https://github.com/docker-library/php/issues/443
-	pecl update-channels; \
-	rm -rf /tmp/pear ~/.pearrc
+# smoke test
+	php --version
 
 COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 

@@ -160,6 +160,19 @@ for version in "${versions[@]}"; do
 					-e '/argon2/d' \
 					"$version/$suite/$variant/Dockerfile"
 			fi
+			if [ "$majorVersion" = '7' -a "$minorVersion" -lt '4' ]; then
+				# oniguruma is part of mbstring in php 7.4+
+				# ARGON2 is a hack only required for alpha1: https://github.com/docker-library/php/pull/840#pullrequestreview-249660894
+				sed -ri \
+					-e '/oniguruma-dev|libonig-dev/d' \
+					-e '/ARGON2/d' \
+					"$version/$suite/$variant/Dockerfile"
+			else
+				# 7.4 and above no longer include pecl/pear: https://github.com/php/php-src/pull/3781
+				sed -ri \
+					-e '\!pecl.*channel|/tmp/pear!d' \
+					"$version/$suite/$variant/Dockerfile"
+			fi
 			if [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ]; then
 				# sodium is part of php core 7.2+ https://wiki.php.net/rfc/libsodium
 				sed -ri '/sodium/d' "$version/$suite/$variant/Dockerfile"
