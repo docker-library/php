@@ -2,6 +2,13 @@ language: bash
 services: docker
 
 env:
+  - VERSION=7.4-rc VARIANT=stretch/cli
+  - VERSION=7.4-rc VARIANT=stretch/apache
+  - VERSION=7.4-rc VARIANT=stretch/fpm
+  - VERSION=7.4-rc VARIANT=stretch/zts
+  - VERSION=7.4-rc VARIANT=alpine3.9/cli
+  - VERSION=7.4-rc VARIANT=alpine3.9/fpm
+  - VERSION=7.4-rc VARIANT=alpine3.9/zts
   - VERSION=7.3 VARIANT=stretch/cli
   - VERSION=7.3 VARIANT=stretch/apache
   - VERSION=7.3 VARIANT=stretch/fpm

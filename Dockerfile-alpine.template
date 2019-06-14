@@ -102,12 +102,16 @@ RUN set -xe \
 		libedit-dev \
 		libsodium-dev \
 		libxml2-dev \
+		oniguruma-dev \
 		openssl-dev \
 		sqlite-dev \
 	\
 	&& export CFLAGS="$PHP_CFLAGS" \
 		CPPFLAGS="$PHP_CPPFLAGS" \
 		LDFLAGS="$PHP_LDFLAGS" \
+		# fix ARGON2 detection for 7.4-alpha1 https://github.com/docker-library/php/pull/840#pullrequestreview-249660894
+		ARGON2_LIBS="-largon2" \
+		ARGON2_CFLAGS="-I/usr/include" \
 	&& docker-php-source extract \
 	&& cd /usr/src/php \
 	&& gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
@@ -165,9 +169,11 @@ RUN set -xe \
 	\
 	&& apk del --no-network .build-deps \
 	\
-# https://github.com/docker-library/php/issues/443
+# update pecl channel definitions https://github.com/docker-library/php/issues/443
 	&& pecl update-channels \
-	&& rm -rf /tmp/pear ~/.pearrc
+	&& rm -rf /tmp/pear ~/.pearrc \
+# smoke test
+	&& php --version
 
 COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 

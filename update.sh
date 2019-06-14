@@ -3,6 +3,11 @@ set -Eeuo pipefail
 
 # https://www.php.net/gpg-keys.php
 declare -A gpgKeys=(
+	# https://wiki.php.net/todo/php74
+	# petk & derick
+	# https://www.php.net/gpg-keys.php#gpg-7.4
+	[7.4]='42670A7FE4D0441C8E4632349E4FDC074A4EF02D 5A52880781F755608BF815FC910DEB46F53EA312'
+
 	# https://wiki.php.net/todo/php73
 	# cmb & stas
 	# https://www.php.net/gpg-keys.php#gpg-7.3
@@ -153,6 +158,19 @@ for version in "${versions[@]}"; do
 				sed -ri \
 					-e '/##<argon2>##/,/##<\/argon2>##/d' \
 					-e '/argon2/d' \
+					"$version/$suite/$variant/Dockerfile"
+			fi
+			if [ "$majorVersion" = '7' -a "$minorVersion" -lt '4' ]; then
+				# oniguruma is part of mbstring in php 7.4+
+				# ARGON2 is a hack only required for alpha1: https://github.com/docker-library/php/pull/840#pullrequestreview-249660894
+				sed -ri \
+					-e '/oniguruma-dev|libonig-dev/d' \
+					-e '/ARGON2/d' \
+					"$version/$suite/$variant/Dockerfile"
+			else
+				# 7.4 and above no longer include pecl/pear: https://github.com/php/php-src/pull/3781
+				sed -ri \
+					-e '\!pecl.*channel|/tmp/pear!d' \
 					"$version/$suite/$variant/Dockerfile"
 			fi
 			if [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ]; then
