@@ -29,12 +29,15 @@ ENV PHPIZE_DEPS \
 		re2c
 
 # persistent / runtime deps
-RUN apt-get update && apt-get install -y \
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
 		$PHPIZE_DEPS \
 		ca-certificates \
 		curl \
 		xz-utils \
-	--no-install-recommends && rm -r /var/lib/apt/lists/*
+	; \
+	rm -rf /var/lib/apt/lists/*
 
 ENV PHP_INI_DIR /usr/local/etc/php
 RUN set -eux; \
@@ -67,23 +70,21 @@ ENV PHP_SHA256="6310599811536dbe87e4bcf212bf93196bdfaff519d0c821e4c0068efd096a7c
 
 RUN set -xe; \
 	\
-	fetchDeps=' \
-		wget \
-	'; \
 	if ! command -v gpg > /dev/null; then \
-		fetchDeps="$fetchDeps \
+		fetchDeps=" \
 			dirmngr \
 			gnupg \
 		"; \
+		\
+		apt-get update; \
+		apt-get install -y --no-install-recommends $fetchDeps; \
+		rm -rf /var/lib/apt/lists/*; \
 	fi; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends $fetchDeps; \
-	rm -rf /var/lib/apt/lists/*; \
 	\
 	mkdir -p /usr/src; \
 	cd /usr/src; \
 	\
-	wget -O php.tar.xz "$PHP_URL"; \
+	curl -fsSL -o php.tar.xz "$PHP_URL"; \
 	\
 	if [ -n "$PHP_SHA256" ]; then \
 		echo "$PHP_SHA256 *php.tar.xz" | sha256sum -c -; \
@@ -93,7 +94,7 @@ RUN set -xe; \
 	fi; \
 	\
 	if [ -n "$PHP_ASC_URL" ]; then \
-		wget -O php.tar.xz.asc "$PHP_ASC_URL"; \
+		curl -fsSL -o php.tar.xz.asc "$PHP_ASC_URL"; \
 		export GNUPGHOME="$(mktemp -d)"; \
 		for key in $GPG_KEYS; do \
 			gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \

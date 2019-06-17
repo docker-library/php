@@ -29,9 +29,9 @@ RUN apk add --no-cache \
 		openssl
 
 # ensure www-data user exists
-RUN set -x \
-	&& addgroup -g 82 -S www-data \
-	&& adduser -u 82 -D -S -G www-data www-data
+RUN set -xe; \
+	addgroup -g 82 -S www-data; \
+	adduser -u 82 -D -S -G www-data www-data
 # 82 is the standard uid/gid for "www-data" in Alpine
 # https://git.alpinelinux.org/aports/tree/main/apache2/apache2.pre-install?h=3.9-stable
 # https://git.alpinelinux.org/aports/tree/main/lighttpd/lighttpd.pre-install?h=3.9-stable
@@ -69,13 +69,12 @@ RUN set -xe; \
 	\
 	apk add --no-cache --virtual .fetch-deps \
 		gnupg \
-		wget \
 	; \
 	\
 	mkdir -p /usr/src; \
 	cd /usr/src; \
 	\
-	wget -O php.tar.xz "$PHP_URL"; \
+	curl -fsSL -o php.tar.xz "$PHP_URL"; \
 	\
 	if [ -n "$PHP_SHA256" ]; then \
 		echo "$PHP_SHA256 *php.tar.xz" | sha256sum -c -; \
@@ -85,7 +84,7 @@ RUN set -xe; \
 	fi; \
 	\
 	if [ -n "$PHP_ASC_URL" ]; then \
-		wget -O php.tar.xz.asc "$PHP_ASC_URL"; \
+		curl -fsSL -o php.tar.xz.asc "$PHP_ASC_URL"; \
 		export GNUPGHOME="$(mktemp -d)"; \
 		for key in $GPG_KEYS; do \
 			gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
@@ -99,8 +98,8 @@ RUN set -xe; \
 
 COPY docker-php-source /usr/local/bin/
 
-RUN set -xe \
-	&& apk add --no-cache --virtual .build-deps \
+RUN set -xe; \
+	apk add --no-cache --virtual .build-deps \
 		$PHPIZE_DEPS \
 		argon2-dev \
 		coreutils \
@@ -111,17 +110,19 @@ RUN set -xe \
 		oniguruma-dev \
 		openssl-dev \
 		sqlite-dev \
+	; \
 	\
-	&& export CFLAGS="$PHP_CFLAGS" \
+	export CFLAGS="$PHP_CFLAGS" \
 		CPPFLAGS="$PHP_CPPFLAGS" \
 		LDFLAGS="$PHP_LDFLAGS" \
 		# fix ARGON2 detection for 7.4-alpha1 https://github.com/docker-library/php/pull/840#pullrequestreview-249660894
 		ARGON2_LIBS="-largon2" \
 		ARGON2_CFLAGS="-I/usr/include" \
-	&& docker-php-source extract \
-	&& cd /usr/src/php \
-	&& gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
-	&& ./configure \
+	; \
+	docker-php-source extract; \
+	cd /usr/src/php; \
+	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+	./configure \
 		--build="$gnuArch" \
 		--with-config-file-path="$PHP_INI_DIR" \
 		--with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
@@ -153,30 +154,31 @@ RUN set -xe \
 		$(test "$gnuArch" = 's390x-linux-gnu' && echo '--without-pcre-jit') \
 		\
 		$PHP_EXTRA_CONFIGURE_ARGS \
-	&& make -j "$(nproc)" \
-	&& find -type f -name '*.a' -delete \
-	&& make install \
-	&& { find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; } \
-	&& make clean \
+	; \
+	make -j "$(nproc)"; \
+	find -type f -name '*.a' -delete; \
+	make install; \
+	{ find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; }; \
+	make clean; \
 	\
 # https://github.com/docker-library/php/issues/692 (copy default example "php.ini" files somewhere easily discoverable)
-	&& cp -v php.ini-* "$PHP_INI_DIR/" \
+	cp -v php.ini-* "$PHP_INI_DIR/"; \
 	\
-	&& cd / \
-	&& docker-php-source delete \
+	cd /; \
+	docker-php-source delete; \
 	\
-	&& runDeps="$( \
+	runDeps="$( \
 		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
 			| tr ',' '\n' \
 			| sort -u \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
-	)" \
-	&& apk add --no-cache $runDeps \
+	)"; \
+	apk add --no-cache $runDeps; \
 	\
-	&& apk del --no-network .build-deps \
+	apk del --no-network .build-deps; \
 	\
 # smoke test
-	&& php --version
+	php --version
 
 COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 
