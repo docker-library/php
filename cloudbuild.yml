@@ -1,25 +1,20 @@
 steps:
   # Branch Filter
   - name: "gcr.io/cloud-builders/gcloud"
+    id: "build-php56"
     entrypoint: "bash"
     args:
       - "-c"
       - |
-        [[ "$BRANCH_NAME" == "master" ]] && echo pass || echo fail && true
-  - name: "gcr.io/cloud-builders/docker"
-    id: "build-php56"
-    args:
-      - "build"
-      - "--pull"
-      - "--build-arg"
-      - "ENV=gke"
-      - "-t"
-      - "gcr.io/$PROJECT_ID/$REPO_NAME/php:$COMMIT_SHA"
-      - "-t"
-      - "gcr.io/$PROJECT_ID/$REPO_NAME/php:latest"
-      - "-f"
-      - "Dockerfile"
-      - "."
+        [[ "$BRANCH_NAME" == "master" ]] && \
+        docker build \
+        --pull \
+        --build-arg \
+        "ENV=gke" \
+        -t "gcr.io/$PROJECT_ID/$REPO_NAME/php:$COMMIT_SHA" \
+        -t "gcr.io/$PROJECT_ID/$REPO_NAME/php:latest" \
+        -f "Dockerfile" \
+        .
     dir: "5.6/alpine3.8/apache-cli"
 
 images:
