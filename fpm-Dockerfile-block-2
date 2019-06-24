@@ -1,6 +1,6 @@
 WORKDIR /var/www/html
 
-RUN set -ex; \
+RUN set -eux; \
 	cd /usr/local/etc; \
 	if [ -d php-fpm.d ]; then \
 		# for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"

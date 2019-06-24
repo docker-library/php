@@ -29,7 +29,7 @@ RUN apk add --no-cache \
 		openssl
 
 # ensure www-data user exists
-RUN set -xe; \
+RUN set -eux; \
 	addgroup -g 82 -S www-data; \
 	adduser -u 82 -D -S -G www-data www-data
 # 82 is the standard uid/gid for "www-data" in Alpine
@@ -66,11 +66,9 @@ ENV PHP_VERSION 7.2.19
 ENV PHP_URL="https://www.php.net/get/php-7.2.19.tar.xz/from/this/mirror" PHP_ASC_URL="https://www.php.net/get/php-7.2.19.tar.xz.asc/from/this/mirror"
 ENV PHP_SHA256="4ffa2404a88d60e993a9fe69f829ebec3eb1e006de41b6048ce5e91bbeaa9282" PHP_MD5=""
 
-RUN set -xe; \
+RUN set -eux; \
 	\
-	apk add --no-cache --virtual .fetch-deps \
-		gnupg \
-	; \
+	apk add --no-cache --virtual .fetch-deps gnupg; \
 	\
 	mkdir -p /usr/src; \
 	cd /usr/src; \
@@ -91,7 +89,7 @@ RUN set -xe; \
 			gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
 		done; \
 		gpg --batch --verify php.tar.xz.asc php.tar.xz; \
-		command -v gpgconf > /dev/null && gpgconf --kill all; \
+		gpgconf --kill all; \
 		rm -rf "$GNUPGHOME"; \
 	fi; \
 	\
@@ -99,7 +97,7 @@ RUN set -xe; \
 
 COPY docker-php-source /usr/local/bin/
 
-RUN set -xe; \
+RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
 		$PHPIZE_DEPS \
 		argon2-dev \
@@ -150,12 +148,12 @@ RUN set -xe; \
 # https://manpages.debian.org/stretch/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
 		$(test "$gnuArch" = 's390x-linux-gnu' && echo '--without-pcre-jit') \
 		\
-		$PHP_EXTRA_CONFIGURE_ARGS \
+		${PHP_EXTRA_CONFIGURE_ARGS:-} \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
 	make install; \
-	{ find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; }; \
+	find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; \
 	make clean; \
 	\
 # https://github.com/docker-library/php/issues/692 (copy default example "php.ini" files somewhere easily discoverable)
