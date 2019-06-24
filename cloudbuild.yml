@@ -17,7 +17,7 @@ steps:
         -f "Dockerfile" \
         . \
         || \
-        echo 'Processing was skipped because the branch is not master.' \
+        echo 'Processing was skipped because the branch is not master. Although "ERROR" is output, there is no problem.' \
         && true
     dir: "5.6/alpine3.8/apache-cli"
 
