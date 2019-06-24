@@ -31,7 +31,10 @@ RUN apk add --no-cache --virtual .persistent-deps \
 # ensure www-data user exists
 RUN set -x \
 	&& addgroup -g 82 -S www-data \
-	&& adduser -u 82 -D -S -G www-data www-data
+	&& adduser -u 82 -D -S -G www-data www-data \
+	&& adduser -H -h /var/www -s /sbin/nologin -D apache \
+	&& addgroup apache www-data \
+	&& apk add --no-cache apache2 apache2-dev
 # 82 is the standard uid/gid for "www-data" in Alpine
 # http://git.alpinelinux.org/cgit/aports/tree/main/apache2/apache2.pre-install?h=v3.3.2
 # http://git.alpinelinux.org/cgit/aports/tree/main/lighttpd/lighttpd.pre-install?h=v3.3.2
@@ -141,6 +144,8 @@ RUN set -xe \
 # bundled pcre does not support JIT on s390x
 # https://manpages.debian.org/stretch/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
 		$(test "$gnuArch" = 's390x-linux-gnu' && echo '--without-pcre-jit') \
+		\
+		--with-apxs2=/usr/bin/apxs \
 		\
 		$PHP_EXTRA_CONFIGURE_ARGS \
 	&& make -j "$(nproc)" \

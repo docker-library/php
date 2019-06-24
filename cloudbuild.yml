@@ -1,0 +1,26 @@
+steps:
+  # Branch Filter
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "build-php56"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        [[ "$BRANCH_NAME" == "master" ]] \
+        && \
+        docker build \
+        --pull \
+        --build-arg \
+        "ENV=gke" \
+        -t "gcr.io/$PROJECT_ID/$REPO_NAME/php:$COMMIT_SHA" \
+        -t "gcr.io/$PROJECT_ID/$REPO_NAME/php:latest" \
+        -f "Dockerfile" \
+        . \
+        || \
+        echo 'Processing was skipped because the branch is not master. Although "ERROR" is output, there is no problem.' \
+        && true
+    dir: "5.6/alpine3.8/apache-cli"
+
+images:
+  - "gcr.io/$PROJECT_ID/$REPO_NAME/php:$COMMIT_SHA"
+  - "gcr.io/$PROJECT_ID/$REPO_NAME/php:latest"
