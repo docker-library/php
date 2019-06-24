@@ -1,4 +1,11 @@
 steps:
+  # Branch Filter
+  - name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        [[ "$BRANCH_NAME" == "master" ]] && echo pass || echo fail && true
   - name: "gcr.io/cloud-builders/docker"
     id: "build-php56"
     args:
