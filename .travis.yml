@@ -6,6 +6,9 @@ env:
   - VERSION=7.4-rc VARIANT=stretch/apache
   - VERSION=7.4-rc VARIANT=stretch/fpm
   - VERSION=7.4-rc VARIANT=stretch/zts
+  - VERSION=7.4-rc VARIANT=alpine3.10/cli
+  - VERSION=7.4-rc VARIANT=alpine3.10/fpm
+  - VERSION=7.4-rc VARIANT=alpine3.10/zts
   - VERSION=7.4-rc VARIANT=alpine3.9/cli
   - VERSION=7.4-rc VARIANT=alpine3.9/fpm
   - VERSION=7.4-rc VARIANT=alpine3.9/zts
@@ -13,6 +16,9 @@ env:
   - VERSION=7.3 VARIANT=stretch/apache
   - VERSION=7.3 VARIANT=stretch/fpm
   - VERSION=7.3 VARIANT=stretch/zts
+  - VERSION=7.3 VARIANT=alpine3.10/cli
+  - VERSION=7.3 VARIANT=alpine3.10/fpm
+  - VERSION=7.3 VARIANT=alpine3.10/zts
   - VERSION=7.3 VARIANT=alpine3.9/cli
   - VERSION=7.3 VARIANT=alpine3.9/fpm
   - VERSION=7.3 VARIANT=alpine3.9/zts
@@ -20,6 +26,9 @@ env:
   - VERSION=7.2 VARIANT=stretch/apache
   - VERSION=7.2 VARIANT=stretch/fpm
   - VERSION=7.2 VARIANT=stretch/zts
+  - VERSION=7.2 VARIANT=alpine3.10/cli
+  - VERSION=7.2 VARIANT=alpine3.10/fpm
+  - VERSION=7.2 VARIANT=alpine3.10/zts
   - VERSION=7.2 VARIANT=alpine3.9/cli
   - VERSION=7.2 VARIANT=alpine3.9/fpm
   - VERSION=7.2 VARIANT=alpine3.9/zts
@@ -27,6 +36,9 @@ env:
   - VERSION=7.1 VARIANT=stretch/apache
   - VERSION=7.1 VARIANT=stretch/fpm
   - VERSION=7.1 VARIANT=stretch/zts
+  - VERSION=7.1 VARIANT=alpine3.10/cli
+  - VERSION=7.1 VARIANT=alpine3.10/fpm
+  - VERSION=7.1 VARIANT=alpine3.10/zts
   - VERSION=7.1 VARIANT=alpine3.9/cli
   - VERSION=7.1 VARIANT=alpine3.9/fpm
   - VERSION=7.1 VARIANT=alpine3.9/zts
