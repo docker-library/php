@@ -6,7 +6,8 @@ steps:
     args:
       - "-c"
       - |
-        [[ "$BRANCH_NAME" == "master" ]] && \
+        [[ "$BRANCH_NAME" == "master" ]] \
+        && \
         docker build \
         --pull \
         --build-arg \
@@ -14,7 +15,10 @@ steps:
         -t "gcr.io/$PROJECT_ID/$REPO_NAME/php:$COMMIT_SHA" \
         -t "gcr.io/$PROJECT_ID/$REPO_NAME/php:latest" \
         -f "Dockerfile" \
-        .
+        . \
+        || \
+        echo 'Processing was skipped because the branch is not master.' \
+        && true
     dir: "5.6/alpine3.8/apache-cli"
 
 images:
