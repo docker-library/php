@@ -1,8 +1,8 @@
 WORKDIR /var/www/html
 
-RUN set -ex \
-	&& cd /usr/local/etc \
-	&& if [ -d php-fpm.d ]; then \
+RUN set -eux; \
+	cd /usr/local/etc; \
+	if [ -d php-fpm.d ]; then \
 		# for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
 		sed 's!=NONE/!=!g' php-fpm.conf.default | tee php-fpm.conf > /dev/null; \
 		cp php-fpm.d/www.conf.default php-fpm.d/www.conf; \
@@ -14,8 +14,8 @@ RUN set -ex \
 			echo '[global]'; \
 			echo 'include=etc/php-fpm.d/*.conf'; \
 		} | tee php-fpm.conf; \
-	fi \
-	&& { \
+	fi; \
+	{ \
 		echo '[global]'; \
 		echo 'error_log = /proc/self/fd/2'; \
 		echo; echo '; https://github.com/docker-library/php/pull/725#issuecomment-443540114'; echo 'log_limit = 8192'; \
@@ -29,8 +29,8 @@ RUN set -ex \
 		echo '; Ensure worker stdout and stderr are sent to the main error log.'; \
 		echo 'catch_workers_output = yes'; \
 		echo 'decorate_workers_output = no'; \
-	} | tee php-fpm.d/docker.conf \
-	&& { \
+	} | tee php-fpm.d/docker.conf; \
+	{ \
 		echo '[global]'; \
 		echo 'daemonize = no'; \
 		echo; \
