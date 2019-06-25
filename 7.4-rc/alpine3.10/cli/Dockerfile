@@ -113,9 +113,6 @@ RUN set -eux; \
 	export CFLAGS="$PHP_CFLAGS" \
 		CPPFLAGS="$PHP_CPPFLAGS" \
 		LDFLAGS="$PHP_LDFLAGS" \
-		# fix ARGON2 detection for 7.4-alpha1 https://github.com/docker-library/php/pull/840#pullrequestreview-249660894
-		ARGON2_LIBS="-largon2" \
-		ARGON2_CFLAGS="-I/usr/include" \
 	; \
 	docker-php-source extract; \
 	cd /usr/src/php; \
