@@ -162,10 +162,8 @@ for version in "${versions[@]}"; do
 			fi
 			if [ "$majorVersion" = '7' -a "$minorVersion" -lt '4' ]; then
 				# oniguruma is part of mbstring in php 7.4+
-				# ARGON2 is a hack only required for alpha1: https://github.com/docker-library/php/pull/840#pullrequestreview-249660894
 				sed -ri \
 					-e '/oniguruma-dev|libonig-dev/d' \
-					-e '/ARGON2/d' \
 					"$version/$suite/$variant/Dockerfile"
 			else
 				# 7.4 and above no longer include pecl/pear: https://github.com/php/php-src/pull/3781
