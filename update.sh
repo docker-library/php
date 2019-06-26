@@ -165,10 +165,17 @@ for version in "${versions[@]}"; do
 				sed -ri \
 					-e '/oniguruma-dev|libonig-dev/d' \
 					"$version/$suite/$variant/Dockerfile"
-			else
-				# 7.4 and above no longer include pecl/pear: https://github.com/php/php-src/pull/3781
+			fi
+			if [ "$majorVersion" -ge '8' ]; then
+				# 8 and above no longer include pecl/pear (see https://github.com/docker-library/php/issues/846#issuecomment-505638494)
 				sed -ri \
-					-e '\!pecl.*channel|/tmp/pear!d' \
+					-e '/pear |pearrc|pecl.*channel/d' \
+					"$version/$suite/$variant/Dockerfile"
+			fi
+			if [ "$majorVersion" != '7' ] || [ "$minorVersion" -lt '4' ]; then
+				# --with-pear is only relevant on PHP 7, and specifically only 7.4+ (see https://github.com/docker-library/php/issues/846#issuecomment-505638494)
+				sed -ri \
+					-e '/--with-pear/d' \
 					"$version/$suite/$variant/Dockerfile"
 			fi
 			if [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ]; then
@@ -184,10 +191,19 @@ for version in "${versions[@]}"; do
 			fi
 
 			# remove any _extra_ blank lines created by the deletions above
-			awk '
-				NF > 0 { blank = 0 }
-				NF == 0 { ++blank }
-				blank < 2 { print }
+			gawk '
+				{
+					if (NF == 0 || (NF == 1 && $1 == "\\")) {
+						blank++
+					}
+					else {
+						blank = 0
+					}
+
+					if (blank < 2) {
+						print
+					}
+				}
 			' "$version/$suite/$variant/Dockerfile" > "$version/$suite/$variant/Dockerfile.new"
 			mv "$version/$suite/$variant/Dockerfile.new" "$version/$suite/$variant/Dockerfile"
 
