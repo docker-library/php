@@ -6,7 +6,10 @@ declare -A aliases=(
 	[7.4-rc]='rc'
 )
 
-defaultDebianSuite='stretch'
+defaultDebianSuite='stretch' # TODO buster
+declare -A debianSuites=(
+	[7.4-rc]='buster'
+)
 defaultAlpineVersion='3.10'
 declare -A alpineVersions=(
 	# /usr/src/php/ext/openssl/openssl.c:551:12: error: static declaration of 'RSA_set0_key' follows non-static declaration
@@ -85,7 +88,7 @@ for version in "${versions[@]}"; do
 
 	# order here controls the order of the library/ file
 	for suite in \
-		stretch \
+		buster stretch \
 		alpine{3.10,3.9} \
 	; do
 		for variant in \
@@ -111,7 +114,7 @@ for version in "${versions[@]}"; do
 			suiteVariantAliases=( "${variantAliases[@]/%/-$suite}" )
 			if [ "${suite#alpine}" = "${alpineVersions[$version]:-$defaultAlpineVersion}" ] ; then
 				variantAliases=( "${variantAliases[@]/%/-alpine}" )
-			elif [ "$suite" != "$defaultDebianSuite" ]; then
+			elif [ "$suite" != "${debianSuites[$version]:-$defaultDebianSuite}" ]; then
 				variantAliases=()
 			fi
 			variantAliases=( "${suiteVariantAliases[@]}" ${variantAliases[@]+"${variantAliases[@]}"} )
