@@ -166,18 +166,7 @@ COPY docker-php-source /usr/local/bin/
 RUN set -eux; \
 	\
 	savedAptMark="$(apt-mark showmanual)"; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
-		libcurl4-openssl-dev \
-		libedit-dev \
-		libsodium-dev \
-		libsqlite3-dev \
-		libssl-dev \
-		libxml2-dev \
-		zlib1g-dev \
-		${PHP_EXTRA_BUILD_DEPS:-} \
-	; \
-##<argon2>##
+##<argon2-stretch>##
 	sed -e 's/stretch/buster/g' /etc/apt/sources.list > /etc/apt/sources.list.d/buster.list; \
 	{ \
 		echo 'Package: *'; \
@@ -188,9 +177,19 @@ RUN set -eux; \
 		echo 'Pin: release n=buster'; \
 		echo 'Pin-Priority: 990'; \
 	} > /etc/apt/preferences.d/argon2-buster; \
+##</argon2-stretch>##
 	apt-get update; \
-	apt-get install -y --no-install-recommends libargon2-dev; \
-##</argon2>##
+	apt-get install -y --no-install-recommends \
+		libargon2-dev \
+		libcurl4-openssl-dev \
+		libedit-dev \
+		libsodium-dev \
+		libsqlite3-dev \
+		libssl-dev \
+		libxml2-dev \
+		zlib1g-dev \
+		${PHP_EXTRA_BUILD_DEPS:-} \
+	; \
 	rm -rf /var/lib/apt/lists/*; \
 	\
 	export \

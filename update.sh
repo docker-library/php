@@ -123,7 +123,7 @@ for version in "${versions[@]}"; do
 
 	dockerfiles=()
 
-	for suite in stretch alpine{3.10,3.9}; do
+	for suite in buster stretch alpine{3.10,3.9}; do
 		[ -d "$version/$suite" ] || continue
 		alpineVer="${suite#alpine}"
 
@@ -156,8 +156,13 @@ for version in "${versions[@]}"; do
 			if [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ]; then
 				# argon2 password hashing is only supported in 7.2+
 				sed -ri \
-					-e '/##<argon2>##/,/##<\/argon2>##/d' \
+					-e '/##<argon2-stretch>##/,/##<\/argon2-stretch>##/d' \
 					-e '/argon2/d' \
+					"$version/$suite/$variant/Dockerfile"
+			elif [ "$suite" != 'stretch' ]; then
+				# and buster+ doesn't need to pull argon2 from stretch-backports
+				sed -ri \
+					-e '/##<argon2-stretch>##/,/##<\/argon2-stretch>##/d' \
 					"$version/$suite/$variant/Dockerfile"
 			fi
 			if [ "$majorVersion" = '7' -a "$minorVersion" -lt '4' ]; then
@@ -207,9 +212,8 @@ for version in "${versions[@]}"; do
 			' "$version/$suite/$variant/Dockerfile" > "$version/$suite/$variant/Dockerfile.new"
 			mv "$version/$suite/$variant/Dockerfile.new" "$version/$suite/$variant/Dockerfile"
 
-			# automatic `-slim` for stretch
 			sed -ri \
-				-e 's!%%DEBIAN_TAG%%!'"${suite}-slim"'!' \
+				-e 's!%%DEBIAN_TAG%%!'"$suite-slim"'!' \
 				-e 's!%%DEBIAN_SUITE%%!'"$suite"'!' \
 				-e 's!%%ALPINE_VERSION%%!'"$alpineVer"'!' \
 				"$version/$suite/$variant/Dockerfile"
