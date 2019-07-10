@@ -6,9 +6,9 @@ declare -A aliases=(
 	[7.4-rc]='rc'
 )
 
-defaultDebianSuite='stretch' # TODO buster
+defaultDebianSuite='buster'
 declare -A debianSuites=(
-	[7.4-rc]='buster'
+	#[7.4-rc]='buster'
 )
 defaultAlpineVersion='3.10'
 declare -A alpineVersions=(
