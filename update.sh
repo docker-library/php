@@ -194,6 +194,15 @@ for version in "${versions[@]}"; do
 					-e '/log_limit/d' \
 					"$version/$suite/$variant/Dockerfile"
 			fi
+			if [ "$suite" = 'stretch' ] || { [ "$majorVersion" = '7' ] && [ "$minorVersion" -ge '4' ]; }; then
+				# https://github.com/docker-library/php/issues/865
+				# https://bugs.php.net/bug.php?id=76324
+				# https://github.com/php/php-src/pull/3632
+				# https://github.com/php/php-src/commit/2d03197749696ac3f8effba6b7977b0d8729fef3
+				sed -ri \
+					-e '/freetype-config/d' \
+					"$version/$suite/$variant/Dockerfile"
+			fi
 
 			# remove any _extra_ blank lines created by the deletions above
 			gawk '
