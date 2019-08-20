@@ -1,3 +1,6 @@
+# https://httpd.apache.org/docs/2.4/stopping.html#gracefulstop
+STOPSIGNAL WINCH
+
 COPY apache2-foreground /usr/local/bin/
 WORKDIR /var/www/html
 
