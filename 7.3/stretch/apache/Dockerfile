@@ -226,6 +226,9 @@ RUN set -eux; \
 		--with-password-argon2 \
 # https://wiki.php.net/rfc/libsodium
 		--with-sodium=shared \
+# always build against system sqlite3 (https://github.com/php/php-src/commit/6083a387a81dbbd66d6316a3a12a63f06d5f7109)
+		--with-pdo-sqlite=/usr \
+		--with-sqlite3=/usr \
 		\
 		--with-curl \
 		--with-libedit \
