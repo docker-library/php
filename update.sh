@@ -203,6 +203,12 @@ for version in "${versions[@]}"; do
 					-e '/freetype-config/d' \
 					"$version/$suite/$variant/Dockerfile"
 			fi
+			if [[ "$suite" == alpine* ]] && [ "$majorVersion" = '7' ] && [ "$minorVersion" -lt '4' ]; then
+				# https://github.com/docker-library/php/issues/888
+				sed -ri \
+					-e '/linux-headers/d' \
+					"$version/$suite/$variant/Dockerfile"
+			fi
 
 			# remove any _extra_ blank lines created by the deletions above
 			gawk '

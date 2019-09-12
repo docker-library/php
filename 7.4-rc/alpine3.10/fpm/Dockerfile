@@ -106,6 +106,7 @@ RUN set -eux; \
 		libedit-dev \
 		libsodium-dev \
 		libxml2-dev \
+		linux-headers \
 		oniguruma-dev \
 		openssl-dev \
 		sqlite-dev \
