@@ -37,20 +37,6 @@ env:
   - VERSION=7.2 VARIANT=alpine3.9/cli
   - VERSION=7.2 VARIANT=alpine3.9/fpm
   - VERSION=7.2 VARIANT=alpine3.9/zts
-  - VERSION=7.1 VARIANT=buster/cli
-  - VERSION=7.1 VARIANT=buster/apache
-  - VERSION=7.1 VARIANT=buster/fpm
-  - VERSION=7.1 VARIANT=buster/zts
-  - VERSION=7.1 VARIANT=stretch/cli
-  - VERSION=7.1 VARIANT=stretch/apache
-  - VERSION=7.1 VARIANT=stretch/fpm
-  - VERSION=7.1 VARIANT=stretch/zts
-  - VERSION=7.1 VARIANT=alpine3.10/cli
-  - VERSION=7.1 VARIANT=alpine3.10/fpm
-  - VERSION=7.1 VARIANT=alpine3.10/zts
-  - VERSION=7.1 VARIANT=alpine3.9/cli
-  - VERSION=7.1 VARIANT=alpine3.9/fpm
-  - VERSION=7.1 VARIANT=alpine3.9/zts
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
