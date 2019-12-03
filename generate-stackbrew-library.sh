@@ -126,9 +126,7 @@ for version in "${versions[@]}"; do
 			# 7.2 no longer supports s390x
 			# #error "Not yet implemented"
 			# https://github.com/docker-library/php/pull/487#issue-254755661
-			if [[ "$version" = 7.* ]] && [ "$version" != '7.1' ]; then
-				variantArches="$(echo " $variantArches " | sed -r -e 's/ s390x//g')"
-			fi
+			variantArches="$(echo " $variantArches " | sed -r -e 's/ s390x//g')"
 
 			echo
 			cat <<-EOE
