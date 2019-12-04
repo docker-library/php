@@ -66,4 +66,4 @@ fi
 
 cd "$ext"
 phpize
-./configure "$@"
+./configure --enable-option-checking=fatal "$@"
