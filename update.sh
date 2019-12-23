@@ -116,7 +116,7 @@ for version in "${versions[@]}"; do
 
 	dockerfiles=()
 
-	for suite in buster stretch alpine{3.10,3.9}; do
+	for suite in buster stretch alpine{3.11,3.10}; do
 		[ -d "$version/$suite" ] || continue
 		alpineVer="${suite#alpine}"
 
