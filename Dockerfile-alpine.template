@@ -104,6 +104,7 @@ RUN set -eux; \
 		oniguruma-dev \
 		openssl-dev \
 		sqlite-dev \
+		tzdata \
 	; \
 	\
 	export CFLAGS="$PHP_CFLAGS" \
