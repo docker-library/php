@@ -1,0 +1,24 @@
+RUN set -eux; \
+        apk add --no-cache --virtual .build-deps \
+            gcc \
+            musl-dev \
+            make \
+        ; \
+        cd /tmp; \
+        curl -fsSL -o unit.tar.gz "https://unit.nginx.org/download/unit-1.14.0.tar.gz"; \
+        mkdir unit; \
+        tar xzf unit.tar.gz -C "unit" --strip-components=1; \
+        cd unit; \
+        ./configure \
+            --prefix=/usr \
+            --state=/var/lib/unit \
+            --control=unix:/run/control.unit.sock \
+            --pid=/run/unit.pid \
+        ; \
+        ./configure php; \
+        make; \
+        make install; \
+        apk del --no-network .build-deps; \
+        unitd --version
+
+CMD ["unitd", "--no-daemon"]

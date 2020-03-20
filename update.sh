@@ -125,7 +125,7 @@ for version in "${versions[@]}"; do
 			baseDockerfile=Dockerfile-alpine.template
 		fi
 
-		for variant in cli apache fpm zts sapi; do
+		for variant in cli apache fpm zts sapi unit; do
 			[ -d "$version/$suite/$variant" ] || continue
 			{ generated_warning; cat "$baseDockerfile"; } > "$version/$suite/$variant/Dockerfile"
 
