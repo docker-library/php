@@ -52,7 +52,8 @@ getArches() {
 	local repo="$1"; shift
 	local officialImagesUrl='https://github.com/docker-library/official-images/raw/master/library/'
 
-	eval "declare -g -A parentRepoToArches=( $(
+	eval "declare -g -A parentRepoToArches"
+	eval "parentRepoToArches=( $(
 		find -name 'Dockerfile' -exec awk '
 				toupper($1) == "FROM" && $2 !~ /^('"$repo"'|scratch|.*\/.*)(:|$)/ {
 					print "'"$officialImagesUrl"'" $2
