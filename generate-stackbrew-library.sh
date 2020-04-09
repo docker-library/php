@@ -123,11 +123,6 @@ for version in "${versions[@]}"; do
 			variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
 			variantArches="${parentRepoToArches[$variantParent]}"
 
-			# 7.2 no longer supports s390x
-			# #error "Not yet implemented"
-			# https://github.com/docker-library/php/pull/487#issue-254755661
-			variantArches="$(echo " $variantArches " | sed -r -e 's/ s390x//g')"
-
 			echo
 			cat <<-EOE
 				Tags: $(join ', ' "${variantAliases[@]}")
