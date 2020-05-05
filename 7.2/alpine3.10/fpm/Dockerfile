@@ -63,7 +63,7 @@ ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 ENV GPG_KEYS 1729F83938DA44E27BA0F4D3DBDB397470D12172 B1B44D8F021E4E2D6021E995DC9FF8D3EE5AF27F
 
 ENV PHP_VERSION 7.2.30
-ENV PHP_URL="https://www.php.net/get/php-7.2.30.tar.xz/from/this/mirror" PHP_ASC_URL="https://www.php.net/get/php-7.2.30.tar.xz.asc/from/this/mirror"
+ENV PHP_URL="https://www.php.net/distributions/php-7.2.30.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.2.30.tar.xz.asc"
 ENV PHP_SHA256="aa93df27b58a45d6c9800ac813245dfdca03490a918ebe515b3a70189b1bf8c3" PHP_MD5=""
 
 RUN set -eux; \

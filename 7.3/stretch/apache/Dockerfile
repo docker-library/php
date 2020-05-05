@@ -124,7 +124,7 @@ ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 ENV GPG_KEYS CBAF69F173A0FEA4B537F470D66C9593118BCCB6 F38252826ACD957EF380D39F2F7956BC5DA04B5D
 
 ENV PHP_VERSION 7.3.17
-ENV PHP_URL="https://www.php.net/get/php-7.3.17.tar.xz/from/this/mirror" PHP_ASC_URL="https://www.php.net/get/php-7.3.17.tar.xz.asc/from/this/mirror"
+ENV PHP_URL="https://www.php.net/distributions/php-7.3.17.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.3.17.tar.xz.asc"
 ENV PHP_SHA256="6a30304c27f7e7a94538f5ffec599f600ee93aedbbecad8aa4f8bec539b10ad8" PHP_MD5=""
 
 RUN set -eux; \

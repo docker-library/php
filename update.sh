@@ -58,8 +58,8 @@ for version in "${versions[@]}"; do
 			.[$version].source[]
 			| select(.filename | endswith(".xz"))
 			|
-				"https://www.php.net/get/" + .filename + "/from/this/mirror",
-				"https://www.php.net/get/" + .filename + ".asc/from/this/mirror",
+				"https://www.php.net/distributions/" + .filename,
+				"https://www.php.net/distributions/" + .filename + ".asc",
 				.sha256 // "",
 				.md5 // ""
 		) ]
