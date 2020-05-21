@@ -11,7 +11,6 @@ env:
   - VERSION=7.4 VARIANT=alpine3.11/fpm
   - VERSION=7.4 VARIANT=alpine3.11/zts
   - VERSION=7.4 VARIANT=alpine3.11/sapi
-  - VERSION=7.4 VARIANT=alpine3.11/unit
   - VERSION=7.4 VARIANT=alpine3.10/cli
   - VERSION=7.4 VARIANT=alpine3.10/fpm
   - VERSION=7.4 VARIANT=alpine3.10/zts

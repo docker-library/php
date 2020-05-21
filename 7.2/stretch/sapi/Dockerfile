@@ -56,18 +56,17 @@ ENV PHP_EXTRA_CONFIGURE_ARGS --enable-embed --disable-cgi
 # Make PHP's main executable position-independent (improves ASLR security mechanism, and has no performance impact on x86_64)
 # Enable optimization (-O2)
 # Enable linker optimization (this sorts the hash buckets to improve cache locality, and is non-default)
-# Adds GNU HASH segments to generated executables (this is used if present, and is much faster than sysv hash; in this configuration, sysv hash is also generated)
 # https://github.com/docker-library/php/issues/272
 # -D_LARGEFILE_SOURCE and -D_FILE_OFFSET_BITS=64 (https://www.php.net/manual/en/intro.filesystem.php)
 ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
-ENV PHP_LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"
+ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
 ENV GPG_KEYS 1729F83938DA44E27BA0F4D3DBDB397470D12172 B1B44D8F021E4E2D6021E995DC9FF8D3EE5AF27F
 
-ENV PHP_VERSION 7.2.27
-ENV PHP_URL="https://www.php.net/get/php-7.2.27.tar.xz/from/this/mirror" PHP_ASC_URL="https://www.php.net/get/php-7.2.27.tar.xz.asc/from/this/mirror"
-ENV PHP_SHA256="7bd0fb9e3b63cfe53176d1f3565cd686f90b3926217158de5ba57091f49e4c32" PHP_MD5=""
+ENV PHP_VERSION 7.2.31
+ENV PHP_URL="https://www.php.net/distributions/php-7.2.31.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.2.31.tar.xz.asc"
+ENV PHP_SHA256="8beaa634bb878a96af9bc8643811ea46973f5f41ad2bfb6ab4cfd290e5a39806" PHP_MD5=""
 
 RUN set -eux; \
 	\
@@ -152,7 +151,7 @@ RUN set -eux; \
 		--with-config-file-path="$PHP_INI_DIR" \
 		--with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
 		\
-# make sure invalid --configure-flags are fatal errors intead of just warnings
+# make sure invalid --configure-flags are fatal errors instead of just warnings
 		--enable-option-checking=fatal \
 		\
 # https://github.com/docker-library/php/issues/439
