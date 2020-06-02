@@ -103,7 +103,15 @@ for module in $modules; do
 		continue
 	fi
 
-	ini="$PHP_INI_DIR/conf.d/${iniName:-"docker-php-ext-$ext.ini"}"
+	case "$iniName" in
+		/*)
+			# allow an absolute path
+			ini="$iniName"
+			;;
+		*)
+			ini="$PHP_INI_DIR/conf.d/${iniName:-"docker-php-ext-$ext.ini"}"
+			;;
+	esac
 	if ! grep -q "$line" "$ini" 2>/dev/null; then
 		echo "$line" >> "$ini"
 	fi

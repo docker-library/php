@@ -19,7 +19,7 @@ fi
 cd /usr/src/php/ext
 
 usage() {
-	echo "usage: $0 [-jN] ext-name [ext-name ...]"
+	echo "usage: $0 [-jN] [--ini-name file.ini] ext-name [ext-name ...]"
 	echo "   ie: $0 gd mysqli"
 	echo "       $0 pdo pdo_mysql"
 	echo "       $0 -j5 gd mbstring mysqli pdo pdo_mysql shmop"
@@ -41,15 +41,17 @@ usage() {
 	echo 'the output of "php -i" to see which modules are already loaded.'
 }
 
-opts="$(getopt -o 'h?j:' --long 'help,jobs:' -- "$@" || { usage >&2 && false; })"
+opts="$(getopt -o 'h?j:' --long 'help,ini-name:,jobs:' -- "$@" || { usage >&2 && false; })"
 eval set -- "$opts"
 
 j=1
+iniName=
 while true; do
 	flag="$1"
 	shift
 	case "$flag" in
 		--help|-h|'-?') usage && exit 0 ;;
+		--ini-name) iniName="$1" && shift ;;
 		--jobs|-j) j="$1" && shift ;;
 		--) break ;;
 		*)
@@ -108,7 +110,7 @@ for ext in $exts; do
 		-maxdepth 1 \
 		-name '*.so' \
 		-exec basename '{}' ';' \
-			| xargs -r docker-php-ext-enable
+			| xargs -r docker-php-ext-enable ${iniName:+--ini-name "$iniName"}
 	make -j"$j" clean
 	cd "$popDir"
 done
