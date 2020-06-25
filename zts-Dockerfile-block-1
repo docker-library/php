@@ -1,1 +1,1 @@
-ENV PHP_EXTRA_CONFIGURE_ARGS --enable-maintainer-zts --disable-cgi
+ENV PHP_EXTRA_CONFIGURE_ARGS --enable-zts --disable-cgi

@@ -3,6 +3,11 @@ set -Eeuo pipefail
 
 # https://www.php.net/gpg-keys.php
 declare -A gpgKeys=(
+	# https://wiki.php.net/todo/php80
+	# pollita & carusogabriel
+	# https://www.php.net/gpg-keys.php#gpg-8.0
+	[8.0]='1729F83938DA44E27BA0F4D3DBDB397470D12172 BFDDD28642824F8118EF77909B67A5C12229118F'
+
 	# https://wiki.php.net/todo/php74
 	# petk & derick
 	# https://www.php.net/gpg-keys.php#gpg-7.4
@@ -187,7 +192,7 @@ for version in "${versions[@]}"; do
 					-e '/log_limit/d' \
 					"$version/$suite/$variant/Dockerfile"
 			fi
-			if [ "$suite" = 'stretch' ] || { [ "$majorVersion" = '7' ] && [ "$minorVersion" -ge '4' ]; }; then
+			if [ "$suite" = 'stretch' ] || [ "$majorVersion" -gt '7' ] || { [ "$majorVersion" = '7' ] && [ "$minorVersion" -ge '4' ]; }; then
 				# https://github.com/docker-library/php/issues/865
 				# https://bugs.php.net/bug.php?id=76324
 				# https://github.com/php/php-src/pull/3632
@@ -200,6 +205,12 @@ for version in "${versions[@]}"; do
 				# https://github.com/docker-library/php/issues/888
 				sed -ri \
 					-e '/linux-headers/d' \
+					"$version/$suite/$variant/Dockerfile"
+			fi
+			if [ "$majorVersion" -lt '8' ]; then
+				# https://github.com/php/php-src/commit/161adfff3f437bf9370e037a9e2bf593c784ccff
+				sed -ri \
+					-e 's/--enable-zts/--enable-maintainer-zts/g' \
 					"$version/$suite/$variant/Dockerfile"
 			fi
 
