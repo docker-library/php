@@ -2,6 +2,12 @@ language: bash
 services: docker
 
 env:
+  - VERSION=8.0-rc VARIANT=buster/cli
+  - VERSION=8.0-rc VARIANT=buster/apache
+  - VERSION=8.0-rc VARIANT=buster/fpm
+  - VERSION=8.0-rc VARIANT=buster/zts
+  - VERSION=8.0-rc VARIANT=alpine3.12/cli
+  - VERSION=8.0-rc VARIANT=alpine3.12/fpm
   - VERSION=7.4 VARIANT=buster/cli
   - VERSION=7.4 VARIANT=buster/apache
   - VERSION=7.4 VARIANT=buster/fpm
