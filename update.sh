@@ -45,15 +45,20 @@ generated_warning() {
 	EOH
 }
 
+# Equivalent to PHP's PHP_VERSION_ID:
+# 5.6.10 => 50610, 7.1.0 => 70100
+as_version_id() {
+	local fullVersion="$1"
+	# strip prelease suffix
+	fullVersion="${fullVersion%%[a-z]*}"
+	local IFS='.'
+	local components=( $fullVersion )
+	printf '%d%02d%02d' "${components[0]}" "${components[1]:-0}" "${components[2]:-0}"
+}
+
 travisEnv=
 for version in "${versions[@]}"; do
 	rcVersion="${version%-rc}"
-
-	# "7", "5", etc
-	majorVersion="${rcVersion%%.*}"
-	# "2", "1", "6", etc
-	minorVersion="${rcVersion#$majorVersion.}"
-	minorVersion="${minorVersion%%.*}"
 
 	# scrape the relevant API based on whether we're looking for pre-releases
 	apiUrl="https://www.php.net/releases/index.php?json&max=100&version=${rcVersion%%.*}"
@@ -107,6 +112,8 @@ for version in "${versions[@]}"; do
 	sha256="${possi[3]}"
 	md5="${possi[4]}"
 
+	versionId="$(as_version_id "$fullVersion")"
+
 	gpgKey="${gpgKeys[$rcVersion]}"
 	if [ -z "$gpgKey" ]; then
 		echo >&2 "ERROR: missing GPG key fingerprint for $version"
@@ -151,7 +158,7 @@ for version in "${versions[@]}"; do
 			if [ "$variant" = 'apache' ]; then
 				cp -a apache2-foreground "$version/$suite/$variant/"
 			fi
-			if [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ]; then
+			if [ "$versionId" -lt "$(as_version_id 7.2)" ]; then
 				# argon2 password hashing is only supported in 7.2+
 				sed -ri \
 					-e '/##<argon2-stretch>##/,/##<\/argon2-stretch>##/d' \
@@ -163,36 +170,36 @@ for version in "${versions[@]}"; do
 					-e '/##<argon2-stretch>##/,/##<\/argon2-stretch>##/d' \
 					"$version/$suite/$variant/Dockerfile"
 			fi
-			if [ "$majorVersion" = '7' -a "$minorVersion" -lt '4' ]; then
+			if [ "$versionId" -lt "$(as_version_id 7.4)" ]; then
 				# oniguruma is part of mbstring in php 7.4+
 				sed -ri \
 					-e '/oniguruma-dev|libonig-dev/d' \
 					"$version/$suite/$variant/Dockerfile"
 			fi
-			if [ "$majorVersion" -ge '8' ]; then
+			if [ "$versionId" -ge "$(as_version_id 8.0)" ]; then
 				# 8 and above no longer include pecl/pear (see https://github.com/docker-library/php/issues/846#issuecomment-505638494)
 				sed -ri \
 					-e '/pear |pearrc|pecl.*channel/d' \
 					"$version/$suite/$variant/Dockerfile"
 			fi
-			if [ "$majorVersion" != '7' ] || [ "$minorVersion" -lt '4' ]; then
-				# --with-pear is only relevant on PHP 7, and specifically only 7.4+ (see https://github.com/docker-library/php/issues/846#issuecomment-505638494)
+			if [ "$versionId" -lt "$(as_version_id 7.4)" ]; then
+				# --with-pear is only relevant on PHP 7.4+ (see https://github.com/docker-library/php/issues/846#issuecomment-505638494)
 				sed -ri \
 					-e '/--with-pear/d' \
 					"$version/$suite/$variant/Dockerfile"
 			fi
-			if [ "$majorVersion" = '7' -a "$minorVersion" -lt '2' ]; then
+			if [ "$versionId" -lt "$(as_version_id 7.2)" ]; then
 				# sodium is part of php core 7.2+ https://wiki.php.net/rfc/libsodium
 				sed -ri '/sodium/d' "$version/$suite/$variant/Dockerfile"
 			fi
-			if [ "$variant" = 'fpm' -a "$majorVersion" = '7' -a "$minorVersion" -lt '3' ]; then
+			if [ "$variant" = 'fpm' -a "$versionId" -lt "$(as_version_id 7.3)" ]; then
 				# php-fpm "decorate_workers_output" is only available in 7.3+
 				sed -ri \
 					-e '/decorate_workers_output/d' \
 					-e '/log_limit/d' \
 					"$version/$suite/$variant/Dockerfile"
 			fi
-			if [ "$suite" = 'stretch' ] || [ "$majorVersion" -gt '7' ] || { [ "$majorVersion" = '7' ] && [ "$minorVersion" -ge '4' ]; }; then
+			if [ "$suite" = 'stretch' ] || [ "$versionId" -ge "$(as_version_id 7.4)" ]; then
 				# https://github.com/docker-library/php/issues/865
 				# https://bugs.php.net/bug.php?id=76324
 				# https://github.com/php/php-src/pull/3632
@@ -201,13 +208,13 @@ for version in "${versions[@]}"; do
 					-e '/freetype-config/d' \
 					"$version/$suite/$variant/Dockerfile"
 			fi
-			if [[ "$suite" == alpine* ]] && [ "$majorVersion" = '7' ] && [ "$minorVersion" -lt '4' ]; then
+			if [[ "$suite" == alpine* ]] && [ "$versionId" -lt "$(as_version_id 7.4)" ]; then
 				# https://github.com/docker-library/php/issues/888
 				sed -ri \
 					-e '/linux-headers/d' \
 					"$version/$suite/$variant/Dockerfile"
 			fi
-			if [ "$majorVersion" -lt '8' ]; then
+			if [ "$versionId" -lt "$(as_version_id 8.0)" ]; then
 				# https://github.com/php/php-src/commit/161adfff3f437bf9370e037a9e2bf593c784ccff
 				sed -ri \
 					-e 's/--enable-zts/--enable-maintainer-zts/g' \
