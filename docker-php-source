@@ -9,13 +9,66 @@ usage() {
 	echo "Manage php source tarball lifecycle."
 	echo
 	echo "Commands:"
-	echo "   extract  extract php source tarball into directory $dir if not already done."
-	echo "   delete   delete extracted php source located into $dir if not already done."
+	echo "   extract         extract php source tarball into directory $dir if not already done."
+	echo "   delete          delete extracted php source located into $dir if not already done."
+	echo "   download        download PHP source code."
+	echo "   delete-download delete the downloaded PHP source code"
 	echo
+}
+
+download() {
+    local url="$1"
+    local url_asc="$2"
+    local sha265="$3"
+    local md5="$4"
+    local gpg_keys="$5"
+
+    if [ -z "$url" ]; then
+        echo "You need to set the PHP source download url with \$PHP_URL"
+        exit 1
+    fi
+
+    if [ -z "$url_asc" ] && [ -z "$sha265" ] && [ -z "$md5" ] && [ -z "$gpg_keys" ]; then
+        echo -n "WARNING: Neither of \$PHP_ASC_URL, \$PHP_SHA256, \$PHP_MD5 nor \$GPG_KEYS specified."
+        echo " Will not verify download."
+    fi
+
+    if [ ! -f /usr/src/php.tar.xz ]; then
+        mkdir -p /usr/src
+
+        curl -fsSL -o /usr/src/php.tar.xz "$url"
+
+        if [ -n "$sha256" ]; then
+            echo "$sha256 *php.tar.xz" | sha256sum -c -
+        fi
+
+        if [ -n "$md5" ]; then
+            echo "$md5 *php.tar.xz" | md5sum -c -
+        fi
+
+        if [ -n "$url_asc" ]; then
+            curl -fsSL -o /usr/src/php.tar.xz.asc "$url_asc"
+            export GNUPGHOME="$(mktemp -d)"
+            for key in $gpg_keys; do
+                gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"
+            done
+            gpg --batch --verify /usr/src/php.tar.xz.asc /usr/src/php.tar.xz
+            gpgconf --kill all
+            rm -rf "$GNUPGHOME"
+        fi
+    fi
+}
+
+deleteSource() {
+    rm -f /usr/src/php.tar.xz /usr/src/php.tar.xz.asc
 }
 
 case "$1" in
 	extract)
+        if [ -n "$PHP_URL" ]; then
+            download "$PHP_URL" "$PHP_ASC_URL" "$PHP_SHA256" "$PHP_MD5" "$GPG_KEYS"
+        fi
+
 		mkdir -p "$dir"
 		if [ ! -f "$dir/.docker-extracted" ]; then
 			tar -Jxf /usr/src/php.tar.xz -C "$dir" --strip-components=1
@@ -25,7 +78,19 @@ case "$1" in
 
 	delete)
 		rm -rf "$dir"
+
+        if [ -n "$PHP_URL" ]; then
+            deleteSource
+        fi
 		;;
+
+    download)
+        download "$PHP_URL" "$PHP_ASC_URL" "$PHP_SHA256" "$PHP_MD5" "$GPG_KEYS"
+        ;;
+
+    delete-download)
+        deleteSource
+        ;;
 
 	*)
 		usage
