@@ -1,3 +1,4 @@
+{{ include "version-id" -}}
 WORKDIR /var/www/html
 
 RUN set -eux; \
@@ -18,7 +19,9 @@ RUN set -eux; \
 	{ \
 		echo '[global]'; \
 		echo 'error_log = /proc/self/fd/2'; \
+{{ if (.version | version_id) >= ("7.3" | version_id) then ( -}}
 		echo; echo '; https://github.com/docker-library/php/pull/725#issuecomment-443540114'; echo 'log_limit = 8192'; \
+{{ ) else "" end -}}
 		echo; \
 		echo '[www]'; \
 		echo '; if we send this to /proc/self/fd/1, it never appears'; \
@@ -28,7 +31,9 @@ RUN set -eux; \
 		echo; \
 		echo '; Ensure worker stdout and stderr are sent to the main error log.'; \
 		echo 'catch_workers_output = yes'; \
+{{ if (.version | version_id) >= ("7.3" | version_id) then ( -}}
 		echo 'decorate_workers_output = no'; \
+{{ ) else "" end -}}
 	} | tee php-fpm.d/docker.conf; \
 	{ \
 		echo '[global]'; \
@@ -43,4 +48,3 @@ RUN set -eux; \
 STOPSIGNAL SIGQUIT
 
 EXPOSE 9000
-CMD ["php-fpm"]

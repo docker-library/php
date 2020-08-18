@@ -1,0 +1,4 @@
+**/Dockerfile          linguist-generated
+**/apache2-foreground  linguist-generated
+**/docker-php-*        linguist-generated
+Dockerfile*.template   linguist-language=Dockerfile
