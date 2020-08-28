@@ -14,7 +14,7 @@ For outstanding `php` image PRs, check [PRs with the "library/php" label on the 
 
 ---
 
--	[![build status badge](https://img.shields.io/travis/docker-library/php/master.svg?label=Travis%20CI)](https://travis-ci.org/docker-library/php/branches)
+-	[![build status badge](https://img.shields.io/github/workflow/status/docker-library/php/GitHub%20CI/master?label=GitHub%20CI)](https://github.com/docker-library/php/actions?query=workflow%3A%22GitHub+CI%22+branch%3Amaster)
 -	[![build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/update.sh/job/php.svg?label=Automated%20update.sh)](https://doi-janky.infosiftr.net/job/update.sh/job/php/)
 
 | Build | Status | Badges | (per-arch) |
