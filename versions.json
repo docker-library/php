@@ -1,0 +1,82 @@
+{
+  "7.2": {
+    "ascUrl": "https://www.php.net/distributions/php-7.2.33.tar.xz.asc",
+    "gpgKeys": "1729F83938DA44E27BA0F4D3DBDB397470D12172 B1B44D8F021E4E2D6021E995DC9FF8D3EE5AF27F",
+    "sha256": "0f160a3483ffce36be5962fab7bcf09d605ee66c5707df83e4195cb796bbb03a",
+    "url": "https://www.php.net/distributions/php-7.2.33.tar.xz",
+    "variants": [
+      "buster/cli",
+      "buster/apache",
+      "buster/fpm",
+      "buster/zts",
+      "stretch/cli",
+      "stretch/apache",
+      "stretch/fpm",
+      "stretch/zts",
+      "alpine3.12/cli",
+      "alpine3.12/fpm",
+      "alpine3.12/zts",
+      "alpine3.11/cli",
+      "alpine3.11/fpm",
+      "alpine3.11/zts"
+    ],
+    "version": "7.2.33"
+  },
+  "7.3": {
+    "ascUrl": "https://www.php.net/distributions/php-7.3.21.tar.xz.asc",
+    "gpgKeys": "CBAF69F173A0FEA4B537F470D66C9593118BCCB6 F38252826ACD957EF380D39F2F7956BC5DA04B5D",
+    "sha256": "4c8b065746ef776d84b7ae47908c21a79e3d4704b86b60d816716b8697c58ce9",
+    "url": "https://www.php.net/distributions/php-7.3.21.tar.xz",
+    "variants": [
+      "buster/cli",
+      "buster/apache",
+      "buster/fpm",
+      "buster/zts",
+      "stretch/cli",
+      "stretch/apache",
+      "stretch/fpm",
+      "stretch/zts",
+      "alpine3.12/cli",
+      "alpine3.12/fpm",
+      "alpine3.12/zts",
+      "alpine3.11/cli",
+      "alpine3.11/fpm",
+      "alpine3.11/zts"
+    ],
+    "version": "7.3.21"
+  },
+  "7.4": {
+    "ascUrl": "https://www.php.net/distributions/php-7.4.9.tar.xz.asc",
+    "gpgKeys": "42670A7FE4D0441C8E4632349E4FDC074A4EF02D 5A52880781F755608BF815FC910DEB46F53EA312",
+    "sha256": "23733f4a608ad1bebdcecf0138ebc5fd57cf20d6e0915f98a9444c3f747dc57b",
+    "url": "https://www.php.net/distributions/php-7.4.9.tar.xz",
+    "variants": [
+      "buster/cli",
+      "buster/apache",
+      "buster/fpm",
+      "buster/zts",
+      "alpine3.12/cli",
+      "alpine3.12/fpm",
+      "alpine3.12/zts",
+      "alpine3.11/cli",
+      "alpine3.11/fpm",
+      "alpine3.11/zts"
+    ],
+    "version": "7.4.9"
+  },
+  "8.0-rc": {
+    "ascUrl": "https://downloads.php.net/~pollita/php-8.0.0beta2.tar.xz.asc",
+    "gpgKeys": "1729F83938DA44E27BA0F4D3DBDB397470D12172 BFDDD28642824F8118EF77909B67A5C12229118F",
+    "sha256": "466b2519f54e819bc8907206b30e0e21196a3609e80f27a112c434c7ede3a965",
+    "url": "https://downloads.php.net/~pollita/php-8.0.0beta2.tar.xz",
+    "variants": [
+      "buster/cli",
+      "buster/apache",
+      "buster/fpm",
+      "buster/zts",
+      "alpine3.12/cli",
+      "alpine3.12/fpm"
+    ],
+    "version": "8.0.0beta2"
+  }
+}

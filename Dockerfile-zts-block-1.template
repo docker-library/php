@@ -1,0 +1,8 @@
+{{ include "version-id" -}}
+ENV PHP_EXTRA_CONFIGURE_ARGS {{
+	if (.version | version_id) >= ("8" | version_id) then
+		"--enable-zts"
+	else
+		"--enable-maintainer-zts"
+	end
+}} --disable-cgi
