@@ -23,8 +23,6 @@ declare -A gpgKeys=(
 	# https://www.php.net/downloads.php#gpg-7.2
 	# https://www.php.net/gpg-keys.php#gpg-7.2
 	[7.2]='1729F83938DA44E27BA0F4D3DBDB397470D12172 B1B44D8F021E4E2D6021E995DC9FF8D3EE5AF27F'
-
-	[7.1]='foo'
 )
 # see https://www.php.net/downloads.php
 
@@ -101,6 +99,11 @@ for version in "${versions[@]}"; do
 		echo >&2 "ERROR: missing GPG key fingerprint for $version"
 		echo >&2 "  try looking on https://www.php.net/downloads.php#gpg-$version"
 		echo >&2 "  (and update 'gpgKeys' array in '$BASH_SOURCE')"
+		exit 1
+	fi
+
+	if ! wget -q --spider "$url"; then
+		echo >&2 "error: '$url' appears to be missing"
 		exit 1
 	fi
 
