@@ -65,10 +65,10 @@
     "version": "7.4.11"
   },
   "8.0-rc": {
-    "ascUrl": "https://downloads.php.net/~pollita/php-8.0.0RC2.tar.xz.asc",
+    "ascUrl": "https://downloads.php.net/~carusogabriel/php-8.0.0RC3.tar.xz.asc",
     "gpgKeys": "1729F83938DA44E27BA0F4D3DBDB397470D12172 BFDDD28642824F8118EF77909B67A5C12229118F",
-    "sha256": "97d8031ba1095c3222fc5725710ac18dc4f584e526cbcbfb2817146abb6891ec",
-    "url": "https://downloads.php.net/~pollita/php-8.0.0RC2.tar.xz",
+    "sha256": "3438b3adf87ee65ba7d90db189cabc0a0a42ffc39bb7ae93f65cf6080a68ebfa",
+    "url": "https://downloads.php.net/~carusogabriel/php-8.0.0RC3.tar.xz",
     "variants": [
       "buster/cli",
       "buster/apache",
@@ -77,6 +77,6 @@
       "alpine3.12/cli",
       "alpine3.12/fpm"
     ],
-    "version": "8.0.0RC2"
+    "version": "8.0.0RC3"
   }
 }
