@@ -61,7 +61,7 @@ ENV GPG_KEYS {{ .gpgKeys }}
 
 ENV PHP_VERSION {{ .version }}
 ENV PHP_URL="{{ .url }}" PHP_ASC_URL="{{ .ascUrl // "" }}"
-ENV PHP_SHA256="{{ .sha256 // "" }}" PHP_MD5="{{ .md5 // "" }}"
+ENV PHP_SHA256="{{ .sha256 // "" }}"
 
 RUN set -eux; \
 	\
@@ -77,9 +77,6 @@ RUN set -eux; \
 	\
 	if [ -n "$PHP_SHA256" ]; then \
 		echo "$PHP_SHA256 *php.tar.xz" | sha256sum -c -; \
-	fi; \
-	if [ -n "$PHP_MD5" ]; then \
-		echo "$PHP_MD5 *php.tar.xz" | md5sum -c -; \
 	fi; \
 	\
 	if [ -n "$PHP_ASC_URL" ]; then \
