@@ -64,7 +64,7 @@ ENV GPG_KEYS CBAF69F173A0FEA4B537F470D66C9593118BCCB6 F38252826ACD957EF380D39F2F
 
 ENV PHP_VERSION 7.3.24
 ENV PHP_URL="https://www.php.net/distributions/php-7.3.24.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.3.24.tar.xz.asc"
-ENV PHP_SHA256="78b0b417a147ab7572c874334d11654e3c61ec5b3f2170098e5db02fb0c89888" PHP_MD5=""
+ENV PHP_SHA256="78b0b417a147ab7572c874334d11654e3c61ec5b3f2170098e5db02fb0c89888"
 
 RUN set -eux; \
 	\
@@ -80,9 +80,6 @@ RUN set -eux; \
 	\
 	if [ -n "$PHP_SHA256" ]; then \
 		echo "$PHP_SHA256 *php.tar.xz" | sha256sum -c -; \
-	fi; \
-	if [ -n "$PHP_MD5" ]; then \
-		echo "$PHP_MD5 *php.tar.xz" | md5sum -c -; \
 	fi; \
 	\
 	if [ -n "$PHP_ASC_URL" ]; then \
