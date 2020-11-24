@@ -222,6 +222,9 @@ RUN set -eux; \
 		--with-openssl \
 		--with-zlib \
 		\
+# in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
+		--with-pear \
+		\
 # bundled pcre does not support JIT on s390x
 # https://manpages.debian.org/stretch/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
 		$(test "$gnuArch" = 's390x-linux-gnu' && echo '--without-pcre-jit') \
