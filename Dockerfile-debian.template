@@ -184,9 +184,8 @@ RUN set -eux; \
 		--with-openssl \
 		--with-zlib \
 		\
-{{ if (.version | version_id) | . >= ("7.4" | version_id) and . < ("8" | version_id) then ( -}}
+{{ if (.version | version_id) | . >= ("7.4" | version_id) then ( -}}
 # in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
-# ... and are removed in PHP 8+; see also https://github.com/docker-library/php/pull/847#issuecomment-505638229
 		--with-pear \
 		\
 {{ ) else "" end -}}
