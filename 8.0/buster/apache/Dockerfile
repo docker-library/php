@@ -4,38 +4,40 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.12
+FROM debian:buster-slim
+
+# prevent Debian's PHP packages from being installed
+# https://github.com/docker-library/php/pull/542
+RUN set -eux; \
+	{ \
+		echo 'Package: php*'; \
+		echo 'Pin: release *'; \
+		echo 'Pin-Priority: -1'; \
+	} > /etc/apt/preferences.d/no-debian-php
 
 # dependencies required for running "phpize"
-# these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
+# (see persistent deps below)
 ENV PHPIZE_DEPS \
 		autoconf \
-		dpkg-dev dpkg \
+		dpkg-dev \
 		file \
 		g++ \
 		gcc \
 		libc-dev \
 		make \
-		pkgconf \
+		pkg-config \
 		re2c
 
 # persistent / runtime deps
-RUN apk add --no-cache \
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
+		$PHPIZE_DEPS \
 		ca-certificates \
 		curl \
-		tar \
-		xz \
-# https://github.com/docker-library/php/issues/494
-		openssl
-
-# ensure www-data user exists
-RUN set -eux; \
-	addgroup -g 82 -S www-data; \
-	adduser -u 82 -D -S -G www-data www-data
-# 82 is the standard uid/gid for "www-data" in Alpine
-# https://git.alpinelinux.org/aports/tree/main/apache2/apache2.pre-install?h=3.9-stable
-# https://git.alpinelinux.org/aports/tree/main/lighttpd/lighttpd.pre-install?h=3.9-stable
-# https://git.alpinelinux.org/aports/tree/main/nginx/nginx.pre-install?h=3.9-stable
+		xz-utils \
+	; \
+	rm -rf /var/lib/apt/lists/*
 
 ENV PHP_INI_DIR /usr/local/etc/php
 RUN set -eux; \
@@ -46,7 +48,66 @@ RUN set -eux; \
 	chown www-data:www-data /var/www/html; \
 	chmod 777 /var/www/html
 
-ENV PHP_EXTRA_CONFIGURE_ARGS --enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data --disable-cgi
+ENV APACHE_CONFDIR /etc/apache2
+ENV APACHE_ENVVARS $APACHE_CONFDIR/envvars
+
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends apache2; \
+	rm -rf /var/lib/apt/lists/*; \
+	\
+# generically convert lines like
+#   export APACHE_RUN_USER=www-data
+# into
+#   : ${APACHE_RUN_USER:=www-data}
+#   export APACHE_RUN_USER
+# so that they can be overridden at runtime ("-e APACHE_RUN_USER=...")
+	sed -ri 's/^export ([^=]+)=(.*)$/: ${\1:=\2}\nexport \1/' "$APACHE_ENVVARS"; \
+	\
+# setup directories and permissions
+	. "$APACHE_ENVVARS"; \
+	for dir in \
+		"$APACHE_LOCK_DIR" \
+		"$APACHE_RUN_DIR" \
+		"$APACHE_LOG_DIR" \
+	; do \
+		rm -rvf "$dir"; \
+		mkdir -p "$dir"; \
+		chown "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$dir"; \
+# allow running as an arbitrary user (https://github.com/docker-library/php/issues/743)
+		chmod 777 "$dir"; \
+	done; \
+	\
+# delete the "index.html" that installing Apache drops in here
+	rm -rvf /var/www/html/*; \
+	\
+# logs should go to stdout / stderr
+	ln -sfT /dev/stderr "$APACHE_LOG_DIR/error.log"; \
+	ln -sfT /dev/stdout "$APACHE_LOG_DIR/access.log"; \
+	ln -sfT /dev/stdout "$APACHE_LOG_DIR/other_vhosts_access.log"; \
+	chown -R --no-dereference "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$APACHE_LOG_DIR"
+
+# Apache + PHP requires preforking Apache for best results
+RUN a2dismod mpm_event && a2enmod mpm_prefork
+
+# PHP files should be handled by PHP, and should be preferred over any other file type
+RUN { \
+		echo '<FilesMatch \.php$>'; \
+		echo '\tSetHandler application/x-httpd-php'; \
+		echo '</FilesMatch>'; \
+		echo; \
+		echo 'DirectoryIndex disabled'; \
+		echo 'DirectoryIndex index.php index.html'; \
+		echo; \
+		echo '<Directory /var/www/>'; \
+		echo '\tOptions -Indexes'; \
+		echo '\tAllowOverride All'; \
+		echo '</Directory>'; \
+	} | tee "$APACHE_CONFDIR/conf-available/docker-php.conf" \
+	&& a2enconf docker-php
+
+ENV PHP_EXTRA_BUILD_DEPS apache2-dev
+ENV PHP_EXTRA_CONFIGURE_ARGS --with-apxs2 --disable-cgi
 
 # Apply stack smash protection to functions using local buffers and alloca()
 # Make PHP's main executable position-independent (improves ASLR security mechanism, and has no performance impact on x86_64)
@@ -60,13 +121,16 @@ ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
 ENV GPG_KEYS 1729F83938DA44E27BA0F4D3DBDB397470D12172 BFDDD28642824F8118EF77909B67A5C12229118F
 
-ENV PHP_VERSION 8.0.0RC5
-ENV PHP_URL="https://downloads.php.net/~carusogabriel/php-8.0.0RC5.tar.xz" PHP_ASC_URL="https://downloads.php.net/~carusogabriel/php-8.0.0RC5.tar.xz.asc"
-ENV PHP_SHA256="fa2e98d8b42e497a45f491c4714f0a67f7d817ff2f7ab9aad09efb72d2a8c60b"
+ENV PHP_VERSION 8.0.0
+ENV PHP_URL="https://www.php.net/distributions/php-8.0.0.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.0.0.tar.xz.asc"
+ENV PHP_SHA256="b5278b3eef584f0c075d15666da4e952fa3859ee509d6b0cc2ed13df13f65ebb"
 
 RUN set -eux; \
 	\
-	apk add --no-cache --virtual .fetch-deps gnupg; \
+	savedAptMark="$(apt-mark showmanual)"; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends gnupg dirmngr; \
+	rm -rf /var/lib/apt/lists/*; \
 	\
 	mkdir -p /usr/src; \
 	cd /usr/src; \
@@ -88,32 +152,43 @@ RUN set -eux; \
 		rm -rf "$GNUPGHOME"; \
 	fi; \
 	\
-	apk del --no-network .fetch-deps
+	apt-mark auto '.*' > /dev/null; \
+	apt-mark manual $savedAptMark > /dev/null; \
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
 
 COPY docker-php-source /usr/local/bin/
 
 RUN set -eux; \
-	apk add --no-cache --virtual .build-deps \
-		$PHPIZE_DEPS \
-		argon2-dev \
-		coreutils \
-		curl-dev \
-		libedit-dev \
-		libsodium-dev \
-		libxml2-dev \
-		linux-headers \
-		oniguruma-dev \
-		openssl-dev \
-		sqlite-dev \
-	; \
 	\
-	export CFLAGS="$PHP_CFLAGS" \
+	savedAptMark="$(apt-mark showmanual)"; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
+		libargon2-dev \
+		libcurl4-openssl-dev \
+		libedit-dev \
+		libonig-dev \
+		libsodium-dev \
+		libsqlite3-dev \
+		libssl-dev \
+		libxml2-dev \
+		zlib1g-dev \
+		${PHP_EXTRA_BUILD_DEPS:-} \
+	; \
+	rm -rf /var/lib/apt/lists/*; \
+	\
+	export \
+		CFLAGS="$PHP_CFLAGS" \
 		CPPFLAGS="$PHP_CPPFLAGS" \
 		LDFLAGS="$PHP_LDFLAGS" \
 	; \
 	docker-php-source extract; \
 	cd /usr/src/php; \
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+	debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
+# https://bugs.php.net/bug.php?id=74125
+	if [ ! -d /usr/include/curl ]; then \
+		ln -sT "/usr/include/$debMultiarch/curl" /usr/local/include/curl; \
+	fi; \
 	./configure \
 		--build="$gnuArch" \
 		--with-config-file-path="$PHP_INI_DIR" \
@@ -152,14 +227,15 @@ RUN set -eux; \
 		\
 # bundled pcre does not support JIT on s390x
 # https://manpages.debian.org/stretch/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
-		$(test "$gnuArch" = 's390x-linux-musl' && echo '--without-pcre-jit') \
+		$(test "$gnuArch" = 's390x-linux-gnu' && echo '--without-pcre-jit') \
+		--with-libdir="lib/$debMultiarch" \
 		\
 		${PHP_EXTRA_CONFIGURE_ARGS:-} \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
 	make install; \
-	find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; \
+	find /usr/local/bin /usr/local/sbin -type f -executable -exec strip --strip-all '{}' + || true; \
 	make clean; \
 	\
 # https://github.com/docker-library/php/issues/692 (copy default example "php.ini" files somewhere easily discoverable)
@@ -168,15 +244,18 @@ RUN set -eux; \
 	cd /; \
 	docker-php-source delete; \
 	\
-	runDeps="$( \
-		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
-			| tr ',' '\n' \
-			| sort -u \
-			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
-	)"; \
-	apk add --no-cache $runDeps; \
-	\
-	apk del --no-network .build-deps; \
+# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
+	apt-mark auto '.*' > /dev/null; \
+	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; \
+	find /usr/local -type f -executable -exec ldd '{}' ';' \
+		| awk '/=>/ { print $(NF-1) }' \
+		| sort -u \
+		| xargs -r dpkg-query --search \
+		| cut -d: -f1 \
+		| sort -u \
+		| xargs -r apt-mark manual \
+	; \
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	\
 # smoke test
 	php --version
@@ -187,49 +266,11 @@ COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 RUN docker-php-ext-enable sodium
 
 ENTRYPOINT ["docker-php-entrypoint"]
+# https://httpd.apache.org/docs/2.4/stopping.html#gracefulstop
+STOPSIGNAL SIGWINCH
+
+COPY apache2-foreground /usr/local/bin/
 WORKDIR /var/www/html
 
-RUN set -eux; \
-	cd /usr/local/etc; \
-	if [ -d php-fpm.d ]; then \
-		# for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
-		sed 's!=NONE/!=!g' php-fpm.conf.default | tee php-fpm.conf > /dev/null; \
-		cp php-fpm.d/www.conf.default php-fpm.d/www.conf; \
-	else \
-		# PHP 5.x doesn't use "include=" by default, so we'll create our own simple config that mimics PHP 7+ for consistency
-		mkdir php-fpm.d; \
-		cp php-fpm.conf.default php-fpm.d/www.conf; \
-		{ \
-			echo '[global]'; \
-			echo 'include=etc/php-fpm.d/*.conf'; \
-		} | tee php-fpm.conf; \
-	fi; \
-	{ \
-		echo '[global]'; \
-		echo 'error_log = /proc/self/fd/2'; \
-		echo; echo '; https://github.com/docker-library/php/pull/725#issuecomment-443540114'; echo 'log_limit = 8192'; \
-		echo; \
-		echo '[www]'; \
-		echo '; if we send this to /proc/self/fd/1, it never appears'; \
-		echo 'access.log = /proc/self/fd/2'; \
-		echo; \
-		echo 'clear_env = no'; \
-		echo; \
-		echo '; Ensure worker stdout and stderr are sent to the main error log.'; \
-		echo 'catch_workers_output = yes'; \
-		echo 'decorate_workers_output = no'; \
-	} | tee php-fpm.d/docker.conf; \
-	{ \
-		echo '[global]'; \
-		echo 'daemonize = no'; \
-		echo; \
-		echo '[www]'; \
-		echo 'listen = 9000'; \
-	} | tee php-fpm.d/zz-docker.conf
-
-# Override stop signal to stop process gracefully
-# https://github.com/php/php-src/blob/17baa87faddc2550def3ae7314236826bc1b1398/sapi/fpm/php-fpm.8.in#L163
-STOPSIGNAL SIGQUIT
-
-EXPOSE 9000
-CMD ["php-fpm"]
+EXPOSE 80
+CMD ["apache2-foreground"]

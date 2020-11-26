@@ -64,11 +64,11 @@
     ],
     "version": "7.4.13"
   },
-  "8.0-rc": {
-    "ascUrl": "https://downloads.php.net/~carusogabriel/php-8.0.0RC5.tar.xz.asc",
+  "8.0": {
+    "ascUrl": "https://www.php.net/distributions/php-8.0.0.tar.xz.asc",
     "gpgKeys": "1729F83938DA44E27BA0F4D3DBDB397470D12172 BFDDD28642824F8118EF77909B67A5C12229118F",
-    "sha256": "fa2e98d8b42e497a45f491c4714f0a67f7d817ff2f7ab9aad09efb72d2a8c60b",
-    "url": "https://downloads.php.net/~carusogabriel/php-8.0.0RC5.tar.xz",
+    "sha256": "b5278b3eef584f0c075d15666da4e952fa3859ee509d6b0cc2ed13df13f65ebb",
+    "url": "https://www.php.net/distributions/php-8.0.0.tar.xz",
     "variants": [
       "buster/cli",
       "buster/apache",
@@ -77,6 +77,6 @@
       "alpine3.12/cli",
       "alpine3.12/fpm"
     ],
-    "version": "8.0.0RC5"
+    "version": "8.0.0"
   }
 }
