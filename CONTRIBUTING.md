@@ -10,6 +10,6 @@
 
 You will need the following software packages to run the [`./apply-templates.sh`](/apply-templates.sh) script.
 
-- [Gnu Awk](https://www.gnu.org/software/gawk/) available as `gawk`.
+- [GNU awk](https://www.gnu.org/software/gawk/) available as `gawk`.
 - [`jq`](https://stedolan.github.io/jq/)
 - A recent version of Bash
