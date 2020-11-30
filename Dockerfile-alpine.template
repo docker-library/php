@@ -188,12 +188,10 @@ RUN set -eux; \
 	\
 	apk del --no-network .build-deps; \
 	\
-{{ if (.version | version_id) < ("8" | version_id) then ( -}}
 # update pecl channel definitions https://github.com/docker-library/php/issues/443
 	pecl update-channels; \
 	rm -rf /tmp/pear ~/.pearrc; \
 	\
-{{ ) else "" end -}}
 # smoke test
 	php --version
 

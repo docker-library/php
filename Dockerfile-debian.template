@@ -221,12 +221,10 @@ RUN set -eux; \
 	; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	\
-{{ if (.version | version_id) < ("8" | version_id) then ( -}}
 # update pecl channel definitions https://github.com/docker-library/php/issues/443
 	pecl update-channels; \
 	rm -rf /tmp/pear ~/.pearrc; \
 	\
-{{ ) else "" end -}}
 # smoke test
 	php --version
 
