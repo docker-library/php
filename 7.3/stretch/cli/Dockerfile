@@ -48,6 +48,9 @@ RUN set -eux; \
 	chown www-data:www-data /var/www/html; \
 	chmod 777 /var/www/html
 
+# https://github.com/docker-library/php/pull/939#issuecomment-730501748
+ENV PHP_EXTRA_CONFIGURE_ARGS --enable-embed
+
 # Apply stack smash protection to functions using local buffers and alloca()
 # Make PHP's main executable position-independent (improves ASLR security mechanism, and has no performance impact on x86_64)
 # Enable optimization (-O2)

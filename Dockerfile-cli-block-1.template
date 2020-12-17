@@ -1,0 +1,4 @@
+{{ if env.suite | startswith("alpine") | not then ( -}}
+# https://github.com/docker-library/php/pull/939#issuecomment-730501748
+ENV PHP_EXTRA_CONFIGURE_ARGS --enable-embed
+{{ ) else "" end -}}
