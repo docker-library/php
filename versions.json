@@ -1,27 +1,4 @@
 {
-  "7.2": {
-    "ascUrl": "https://www.php.net/distributions/php-7.2.34.tar.xz.asc",
-    "gpgKeys": "1729F83938DA44E27BA0F4D3DBDB397470D12172 B1B44D8F021E4E2D6021E995DC9FF8D3EE5AF27F",
-    "sha256": "409e11bc6a2c18707dfc44bc61c820ddfd81e17481470f3405ee7822d8379903",
-    "url": "https://www.php.net/distributions/php-7.2.34.tar.xz",
-    "variants": [
-      "buster/cli",
-      "buster/apache",
-      "buster/fpm",
-      "buster/zts",
-      "stretch/cli",
-      "stretch/apache",
-      "stretch/fpm",
-      "stretch/zts",
-      "alpine3.12/cli",
-      "alpine3.12/fpm",
-      "alpine3.12/zts",
-      "alpine3.11/cli",
-      "alpine3.11/fpm",
-      "alpine3.11/zts"
-    ],
-    "version": "7.2.34"
-  },
   "7.3": {
     "ascUrl": "https://www.php.net/distributions/php-7.3.25.tar.xz.asc",
     "gpgKeys": "CBAF69F173A0FEA4B537F470D66C9593118BCCB6 F38252826ACD957EF380D39F2F7956BC5DA04B5D",
