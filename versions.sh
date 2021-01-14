@@ -114,8 +114,8 @@ for version in "${versions[@]}"; do
 	for suite in \
 		buster \
 		stretch \
+		alpine3.13 \
 		alpine3.12 \
-		alpine3.11 \
 	; do
 		for variant in cli apache fpm zts; do
 			[ -d "$version/$suite/$variant" ] || continue

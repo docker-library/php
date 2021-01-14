@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.11
+FROM alpine:3.13
 
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
@@ -58,11 +58,11 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
-ENV GPG_KEYS 42670A7FE4D0441C8E4632349E4FDC074A4EF02D 5A52880781F755608BF815FC910DEB46F53EA312
+ENV GPG_KEYS CBAF69F173A0FEA4B537F470D66C9593118BCCB6 F38252826ACD957EF380D39F2F7956BC5DA04B5D
 
-ENV PHP_VERSION 7.4.14
-ENV PHP_URL="https://www.php.net/distributions/php-7.4.14.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.4.14.tar.xz.asc"
-ENV PHP_SHA256="f9f3c37969fcd9006c1dbb1dd76ab53f28c698a1646fa2dde8547c3f45e02886"
+ENV PHP_VERSION 7.3.26
+ENV PHP_URL="https://www.php.net/distributions/php-7.3.26.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.3.26.tar.xz.asc"
+ENV PHP_SHA256="d93052f4cb2882090b6a37fd1e0c764be1605a2461152b7f6b8f04fa48875208"
 
 RUN set -eux; \
 	\
@@ -101,8 +101,6 @@ RUN set -eux; \
 		libedit-dev \
 		libsodium-dev \
 		libxml2-dev \
-		linux-headers \
-		oniguruma-dev \
 		openssl-dev \
 		sqlite-dev \
 	; \
@@ -146,9 +144,6 @@ RUN set -eux; \
 		--with-libedit \
 		--with-openssl \
 		--with-zlib \
-		\
-# in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
-		--with-pear \
 		\
 # bundled pcre does not support JIT on s390x
 # https://manpages.debian.org/stretch/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
