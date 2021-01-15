@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.11
+FROM alpine:3.13
 
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
@@ -46,8 +46,6 @@ RUN set -eux; \
 	chown www-data:www-data /var/www/html; \
 	chmod 777 /var/www/html
 
-ENV PHP_EXTRA_CONFIGURE_ARGS --enable-maintainer-zts --disable-cgi
-
 # Apply stack smash protection to functions using local buffers and alloca()
 # Make PHP's main executable position-independent (improves ASLR security mechanism, and has no performance impact on x86_64)
 # Enable optimization (-O2)
@@ -58,11 +56,11 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
-ENV GPG_KEYS 42670A7FE4D0441C8E4632349E4FDC074A4EF02D 5A52880781F755608BF815FC910DEB46F53EA312
+ENV GPG_KEYS 1729F83938DA44E27BA0F4D3DBDB397470D12172 BFDDD28642824F8118EF77909B67A5C12229118F
 
-ENV PHP_VERSION 7.4.14
-ENV PHP_URL="https://www.php.net/distributions/php-7.4.14.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.4.14.tar.xz.asc"
-ENV PHP_SHA256="f9f3c37969fcd9006c1dbb1dd76ab53f28c698a1646fa2dde8547c3f45e02886"
+ENV PHP_VERSION 8.0.1
+ENV PHP_URL="https://www.php.net/distributions/php-8.0.1.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.0.1.tar.xz.asc"
+ENV PHP_SHA256="208b3330af881b44a6a8c6858d569c72db78dab97810332978cc65206b0ec2dc"
 
 RUN set -eux; \
 	\
