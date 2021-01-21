@@ -111,7 +111,7 @@ for module in $modules; do
 			ini="$PHP_INI_DIR/conf.d/${iniName:-"docker-php-ext-$ext.ini"}"
 			;;
 	esac
-	if ! grep -q "$line" "$ini" 2>/dev/null; then
+	if ! grep -qFx -e "$line" -e "$line.so" "$ini" 2>/dev/null; then
 		echo "$line" >> "$ini"
 	fi
 done
