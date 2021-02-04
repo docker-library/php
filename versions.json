@@ -23,10 +23,10 @@
     "version": "7.3.27"
   },
   "7.4": {
-    "ascUrl": "https://www.php.net/distributions/php-7.4.14.tar.xz.asc",
+    "ascUrl": "https://www.php.net/distributions/php-7.4.15.tar.xz.asc",
     "gpgKeys": "42670A7FE4D0441C8E4632349E4FDC074A4EF02D 5A52880781F755608BF815FC910DEB46F53EA312",
-    "sha256": "f9f3c37969fcd9006c1dbb1dd76ab53f28c698a1646fa2dde8547c3f45e02886",
-    "url": "https://www.php.net/distributions/php-7.4.14.tar.xz",
+    "sha256": "9b859c65f0cf7b3eff9d4a28cfab719fb3d36a1db3c20d874a79b5ec44d43cb8",
+    "url": "https://www.php.net/distributions/php-7.4.15.tar.xz",
     "variants": [
       "buster/cli",
       "buster/apache",
@@ -39,7 +39,7 @@
       "alpine3.12/fpm",
       "alpine3.12/zts"
     ],
-    "version": "7.4.14"
+    "version": "7.4.15"
   },
   "8.0": {
     "ascUrl": "https://www.php.net/distributions/php-8.0.1.tar.xz.asc",
