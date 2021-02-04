@@ -126,6 +126,12 @@ for version in "${versions[@]}"; do
 
 	echo "$version: $fullVersion"
 
+	if [ "$fullVersion" = '8.0.2' ]; then
+		# https://bugs.php.net/bug.php?id=80711#1612456954 😬
+		url+='?a=1'
+		ascUrl+='?a=1'
+	fi
+
 	export fullVersion url ascUrl sha256 gpgKey
 	json="$(
 		jq <<<"$json" -c \
