@@ -47,6 +47,10 @@
     "sha256": "5dd358b35ecd5890a4f09fb68035a72fe6b45d3ead6999ea95981a107fd1f2ab",
     "url": "https://www.php.net/distributions/php-8.0.5.tar.xz",
     "variants": [
+      "bullseye/cli",
+      "bullseye/apache",
+      "bullseye/fpm",
+      "bullseye/zts",
       "buster/cli",
       "buster/apache",
       "buster/fpm",
