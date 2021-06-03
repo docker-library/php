@@ -42,10 +42,10 @@
     "version": "7.4.20"
   },
   "8.0": {
-    "ascUrl": "https://www.php.net/distributions/php-8.0.6.tar.xz.asc",
+    "ascUrl": "https://www.php.net/distributions/php-8.0.7.tar.xz.asc",
     "gpgKeys": "1729F83938DA44E27BA0F4D3DBDB397470D12172 BFDDD28642824F8118EF77909B67A5C12229118F",
-    "sha256": "e9871d3b6c391fe9e89f86f6334852dcc10eeaaa8d5565beb8436e7f0cf30e20",
-    "url": "https://www.php.net/distributions/php-8.0.6.tar.xz",
+    "sha256": "d5fc2e4fc780a32404d88c360e3e0009bc725d936459668e9c2ac992f2d83654",
+    "url": "https://www.php.net/distributions/php-8.0.7.tar.xz",
     "variants": [
       "buster/cli",
       "buster/apache",
@@ -56,6 +56,6 @@
       "alpine3.12/cli",
       "alpine3.12/fpm"
     ],
-    "version": "8.0.6"
+    "version": "8.0.7"
   }
 }
