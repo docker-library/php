@@ -3,6 +3,11 @@ set -Eeuo pipefail
 
 # https://www.php.net/gpg-keys.php
 declare -A gpgKeys=(
+	# https://wiki.php.net/todo/php81
+	# krakjoe & ramsey & patrickallaert
+	# https://www.php.net/gpg-keys.php#gpg-8.1
+	[8.1]='528995BFEDFBA7191D46839EF9BA0ADA31CBD89E 39B641343D8C104B2B146DC3F9C39DC0B9698544 F1F692238FBC1666E5A5CCD4199F9DFEF6FFBAFD'
+
 	# https://wiki.php.net/todo/php80
 	# pollita & carusogabriel
 	# https://www.php.net/gpg-keys.php#gpg-8.0
@@ -94,7 +99,7 @@ for version in "${versions[@]}"; do
 	gpgKey="${gpgKeys[$rcVersion]:-}"
 	if [ -z "$gpgKey" ]; then
 		echo >&2 "ERROR: missing GPG key fingerprint for $version"
-		echo >&2 "  try looking on https://www.php.net/downloads.php#gpg-$version"
+		echo >&2 "  try looking on https://www.php.net/downloads.php#gpg-$rcVersion"
 		echo >&2 "  (and update 'gpgKeys' array in '$BASH_SOURCE')"
 		exit 1
 	fi
