@@ -57,5 +57,22 @@
       "alpine3.12/fpm"
     ],
     "version": "8.0.7"
+  },
+  "8.1-rc": {
+    "ascUrl": "https://downloads.php.net/~patrickallaert/php-8.1.0alpha1.tar.xz.asc",
+    "gpgKeys": "528995BFEDFBA7191D46839EF9BA0ADA31CBD89E 39B641343D8C104B2B146DC3F9C39DC0B9698544 F1F692238FBC1666E5A5CCD4199F9DFEF6FFBAFD",
+    "sha256": "131a81ef9e0d62ba3b5ed81d530a4ff38d256ff12acec243d6afb5b39a85cb79",
+    "url": "https://downloads.php.net/~patrickallaert/php-8.1.0alpha1.tar.xz",
+    "variants": [
+      "buster/cli",
+      "buster/apache",
+      "buster/fpm",
+      "buster/zts",
+      "alpine3.13/cli",
+      "alpine3.13/fpm",
+      "alpine3.12/cli",
+      "alpine3.12/fpm"
+    ],
+    "version": "8.1.0alpha1"
   }
 }
