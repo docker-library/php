@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.12
+FROM alpine:3.14
 
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
@@ -30,12 +30,11 @@ RUN apk add --no-cache \
 
 # ensure www-data user exists
 RUN set -eux; \
-	addgroup -g 82 -S www-data; \
 	adduser -u 82 -D -S -G www-data www-data
 # 82 is the standard uid/gid for "www-data" in Alpine
-# https://git.alpinelinux.org/aports/tree/main/apache2/apache2.pre-install?h=3.9-stable
-# https://git.alpinelinux.org/aports/tree/main/lighttpd/lighttpd.pre-install?h=3.9-stable
-# https://git.alpinelinux.org/aports/tree/main/nginx/nginx.pre-install?h=3.9-stable
+# https://git.alpinelinux.org/aports/tree/main/apache2/apache2.pre-install?h=3.14-stable
+# https://git.alpinelinux.org/aports/tree/main/lighttpd/lighttpd.pre-install?h=3.14-stable
+# https://git.alpinelinux.org/aports/tree/main/nginx/nginx.pre-install?h=3.14-stable
 
 ENV PHP_INI_DIR /usr/local/etc/php
 RUN set -eux; \
@@ -58,11 +57,11 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
-ENV GPG_KEYS 528995BFEDFBA7191D46839EF9BA0ADA31CBD89E 39B641343D8C104B2B146DC3F9C39DC0B9698544 F1F692238FBC1666E5A5CCD4199F9DFEF6FFBAFD
+ENV GPG_KEYS 42670A7FE4D0441C8E4632349E4FDC074A4EF02D 5A52880781F755608BF815FC910DEB46F53EA312
 
-ENV PHP_VERSION 8.1.0alpha1
-ENV PHP_URL="https://downloads.php.net/~patrickallaert/php-8.1.0alpha1.tar.xz" PHP_ASC_URL="https://downloads.php.net/~patrickallaert/php-8.1.0alpha1.tar.xz.asc"
-ENV PHP_SHA256="131a81ef9e0d62ba3b5ed81d530a4ff38d256ff12acec243d6afb5b39a85cb79"
+ENV PHP_VERSION 7.4.20
+ENV PHP_URL="https://www.php.net/distributions/php-7.4.20.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.4.20.tar.xz.asc"
+ENV PHP_SHA256="1fa46ca6790d780bf2cb48961df65f0ca3640c4533f0bca743cd61b71cb66335"
 
 RUN set -eux; \
 	\
