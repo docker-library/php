@@ -5,4 +5,9 @@ ENV PHP_EXTRA_CONFIGURE_ARGS {{
 	else
 		"--enable-maintainer-zts"
 	end
+-}}
+{{
+	if env.suite | startswith("alpine") | not then
+		" --enable-embed"
+	else "" end
 }} --disable-cgi
