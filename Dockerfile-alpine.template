@@ -97,7 +97,6 @@ RUN set -eux; \
 		argon2-dev \
 		coreutils \
 		curl-dev \
-		libedit-dev \
 {{ if (.version | version_id) >= ("7.2" | version_id) then ( -}}
 		libsodium-dev \
 {{ ) else "" end -}}
@@ -112,6 +111,7 @@ RUN set -eux; \
 		oniguruma-dev \
 {{ ) else "" end -}}
 		openssl-dev \
+		readline-dev \
 		sqlite-dev \
 	; \
 	\
@@ -153,8 +153,8 @@ RUN set -eux; \
 		--with-sqlite3=/usr \
 		\
 		--with-curl \
-		--with-libedit \
 		--with-openssl \
+		--with-readline \
 		--with-zlib \
 		\
 {{ if (.version | version_id) | . >= ("7.4" | version_id) then ( -}}
