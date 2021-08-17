@@ -99,21 +99,6 @@ COPY docker-php-source /usr/local/bin/
 RUN set -eux; \
 	\
 	savedAptMark="$(apt-mark showmanual)"; \
-{{
-	# stretch needs to pull argon2 from buster
-	if env.suite == "stretch" then (
--}}
-	sed -e 's/stretch/buster/g' /etc/apt/sources.list > /etc/apt/sources.list.d/buster.list; \
-	{ \
-		echo 'Package: *'; \
-		echo 'Pin: release n=buster*'; \
-		echo 'Pin-Priority: -10'; \
-		echo; \
-		echo 'Package: libargon2*'; \
-		echo 'Pin: release n=buster*'; \
-		echo 'Pin-Priority: 990'; \
-	} > /etc/apt/preferences.d/argon2-buster; \
-{{ ) else "" end -}}
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
 		libargon2-dev \
@@ -190,7 +175,7 @@ RUN set -eux; \
 		\
 {{ ) else "" end -}}
 # bundled pcre does not support JIT on s390x
-# https://manpages.debian.org/stretch/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
+# https://manpages.debian.org/bullseye/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
 		$(test "$gnuArch" = 's390x-linux-gnu' && echo '--without-pcre-jit') \
 		--with-libdir="lib/$debMultiarch" \
 		\
@@ -240,7 +225,7 @@ RUN docker-php-ext-enable sodium
 	# https://bugs.php.net/bug.php?id=76324
 	# https://github.com/php/php-src/pull/3632
 	# https://github.com/php/php-src/commit/2d03197749696ac3f8effba6b7977b0d8729fef3
-	if env.suite != "stretch" and (.version | version_id) < ("7.4" | version_id) then (
+	if (.version | version_id) < ("7.4" | version_id) then (
 -}}
 # temporary "freetype-config" workaround for https://github.com/docker-library/php/issues/865 (https://bugs.php.net/bug.php?id=76324)
 RUN { echo '#!/bin/sh'; echo 'exec pkg-config "$@" freetype2'; } > /usr/local/bin/freetype-config && chmod +x /usr/local/bin/freetype-config

@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM debian:stretch-slim
+FROM debian:bullseye-slim
 
 # prevent Debian's PHP packages from being installed
 # https://github.com/docker-library/php/pull/542
@@ -48,66 +48,7 @@ RUN set -eux; \
 	chown www-data:www-data /var/www/html; \
 	chmod 777 /var/www/html
 
-ENV APACHE_CONFDIR /etc/apache2
-ENV APACHE_ENVVARS $APACHE_CONFDIR/envvars
-
-RUN set -eux; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends apache2; \
-	rm -rf /var/lib/apt/lists/*; \
-	\
-# generically convert lines like
-#   export APACHE_RUN_USER=www-data
-# into
-#   : ${APACHE_RUN_USER:=www-data}
-#   export APACHE_RUN_USER
-# so that they can be overridden at runtime ("-e APACHE_RUN_USER=...")
-	sed -ri 's/^export ([^=]+)=(.*)$/: ${\1:=\2}\nexport \1/' "$APACHE_ENVVARS"; \
-	\
-# setup directories and permissions
-	. "$APACHE_ENVVARS"; \
-	for dir in \
-		"$APACHE_LOCK_DIR" \
-		"$APACHE_RUN_DIR" \
-		"$APACHE_LOG_DIR" \
-	; do \
-		rm -rvf "$dir"; \
-		mkdir -p "$dir"; \
-		chown "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$dir"; \
-# allow running as an arbitrary user (https://github.com/docker-library/php/issues/743)
-		chmod 777 "$dir"; \
-	done; \
-	\
-# delete the "index.html" that installing Apache drops in here
-	rm -rvf /var/www/html/*; \
-	\
-# logs should go to stdout / stderr
-	ln -sfT /dev/stderr "$APACHE_LOG_DIR/error.log"; \
-	ln -sfT /dev/stdout "$APACHE_LOG_DIR/access.log"; \
-	ln -sfT /dev/stdout "$APACHE_LOG_DIR/other_vhosts_access.log"; \
-	chown -R --no-dereference "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$APACHE_LOG_DIR"
-
-# Apache + PHP requires preforking Apache for best results
-RUN a2dismod mpm_event && a2enmod mpm_prefork
-
-# PHP files should be handled by PHP, and should be preferred over any other file type
-RUN { \
-		echo '<FilesMatch \.php$>'; \
-		echo '\tSetHandler application/x-httpd-php'; \
-		echo '</FilesMatch>'; \
-		echo; \
-		echo 'DirectoryIndex disabled'; \
-		echo 'DirectoryIndex index.php index.html'; \
-		echo; \
-		echo '<Directory /var/www/>'; \
-		echo '\tOptions -Indexes'; \
-		echo '\tAllowOverride All'; \
-		echo '</Directory>'; \
-	} | tee "$APACHE_CONFDIR/conf-available/docker-php.conf" \
-	&& a2enconf docker-php
-
-ENV PHP_EXTRA_BUILD_DEPS apache2-dev
-ENV PHP_EXTRA_CONFIGURE_ARGS --with-apxs2 --disable-cgi
+ENV PHP_EXTRA_CONFIGURE_ARGS --enable-maintainer-zts --disable-cgi
 
 # Apply stack smash protection to functions using local buffers and alloca()
 # Make PHP's main executable position-independent (improves ASLR security mechanism, and has no performance impact on x86_64)
@@ -161,16 +102,6 @@ COPY docker-php-source /usr/local/bin/
 RUN set -eux; \
 	\
 	savedAptMark="$(apt-mark showmanual)"; \
-	sed -e 's/stretch/buster/g' /etc/apt/sources.list > /etc/apt/sources.list.d/buster.list; \
-	{ \
-		echo 'Package: *'; \
-		echo 'Pin: release n=buster*'; \
-		echo 'Pin-Priority: -10'; \
-		echo; \
-		echo 'Package: libargon2*'; \
-		echo 'Pin: release n=buster*'; \
-		echo 'Pin-Priority: 990'; \
-	} > /etc/apt/preferences.d/argon2-buster; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
 		libargon2-dev \
@@ -232,7 +163,7 @@ RUN set -eux; \
 		--with-zlib \
 		\
 # bundled pcre does not support JIT on s390x
-# https://manpages.debian.org/stretch/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
+# https://manpages.debian.org/bullseye/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
 		$(test "$gnuArch" = 's390x-linux-gnu' && echo '--without-pcre-jit') \
 		--with-libdir="lib/$debMultiarch" \
 		\
@@ -275,12 +206,8 @@ COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 # sodium was built as a shared module (so that it can be replaced later if so desired), so let's enable it too (https://github.com/docker-library/php/issues/598)
 RUN docker-php-ext-enable sodium
 
+# temporary "freetype-config" workaround for https://github.com/docker-library/php/issues/865 (https://bugs.php.net/bug.php?id=76324)
+RUN { echo '#!/bin/sh'; echo 'exec pkg-config "$@" freetype2'; } > /usr/local/bin/freetype-config && chmod +x /usr/local/bin/freetype-config
+
 ENTRYPOINT ["docker-php-entrypoint"]
-# https://httpd.apache.org/docs/2.4/stopping.html#gracefulstop
-STOPSIGNAL SIGWINCH
-
-COPY apache2-foreground /usr/local/bin/
-WORKDIR /var/www/html
-
-EXPOSE 80
-CMD ["apache2-foreground"]
+CMD ["php", "-a"]
