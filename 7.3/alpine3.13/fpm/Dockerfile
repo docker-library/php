@@ -98,10 +98,10 @@ RUN set -eux; \
 		argon2-dev \
 		coreutils \
 		curl-dev \
-		libedit-dev \
 		libsodium-dev \
 		libxml2-dev \
 		openssl-dev \
+		readline-dev \
 		sqlite-dev \
 	; \
 	\
@@ -141,8 +141,8 @@ RUN set -eux; \
 		--with-sqlite3=/usr \
 		\
 		--with-curl \
-		--with-libedit \
 		--with-openssl \
+		--with-readline \
 		--with-zlib \
 		\
 # bundled pcre does not support JIT on s390x

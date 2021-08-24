@@ -103,13 +103,13 @@ RUN set -eux; \
 	apt-get install -y --no-install-recommends \
 		libargon2-dev \
 		libcurl4-openssl-dev \
-		libedit-dev \
 {{
 	# oniguruma is part of mbstring in php 7.4+
 	if (.version | version_id) >= ("7.4" | version_id) then (
 -}}
 		libonig-dev \
 {{ ) else "" end -}}
+		libreadline-dev \
 {{ if (.version | version_id) >= ("7.2" | version_id) then ( -}}
 		libsodium-dev \
 {{ ) else "" end -}}
@@ -165,8 +165,8 @@ RUN set -eux; \
 		--with-sqlite3=/usr \
 		\
 		--with-curl \
-		--with-libedit \
 		--with-openssl \
+		--with-readline \
 		--with-zlib \
 		\
 {{ if (.version | version_id) | . >= ("7.4" | version_id) then ( -}}
