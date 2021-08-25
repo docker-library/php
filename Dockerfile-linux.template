@@ -1,11 +1,21 @@
-#
-# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
-#
-# PLEASE DO NOT EDIT IT DIRECTLY.
-#
+{{
+	def version_id:
+		# https://www.php.net/phpversion
+		# $version_id = $major_version * 10000 + $minor_version * 100 + $release_version;
+		sub("[a-zA-Z].*$"; "")
+		| split(".")
+		| (
+			(.[0] // 0 | tonumber) * 10000
+			+ (.[1] // 0 | tonumber) * 100
+			+ (.[2] // 0 | tonumber)
+		)
+	;
+	def is_alpine:
+		env.from | startswith("alpine")
+-}}
+FROM {{ env.from }}
 
-FROM debian:bullseye-slim
-
+{{ if is_alpine then "" else ( -}}
 # prevent Debian's PHP packages from being installed
 # https://github.com/docker-library/php/pull/542
 RUN set -eux; \
@@ -15,20 +25,45 @@ RUN set -eux; \
 		echo 'Pin-Priority: -1'; \
 	} > /etc/apt/preferences.d/no-debian-php
 
+{{ ) end -}}
 # dependencies required for running "phpize"
+{{ if is_alpine then ( -}}
+# these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
+{{ ) else ( -}}
 # (see persistent deps below)
+{{ ) end -}}
 ENV PHPIZE_DEPS \
 		autoconf \
-		dpkg-dev \
+		dpkg-dev {{ if is_alpine then "dpkg " else "" end }}\
 		file \
 		g++ \
 		gcc \
 		libc-dev \
 		make \
-		pkg-config \
+		{{ if is_alpine then "pkgconf" else "pkg-config" end }} \
 		re2c
 
 # persistent / runtime deps
+{{ if is_alpine then ( -}}
+RUN apk add --no-cache \
+		ca-certificates \
+		curl \
+		tar \
+		xz \
+# https://github.com/docker-library/php/issues/494
+		openssl
+
+# ensure www-data user exists
+RUN set -eux; \
+{{ if env.alpineVer == "3.13" then ( -}}
+	addgroup -g 82 -S www-data; \
+{{ ) else "" end -}}
+	adduser -u 82 -D -S -G www-data www-data
+# 82 is the standard uid/gid for "www-data" in Alpine
+# https://git.alpinelinux.org/aports/tree/main/apache2/apache2.pre-install?h=3.14-stable
+# https://git.alpinelinux.org/aports/tree/main/lighttpd/lighttpd.pre-install?h=3.14-stable
+# https://git.alpinelinux.org/aports/tree/main/nginx/nginx.pre-install?h=3.14-stable
+{{ ) else ( -}}
 RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
@@ -38,6 +73,7 @@ RUN set -eux; \
 		xz-utils \
 	; \
 	rm -rf /var/lib/apt/lists/*
+{{ ) end -}}
 
 ENV PHP_INI_DIR /usr/local/etc/php
 RUN set -eux; \
@@ -48,8 +84,87 @@ RUN set -eux; \
 	chown www-data:www-data /var/www/html; \
 	chmod 777 /var/www/html
 
+{{ if env.variant == "apache" then ( -}}
+ENV APACHE_CONFDIR /etc/apache2
+ENV APACHE_ENVVARS $APACHE_CONFDIR/envvars
+
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends apache2; \
+	rm -rf /var/lib/apt/lists/*; \
+	\
+# generically convert lines like
+#   export APACHE_RUN_USER=www-data
+# into
+#   : ${APACHE_RUN_USER:=www-data}
+#   export APACHE_RUN_USER
+# so that they can be overridden at runtime ("-e APACHE_RUN_USER=...")
+	sed -ri 's/^export ([^=]+)=(.*)$/: ${\1:=\2}\nexport \1/' "$APACHE_ENVVARS"; \
+	\
+# setup directories and permissions
+	. "$APACHE_ENVVARS"; \
+	for dir in \
+		"$APACHE_LOCK_DIR" \
+		"$APACHE_RUN_DIR" \
+		"$APACHE_LOG_DIR" \
+	; do \
+		rm -rvf "$dir"; \
+		mkdir -p "$dir"; \
+		chown "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$dir"; \
+# allow running as an arbitrary user (https://github.com/docker-library/php/issues/743)
+		chmod 777 "$dir"; \
+	done; \
+	\
+# delete the "index.html" that installing Apache drops in here
+	rm -rvf /var/www/html/*; \
+	\
+# logs should go to stdout / stderr
+	ln -sfT /dev/stderr "$APACHE_LOG_DIR/error.log"; \
+	ln -sfT /dev/stdout "$APACHE_LOG_DIR/access.log"; \
+	ln -sfT /dev/stdout "$APACHE_LOG_DIR/other_vhosts_access.log"; \
+	chown -R --no-dereference "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$APACHE_LOG_DIR"
+
+# Apache + PHP requires preforking Apache for best results
+RUN a2dismod mpm_event && a2enmod mpm_prefork
+
+# PHP files should be handled by PHP, and should be preferred over any other file type
+RUN { \
+		echo '<FilesMatch \.php$>'; \
+		echo '\tSetHandler application/x-httpd-php'; \
+		echo '</FilesMatch>'; \
+		echo; \
+		echo 'DirectoryIndex disabled'; \
+		echo 'DirectoryIndex index.php index.html'; \
+		echo; \
+		echo '<Directory /var/www/>'; \
+		echo '\tOptions -Indexes'; \
+		echo '\tAllowOverride All'; \
+		echo '</Directory>'; \
+	} | tee "$APACHE_CONFDIR/conf-available/docker-php.conf" \
+	&& a2enconf docker-php
+
+ENV PHP_EXTRA_BUILD_DEPS apache2-dev
+ENV PHP_EXTRA_CONFIGURE_ARGS --with-apxs2 --disable-cgi
+
+{{ ) elif env.variant == "cli" then ( -}}
+{{ if is_alpine then "" else ( -}}
+# https://github.com/docker-library/php/pull/939#issuecomment-730501748
+ENV PHP_EXTRA_CONFIGURE_ARGS --enable-embed
+
+{{ ) end -}}
+{{ ) elif env.variant == "fpm" then ( -}}
 ENV PHP_EXTRA_CONFIGURE_ARGS --enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data --disable-cgi
 
+{{ ) elif env.variant == "zts" then ( -}}
+ENV PHP_EXTRA_CONFIGURE_ARGS {{
+	if (.version | version_id) >= ("8" | version_id) then
+		"--enable-zts"
+	else
+		"--enable-maintainer-zts"
+	end
+}} --disable-cgi
+
+{{ ) else "" end -}}
 # Apply stack smash protection to functions using local buffers and alloca()
 # Make PHP's main executable position-independent (improves ASLR security mechanism, and has no performance impact on x86_64)
 # Enable optimization (-O2)
@@ -60,18 +175,22 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
-ENV GPG_KEYS CBAF69F173A0FEA4B537F470D66C9593118BCCB6 F38252826ACD957EF380D39F2F7956BC5DA04B5D
+ENV GPG_KEYS {{ .gpgKeys }}
 
-ENV PHP_VERSION 7.3.29
-ENV PHP_URL="https://www.php.net/distributions/php-7.3.29.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.3.29.tar.xz.asc"
-ENV PHP_SHA256="7db2834511f3d86272dca3daee3f395a5a4afce359b8342aa6edad80e12eb4d0"
+ENV PHP_VERSION {{ .version }}
+ENV PHP_URL="{{ .url }}" PHP_ASC_URL="{{ .ascUrl // "" }}"
+ENV PHP_SHA256="{{ .sha256 // "" }}"
 
 RUN set -eux; \
 	\
+{{ if is_alpine then ( -}}
+	apk add --no-cache --virtual .fetch-deps gnupg; \
+{{ ) else ( -}}
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends gnupg dirmngr; \
 	rm -rf /var/lib/apt/lists/*; \
+{{ ) end -}}
 	\
 	mkdir -p /usr/src; \
 	cd /usr/src; \
@@ -93,26 +212,62 @@ RUN set -eux; \
 		rm -rf "$GNUPGHOME"; \
 	fi; \
 	\
+{{ if is_alpine then ( -}}
+	apk del --no-network .fetch-deps
+{{ ) else ( -}}
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark > /dev/null; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
+{{ ) end -}}
 
 COPY docker-php-source /usr/local/bin/
 
 RUN set -eux; \
+{{ if is_alpine then ( -}}
+	apk add --no-cache --virtual .build-deps \
+{{ ) else ( -}}
 	\
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
-		${PHP_EXTRA_BUILD_DEPS:-} \
-		libargon2-dev \
-		libcurl4-openssl-dev \
-		libreadline-dev \
-		libsodium-dev \
-		libsqlite3-dev \
-		libssl-dev \
-		libxml2-dev \
-		zlib1g-dev \
+{{ ) end -}}
+{{
+	[
+		[ if is_alpine then
+			# alpine packages
+			"$PHPIZE_DEPS",
+			"argon2-dev",
+			"coreutils",
+			"curl-dev",
+			"libsodium-dev",
+			"libxml2-dev",
+			"openssl-dev",
+			"readline-dev",
+			"sqlite-dev",
+			# https://github.com/docker-library/php/issues/888
+			if (.version | version_id) >= ("7.4" | version_id) then "linux-headers" else empty end,
+			# oniguruma is part of mbstring in php 7.4+
+			if (.version | version_id) >= ("7.4" | version_id) then "oniguruma-dev" else empty end
+		else
+			# debian packages
+			"${PHP_EXTRA_BUILD_DEPS:-}",
+			"libargon2-dev",
+			"libcurl4-openssl-dev",
+			"libreadline-dev",
+			"libsodium-dev",
+			"libsqlite3-dev",
+			"libssl-dev",
+			"libxml2-dev",
+			"zlib1g-dev",
+			# oniguruma is part of mbstring in php 7.4+
+			if (.version | version_id) >= ("7.4" | version_id) then "libonig-dev" else empty end
+		end ] | sort[] | (
+-}}
+		{{ . }} \
+{{
+		)
+	] | add
+-}}
 	; \
 	\
 	export \
@@ -123,11 +278,13 @@ RUN set -eux; \
 	docker-php-source extract; \
 	cd /usr/src/php; \
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+{{ if is_alpine then "" else ( -}}
 	debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
 # https://bugs.php.net/bug.php?id=74125
 	if [ ! -d /usr/include/curl ]; then \
 		ln -sT "/usr/include/$debMultiarch/curl" /usr/local/include/curl; \
 	fi; \
+{{ ) end -}}
 	./configure \
 		--build="$gnuArch" \
 		--with-config-file-path="$PHP_INI_DIR" \
@@ -161,10 +318,19 @@ RUN set -eux; \
 		--with-readline \
 		--with-zlib \
 		\
+{{ if (.version | version_id) >= ("7.4" | version_id) then ( -}}
+# in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
+		--with-pear \
+		\
+{{ ) else "" end -}}
 # bundled pcre does not support JIT on s390x
 # https://manpages.debian.org/bullseye/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
+{{ if is_alpine then ( -}}
+		$(test "$gnuArch" = 's390x-linux-musl' && echo '--without-pcre-jit') \
+{{ ) else ( -}}
 		$(test "$gnuArch" = 's390x-linux-gnu' && echo '--without-pcre-jit') \
 		--with-libdir="lib/$debMultiarch" \
+{{ ) end -}}
 		\
 		${PHP_EXTRA_CONFIGURE_ARGS:-} \
 	; \
@@ -180,6 +346,17 @@ RUN set -eux; \
 	cd /; \
 	docker-php-source delete; \
 	\
+{{ if is_alpine then ( -}}
+	runDeps="$( \
+		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
+			| tr ',' '\n' \
+			| sort -u \
+			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+	)"; \
+	apk add --no-cache $runDeps; \
+	\
+	apk del --no-network .build-deps; \
+{{ ) else ( -}}
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; \
@@ -193,6 +370,7 @@ RUN set -eux; \
 	; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	rm -rf /var/lib/apt/lists/*; \
+{{ ) end -}}
 	\
 # update pecl channel definitions https://github.com/docker-library/php/issues/443
 	pecl update-channels; \
@@ -206,10 +384,27 @@ COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 # sodium was built as a shared module (so that it can be replaced later if so desired), so let's enable it too (https://github.com/docker-library/php/issues/598)
 RUN docker-php-ext-enable sodium
 
+{{
+	# https://github.com/docker-library/php/issues/865
+	# https://bugs.php.net/bug.php?id=76324
+	# https://github.com/php/php-src/pull/3632
+	# https://github.com/php/php-src/commit/2d03197749696ac3f8effba6b7977b0d8729fef3
+	if (is_alpine | not) and (.version | version_id) < ("7.4" | version_id) then (
+-}}
 # temporary "freetype-config" workaround for https://github.com/docker-library/php/issues/865 (https://bugs.php.net/bug.php?id=76324)
 RUN { echo '#!/bin/sh'; echo 'exec pkg-config "$@" freetype2'; } > /usr/local/bin/freetype-config && chmod +x /usr/local/bin/freetype-config
 
+{{ ) else "" end -}}
 ENTRYPOINT ["docker-php-entrypoint"]
+{{ if env.variant == "apache" then ( -}}
+# https://httpd.apache.org/docs/2.4/stopping.html#gracefulstop
+STOPSIGNAL SIGWINCH
+
+COPY apache2-foreground /usr/local/bin/
+WORKDIR /var/www/html
+
+EXPOSE 80
+{{ ) elif env.variant == "fpm" then ( -}}
 WORKDIR /var/www/html
 
 RUN set -eux; \
@@ -230,7 +425,9 @@ RUN set -eux; \
 	{ \
 		echo '[global]'; \
 		echo 'error_log = /proc/self/fd/2'; \
+{{ if (.version | version_id) >= ("7.3" | version_id) then ( -}}
 		echo; echo '; https://github.com/docker-library/php/pull/725#issuecomment-443540114'; echo 'log_limit = 8192'; \
+{{ ) else "" end -}}
 		echo; \
 		echo '[www]'; \
 		echo '; if we send this to /proc/self/fd/1, it never appears'; \
@@ -240,7 +437,9 @@ RUN set -eux; \
 		echo; \
 		echo '; Ensure worker stdout and stderr are sent to the main error log.'; \
 		echo 'catch_workers_output = yes'; \
+{{ if (.version | version_id) >= ("7.3" | version_id) then ( -}}
 		echo 'decorate_workers_output = no'; \
+{{ ) else "" end -}}
 	} | tee php-fpm.d/docker.conf; \
 	{ \
 		echo '[global]'; \
@@ -255,4 +454,5 @@ RUN set -eux; \
 STOPSIGNAL SIGQUIT
 
 EXPOSE 9000
-CMD ["php-fpm"]
+{{ ) else "" end -}}
+CMD {{ env.cmd }}
