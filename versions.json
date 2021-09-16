@@ -67,10 +67,10 @@
     "version": "8.0.10"
   },
   "8.1-rc": {
-    "ascUrl": "https://downloads.php.net/~patrickallaert/php-8.1.0RC1.tar.xz.asc",
+    "ascUrl": "https://downloads.php.net/~patrickallaert/php-8.1.0RC2.tar.xz.asc",
     "gpgKeys": "528995BFEDFBA7191D46839EF9BA0ADA31CBD89E 39B641343D8C104B2B146DC3F9C39DC0B9698544 F1F692238FBC1666E5A5CCD4199F9DFEF6FFBAFD",
-    "sha256": "ab8889d3c0012740cc43cda469151cfa9d0562ee2b21c01f719d5b6d0deed8a4",
-    "url": "https://downloads.php.net/~patrickallaert/php-8.1.0RC1.tar.xz",
+    "sha256": "732f006fcec5e7f418ab79110d88becfb918388858fbe667d17b058a54876efc",
+    "url": "https://downloads.php.net/~patrickallaert/php-8.1.0RC2.tar.xz",
     "variants": [
       "bullseye/cli",
       "bullseye/apache",
@@ -85,6 +85,6 @@
       "alpine3.13/cli",
       "alpine3.13/fpm"
     ],
-    "version": "8.1.0RC1"
+    "version": "8.1.0RC2"
   }
 }
