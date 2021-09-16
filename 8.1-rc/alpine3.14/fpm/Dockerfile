@@ -59,9 +59,9 @@ ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
 ENV GPG_KEYS 528995BFEDFBA7191D46839EF9BA0ADA31CBD89E 39B641343D8C104B2B146DC3F9C39DC0B9698544 F1F692238FBC1666E5A5CCD4199F9DFEF6FFBAFD
 
-ENV PHP_VERSION 8.1.0alpha2
-ENV PHP_URL="https://downloads.php.net/~patrickallaert/php-8.1.0alpha2.tar.xz" PHP_ASC_URL="https://downloads.php.net/~patrickallaert/php-8.1.0alpha2.tar.xz.asc"
-ENV PHP_SHA256="916e96eda029198134dd20e50a98b539d70ef204aa241e017c8b2c736222e4c6"
+ENV PHP_VERSION 8.1.0RC1
+ENV PHP_URL="https://downloads.php.net/~patrickallaert/php-8.1.0RC1.tar.xz" PHP_ASC_URL="https://downloads.php.net/~patrickallaert/php-8.1.0RC1.tar.xz.asc"
+ENV PHP_SHA256="ab8889d3c0012740cc43cda469151cfa9d0562ee2b21c01f719d5b6d0deed8a4"
 
 RUN set -eux; \
 	\
@@ -97,16 +97,17 @@ RUN set -eux; \
 		argon2-dev \
 		coreutils \
 		curl-dev \
-		libedit-dev \
 		libsodium-dev \
 		libxml2-dev \
 		linux-headers \
 		oniguruma-dev \
 		openssl-dev \
+		readline-dev \
 		sqlite-dev \
 	; \
 	\
-	export CFLAGS="$PHP_CFLAGS" \
+	export \
+		CFLAGS="$PHP_CFLAGS" \
 		CPPFLAGS="$PHP_CPPFLAGS" \
 		LDFLAGS="$PHP_LDFLAGS" \
 	; \
@@ -133,7 +134,7 @@ RUN set -eux; \
 		--enable-mbstring \
 # --enable-mysqlnd is included here because it's harder to compile after the fact than extensions are (since it's a plugin for several extensions, not an extension in itself)
 		--enable-mysqlnd \
-# https://wiki.php.net/rfc/argon2_password_hash (7.2+)
+# https://wiki.php.net/rfc/argon2_password_hash
 		--with-password-argon2 \
 # https://wiki.php.net/rfc/libsodium
 		--with-sodium=shared \
@@ -142,15 +143,15 @@ RUN set -eux; \
 		--with-sqlite3=/usr \
 		\
 		--with-curl \
-		--with-libedit \
 		--with-openssl \
+		--with-readline \
 		--with-zlib \
 		\
 # in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
 		--with-pear \
 		\
 # bundled pcre does not support JIT on s390x
-# https://manpages.debian.org/stretch/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
+# https://manpages.debian.org/bullseye/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
 		$(test "$gnuArch" = 's390x-linux-musl' && echo '--without-pcre-jit') \
 		\
 		${PHP_EXTRA_CONFIGURE_ARGS:-} \

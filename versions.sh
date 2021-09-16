@@ -117,13 +117,20 @@ for version in "${versions[@]}"; do
 	variants='[]'
 	# order here controls the order of the library/ file
 	for suite in \
+		bullseye \
 		buster \
-		stretch \
 		alpine3.14 \
 		alpine3.13 \
 	; do
 		for variant in cli apache fpm zts; do
-			[ -d "$version/$suite/$variant" ] || continue
+			if [[ "$suite" = alpine* ]]; then
+				if [ "$variant" = 'apache' ]; then
+					continue
+				elif [ "$variant" = 'zts' ] && [[ "$rcVersion" != 7.* ]]; then
+					# https://github.com/docker-library/php/issues/1074
+					continue
+				fi
+			fi
 			export suite variant
 			variants="$(jq <<<"$variants" -c '. + [ env.suite + "/" + env.variant ]')"
 		done

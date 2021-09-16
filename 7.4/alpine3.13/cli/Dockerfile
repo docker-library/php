@@ -58,9 +58,9 @@ ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
 ENV GPG_KEYS 42670A7FE4D0441C8E4632349E4FDC074A4EF02D 5A52880781F755608BF815FC910DEB46F53EA312
 
-ENV PHP_VERSION 7.4.20
-ENV PHP_URL="https://www.php.net/distributions/php-7.4.20.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.4.20.tar.xz.asc"
-ENV PHP_SHA256="1fa46ca6790d780bf2cb48961df65f0ca3640c4533f0bca743cd61b71cb66335"
+ENV PHP_VERSION 7.4.23
+ENV PHP_URL="https://www.php.net/distributions/php-7.4.23.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.4.23.tar.xz.asc"
+ENV PHP_SHA256="cea52313fcffe56343bcd3c66dbb23cd5507dc559cc2e3547cf8f5452e88a05d"
 
 RUN set -eux; \
 	\
@@ -96,16 +96,17 @@ RUN set -eux; \
 		argon2-dev \
 		coreutils \
 		curl-dev \
-		libedit-dev \
 		libsodium-dev \
 		libxml2-dev \
 		linux-headers \
 		oniguruma-dev \
 		openssl-dev \
+		readline-dev \
 		sqlite-dev \
 	; \
 	\
-	export CFLAGS="$PHP_CFLAGS" \
+	export \
+		CFLAGS="$PHP_CFLAGS" \
 		CPPFLAGS="$PHP_CPPFLAGS" \
 		LDFLAGS="$PHP_LDFLAGS" \
 	; \
@@ -132,7 +133,7 @@ RUN set -eux; \
 		--enable-mbstring \
 # --enable-mysqlnd is included here because it's harder to compile after the fact than extensions are (since it's a plugin for several extensions, not an extension in itself)
 		--enable-mysqlnd \
-# https://wiki.php.net/rfc/argon2_password_hash (7.2+)
+# https://wiki.php.net/rfc/argon2_password_hash
 		--with-password-argon2 \
 # https://wiki.php.net/rfc/libsodium
 		--with-sodium=shared \
@@ -141,15 +142,15 @@ RUN set -eux; \
 		--with-sqlite3=/usr \
 		\
 		--with-curl \
-		--with-libedit \
 		--with-openssl \
+		--with-readline \
 		--with-zlib \
 		\
 # in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
 		--with-pear \
 		\
 # bundled pcre does not support JIT on s390x
-# https://manpages.debian.org/stretch/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
+# https://manpages.debian.org/bullseye/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
 		$(test "$gnuArch" = 's390x-linux-musl' && echo '--without-pcre-jit') \
 		\
 		${PHP_EXTRA_CONFIGURE_ARGS:-} \

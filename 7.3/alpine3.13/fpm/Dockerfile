@@ -60,9 +60,9 @@ ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
 ENV GPG_KEYS CBAF69F173A0FEA4B537F470D66C9593118BCCB6 F38252826ACD957EF380D39F2F7956BC5DA04B5D
 
-ENV PHP_VERSION 7.3.28
-ENV PHP_URL="https://www.php.net/distributions/php-7.3.28.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.3.28.tar.xz.asc"
-ENV PHP_SHA256="a2a84dbec8c1eee3f46c5f249eaaa2ecb3f9e7a6f5d0604d2df44ff8d4904dbe"
+ENV PHP_VERSION 7.3.30
+ENV PHP_URL="https://www.php.net/distributions/php-7.3.30.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.3.30.tar.xz.asc"
+ENV PHP_SHA256="0ebfd656df0f3b1ea37ff2887f8f2d1a71cd160fb0292547c0ee0a99e58ffd1b"
 
 RUN set -eux; \
 	\
@@ -98,14 +98,15 @@ RUN set -eux; \
 		argon2-dev \
 		coreutils \
 		curl-dev \
-		libedit-dev \
 		libsodium-dev \
 		libxml2-dev \
 		openssl-dev \
+		readline-dev \
 		sqlite-dev \
 	; \
 	\
-	export CFLAGS="$PHP_CFLAGS" \
+	export \
+		CFLAGS="$PHP_CFLAGS" \
 		CPPFLAGS="$PHP_CPPFLAGS" \
 		LDFLAGS="$PHP_LDFLAGS" \
 	; \
@@ -132,7 +133,7 @@ RUN set -eux; \
 		--enable-mbstring \
 # --enable-mysqlnd is included here because it's harder to compile after the fact than extensions are (since it's a plugin for several extensions, not an extension in itself)
 		--enable-mysqlnd \
-# https://wiki.php.net/rfc/argon2_password_hash (7.2+)
+# https://wiki.php.net/rfc/argon2_password_hash
 		--with-password-argon2 \
 # https://wiki.php.net/rfc/libsodium
 		--with-sodium=shared \
@@ -141,12 +142,12 @@ RUN set -eux; \
 		--with-sqlite3=/usr \
 		\
 		--with-curl \
-		--with-libedit \
 		--with-openssl \
+		--with-readline \
 		--with-zlib \
 		\
 # bundled pcre does not support JIT on s390x
-# https://manpages.debian.org/stretch/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
+# https://manpages.debian.org/bullseye/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
 		$(test "$gnuArch" = 's390x-linux-musl' && echo '--without-pcre-jit') \
 		\
 		${PHP_EXTRA_CONFIGURE_ARGS:-} \
