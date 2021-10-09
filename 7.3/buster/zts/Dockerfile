@@ -48,8 +48,6 @@ RUN set -eux; \
 	chown www-data:www-data /var/www/html; \
 	chmod 777 /var/www/html
 
-ENV PHP_EXTRA_CONFIGURE_ARGS --enable-maintainer-zts --disable-cgi
-
 # Apply stack smash protection to functions using local buffers and alloca()
 # Make PHP's main executable position-independent (improves ASLR security mechanism, and has no performance impact on x86_64)
 # Enable optimization (-O2)
@@ -104,7 +102,6 @@ RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
-		${PHP_EXTRA_BUILD_DEPS:-} \
 		libargon2-dev \
 		libcurl4-openssl-dev \
 		libreadline-dev \
@@ -166,7 +163,12 @@ RUN set -eux; \
 		$(test "$gnuArch" = 's390x-linux-gnu' && echo '--without-pcre-jit') \
 		--with-libdir="lib/$debMultiarch" \
 		\
-		${PHP_EXTRA_CONFIGURE_ARGS:-} \
+		--disable-cgi \
+		\
+# https://github.com/docker-library/php/pull/939#issuecomment-730501748
+		--enable-embed \
+		\
+		--enable-maintainer-zts \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \

@@ -106,9 +106,6 @@ RUN { \
 	} | tee "$APACHE_CONFDIR/conf-available/docker-php.conf" \
 	&& a2enconf docker-php
 
-ENV PHP_EXTRA_BUILD_DEPS apache2-dev
-ENV PHP_EXTRA_CONFIGURE_ARGS --with-apxs2 --disable-cgi
-
 # Apply stack smash protection to functions using local buffers and alloca()
 # Make PHP's main executable position-independent (improves ASLR security mechanism, and has no performance impact on x86_64)
 # Enable optimization (-O2)
@@ -163,7 +160,7 @@ RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
-		${PHP_EXTRA_BUILD_DEPS:-} \
+		apache2-dev \
 		libargon2-dev \
 		libcurl4-openssl-dev \
 		libreadline-dev \
@@ -225,7 +222,9 @@ RUN set -eux; \
 		$(test "$gnuArch" = 's390x-linux-gnu' && echo '--without-pcre-jit') \
 		--with-libdir="lib/$debMultiarch" \
 		\
-		${PHP_EXTRA_CONFIGURE_ARGS:-} \
+		--disable-cgi \
+		\
+		--with-apxs2 \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
