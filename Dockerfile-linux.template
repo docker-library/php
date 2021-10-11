@@ -143,27 +143,6 @@ RUN { \
 	} | tee "$APACHE_CONFDIR/conf-available/docker-php.conf" \
 	&& a2enconf docker-php
 
-ENV PHP_EXTRA_BUILD_DEPS apache2-dev
-ENV PHP_EXTRA_CONFIGURE_ARGS --with-apxs2 --disable-cgi
-
-{{ ) elif env.variant == "cli" then ( -}}
-{{ if is_alpine then "" else ( -}}
-# https://github.com/docker-library/php/pull/939#issuecomment-730501748
-ENV PHP_EXTRA_CONFIGURE_ARGS --enable-embed
-
-{{ ) end -}}
-{{ ) elif env.variant == "fpm" then ( -}}
-ENV PHP_EXTRA_CONFIGURE_ARGS --enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data --disable-cgi
-
-{{ ) elif env.variant == "zts" then ( -}}
-ENV PHP_EXTRA_CONFIGURE_ARGS {{
-	if (.version | version_id) >= ("8" | version_id) then
-		"--enable-zts"
-	else
-		"--enable-maintainer-zts"
-	end
-}} --disable-cgi
-
 {{ ) else "" end -}}
 # Apply stack smash protection to functions using local buffers and alloca()
 # Make PHP's main executable position-independent (improves ASLR security mechanism, and has no performance impact on x86_64)
@@ -250,7 +229,7 @@ RUN set -eux; \
 			if (.version | version_id) >= ("7.4" | version_id) then "oniguruma-dev" else empty end
 		else
 			# debian packages
-			"${PHP_EXTRA_BUILD_DEPS:-}",
+			if env.variant == "apache" then "apache2-dev" else empty end,
 			"libargon2-dev",
 			"libcurl4-openssl-dev",
 			"libreadline-dev",
@@ -331,8 +310,32 @@ RUN set -eux; \
 		$(test "$gnuArch" = 's390x-linux-gnu' && echo '--without-pcre-jit') \
 		--with-libdir="lib/$debMultiarch" \
 {{ ) end -}}
+{{ # https://github.com/docker-library/php/issues/280 -}}
+{{ if env.variant == "cli" then "" else ( -}}
 		\
-		${PHP_EXTRA_CONFIGURE_ARGS:-} \
+		--disable-cgi \
+{{ ) end -}}
+{{ if (env.variant == "cli" or env.variant == "zts") and (is_alpine | not) then ( -}}
+		\
+# https://github.com/docker-library/php/pull/939#issuecomment-730501748
+		--enable-embed \
+{{ ) else "" end -}}
+{{ if env.variant == "apache" then ( -}}
+		\
+		--with-apxs2 \
+{{ ) elif env.variant == "fpm" then ( -}}
+		\
+		--enable-fpm \
+		--with-fpm-user=www-data \
+		--with-fpm-group=www-data \
+{{ ) elif env.variant == "zts" then ( -}}
+		\
+{{ if (.version | version_id) >= ("8" | version_id) then ( -}}
+		--enable-zts \
+{{ ) else ( -}}
+		--enable-maintainer-zts \
+{{ ) end -}}
+{{ ) else "" end -}}
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
