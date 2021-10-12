@@ -176,7 +176,14 @@ RUN set -eux; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
 	make install; \
-	find /usr/local/bin /usr/local/sbin -type f -perm +0111 -exec strip --strip-all '{}' + || true; \
+	find \
+		/usr/local \
+		-type f \
+		-perm '/0111' \
+		-exec sh -euxc ' \
+			strip --strip-all "$@" || : \
+		' -- '{}' + \
+	; \
 	make clean; \
 	\
 # https://github.com/docker-library/php/issues/692 (copy default example "php.ini" files somewhere easily discoverable)
