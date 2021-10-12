@@ -105,6 +105,12 @@ for ext in $exts; do
 	cd "$ext"
 	[ -e Makefile ] || docker-php-ext-configure "$ext"
 	make -j"$j"
+	find modules \
+		-maxdepth 1 \
+		-name '*.so' \
+		-exec sh -euxc ' \
+			strip --strip-all "$@" || :
+		' -- '{}' +
 	make -j"$j" install
 	find modules \
 		-maxdepth 1 \
