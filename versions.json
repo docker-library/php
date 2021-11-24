@@ -16,6 +16,7 @@
       "alpine3.14/cli",
       "alpine3.14/fpm",
       "alpine3.14/zts",
+      "alpine3.14/apache",
       "alpine3.13/cli",
       "alpine3.13/fpm",
       "alpine3.13/zts"
@@ -39,6 +40,7 @@
       "alpine3.14/cli",
       "alpine3.14/fpm",
       "alpine3.14/zts",
+      "alpine3.14/apache",
       "alpine3.13/cli",
       "alpine3.13/fpm",
       "alpine3.13/zts"
@@ -61,6 +63,7 @@
       "buster/zts",
       "alpine3.14/cli",
       "alpine3.14/fpm",
+      "alpine3.14/apache",
       "alpine3.13/cli",
       "alpine3.13/fpm"
     ],
@@ -82,6 +85,7 @@
       "buster/zts",
       "alpine3.14/cli",
       "alpine3.14/fpm",
+      "alpine3.14/apache",
       "alpine3.13/cli",
       "alpine3.13/fpm"
     ],

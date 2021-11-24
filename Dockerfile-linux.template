@@ -89,9 +89,28 @@ ENV APACHE_CONFDIR /etc/apache2
 ENV APACHE_ENVVARS $APACHE_CONFDIR/envvars
 
 RUN set -eux; \
+{{ if is_alpine then ( -}}
+	apk add --no-cache bash apache2; \
+	echo -en "unset HOME\n \
+export APACHE_RUN_USER=www-data\n \
+export APACHE_RUN_GROUP=www-data\n \
+export APACHE_PID_FILE=/var/run/apache2/apache2.pid\n \
+export APACHE_RUN_DIR=/var/run/apache2\n \
+export APACHE_LOCK_DIR=/var/lock/apache2\n \
+export APACHE_LOG_DIR=/var/log/apache2\n \
+export LANG=C\n \
+#. /etc/default/locale\n \
+export LANG\n \
+#export APACHE_LYNX='www-browser -dump'\n \
+#APACHE_ULIMIT_MAX_FILES='ulimit -n 65536'\n \
+#export APACHE_ARGUMENTS=''\n \
+#export APACHE2_MAINTSCRIPT_DEBUG=1\n \
+" > ${APACHE_ENVVARS}; \
+{{ ) else ( -}}
 	apt-get update; \
 	apt-get install -y --no-install-recommends apache2; \
 	rm -rf /var/lib/apt/lists/*; \
+{{ ) end -}}
 	\
 # generically convert lines like
 #   export APACHE_RUN_USER=www-data
@@ -125,24 +144,27 @@ RUN set -eux; \
 	chown -R --no-dereference "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$APACHE_LOG_DIR"
 
 # Apache + PHP requires preforking Apache for best results
-RUN a2dismod mpm_event && a2enmod mpm_prefork
+{{ if is_alpine then "" else ( -}}
+	RUN a2dismod mpm_event && a2enmod mpm_prefork
+{{ ) end -}}
 
 # PHP files should be handled by PHP, and should be preferred over any other file type
 RUN { \
 		echo '<FilesMatch \.php$>'; \
-		echo '\tSetHandler application/x-httpd-php'; \
+		echo -e '\tSetHandler application/x-httpd-php'; \
 		echo '</FilesMatch>'; \
 		echo; \
 		echo 'DirectoryIndex disabled'; \
 		echo 'DirectoryIndex index.php index.html'; \
 		echo; \
 		echo '<Directory /var/www/>'; \
-		echo '\tOptions -Indexes'; \
-		echo '\tAllowOverride All'; \
+		echo -e '\tOptions -Indexes'; \
+		echo -e '\tAllowOverride All'; \
 		echo '</Directory>'; \
-	} | tee "$APACHE_CONFDIR/conf-available/docker-php.conf" \
-	&& a2enconf docker-php
-
+	} | tee "$APACHE_CONFDIR/conf{{ if is_alpine then ".d" else "-available" end }}/docker-php.conf" \
+	{{ if is_alpine then ";" else ( -}}
+		&& a2enconf docker-php
+	{{ ) end -}}
 {{ ) else "" end -}}
 # Apply stack smash protection to functions using local buffers and alloca()
 # Make PHP's main executable position-independent (improves ASLR security mechanism, and has no performance impact on x86_64)
@@ -215,6 +237,7 @@ RUN set -eux; \
 		[ if is_alpine then
 			# alpine packages
 			"$PHPIZE_DEPS",
+			if env.variant == "apache" then "apache2-dev" else empty end,
 			"argon2-dev",
 			"coreutils",
 			"curl-dev",
@@ -411,6 +434,12 @@ ENTRYPOINT ["docker-php-entrypoint"]
 STOPSIGNAL SIGWINCH
 
 COPY apache2-foreground /usr/local/bin/
+
+	{{ if is_alpine then ( -}}
+		RUN sed -i 's/^LoadModule php7_module.*/LoadModule php7_module modules\/libphp7\.so/g' ${APACHE_CONFDIR}/httpd.conf && \
+			sed -i 's/^exec apache2/exec httpd/g' /usr/local/bin/apache2-foreground
+	{{ ) else "" end -}}
+
 WORKDIR /var/www/html
 
 EXPOSE 80
