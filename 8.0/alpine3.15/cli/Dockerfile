@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.13
+FROM alpine:3.15
 
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
@@ -30,7 +30,6 @@ RUN apk add --no-cache \
 
 # ensure www-data user exists
 RUN set -eux; \
-	addgroup -g 82 -S www-data; \
 	adduser -u 82 -D -S -G www-data www-data
 # 82 is the standard uid/gid for "www-data" in Alpine
 # https://git.alpinelinux.org/aports/tree/main/apache2/apache2.pre-install?h=3.14-stable
@@ -56,11 +55,11 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
-ENV GPG_KEYS CBAF69F173A0FEA4B537F470D66C9593118BCCB6 F38252826ACD957EF380D39F2F7956BC5DA04B5D
+ENV GPG_KEYS 1729F83938DA44E27BA0F4D3DBDB397470D12172 BFDDD28642824F8118EF77909B67A5C12229118F
 
-ENV PHP_VERSION 7.3.33
-ENV PHP_URL="https://www.php.net/distributions/php-7.3.33.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.3.33.tar.xz.asc"
-ENV PHP_SHA256="166eaccde933381da9516a2b70ad0f447d7cec4b603d07b9a916032b215b90cc"
+ENV PHP_VERSION 8.0.13
+ENV PHP_URL="https://www.php.net/distributions/php-8.0.13.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.0.13.tar.xz.asc"
+ENV PHP_SHA256="cd976805ec2e9198417651027dfe16854ba2c2c388151ab9d4d268513d52ed52"
 
 RUN set -eux; \
 	\
@@ -98,6 +97,8 @@ RUN set -eux; \
 		curl-dev \
 		libsodium-dev \
 		libxml2-dev \
+		linux-headers \
+		oniguruma-dev \
 		openssl-dev \
 		readline-dev \
 		sqlite-dev \
@@ -144,13 +145,12 @@ RUN set -eux; \
 		--with-readline \
 		--with-zlib \
 		\
+# in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
+		--with-pear \
+		\
 # bundled pcre does not support JIT on s390x
 # https://manpages.debian.org/bullseye/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
 		$(test "$gnuArch" = 's390x-linux-musl' && echo '--without-pcre-jit') \
-		\
-		--disable-cgi \
-		\
-		--enable-maintainer-zts \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
