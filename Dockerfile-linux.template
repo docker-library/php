@@ -76,6 +76,8 @@ RUN set -eux; \
 {{ ) end -}}
 
 ENV PHP_INI_DIR /usr/local/etc/php
+# https://www.php.net/manual/en/configuration.file.php#configuration.file.scan
+ENV CONFIG_SCAN_DIRS $PHP_INI_DIR/conf.d
 RUN set -eux; \
 	mkdir -p "$PHP_INI_DIR/conf.d"; \
 # allow running as an arbitrary user (https://github.com/docker-library/php/issues/743)
@@ -267,7 +269,7 @@ RUN set -eux; \
 	./configure \
 		--build="$gnuArch" \
 		--with-config-file-path="$PHP_INI_DIR" \
-		--with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
+		--with-config-file-scan-dir="$CONFIG_SCAN_DIRS" \
 		\
 # make sure invalid --configure-flags are fatal errors instead of just warnings
 		--enable-option-checking=fatal \
