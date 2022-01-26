@@ -22,6 +22,7 @@
     ],
     "version": "7.3.33"
   },
+  "7.3-rc": null,
   "7.4": {
     "ascUrl": "https://www.php.net/distributions/php-7.4.27.tar.xz.asc",
     "gpgKeys": "42670A7FE4D0441C8E4632349E4FDC074A4EF02D 5A52880781F755608BF815FC910DEB46F53EA312",
@@ -45,6 +46,7 @@
     ],
     "version": "7.4.27"
   },
+  "7.4-rc": null,
   "8.0": {
     "ascUrl": "https://www.php.net/distributions/php-8.0.15.tar.xz.asc",
     "gpgKeys": "1729F83938DA44E27BA0F4D3DBDB397470D12172 BFDDD28642824F8118EF77909B67A5C12229118F",
@@ -66,6 +68,7 @@
     ],
     "version": "8.0.15"
   },
+  "8.0-rc": null,
   "8.1": {
     "ascUrl": "https://www.php.net/distributions/php-8.1.2.tar.xz.asc",
     "gpgKeys": "528995BFEDFBA7191D46839EF9BA0ADA31CBD89E 39B641343D8C104B2B146DC3F9C39DC0B9698544 F1F692238FBC1666E5A5CCD4199F9DFEF6FFBAFD",
@@ -86,5 +89,6 @@
       "alpine3.14/fpm"
     ],
     "version": "8.1.2"
-  }
+  },
+  "8.1-rc": null
 }
