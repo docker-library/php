@@ -154,7 +154,43 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
-ENV GPG_KEYS {{ .gpgKeys }}
+ENV GPG_KEYS {{
+	{
+		# https://www.php.net/gpg-keys.php
+		# https://www.php.net/downloads.php
+
+		"8.1": [
+			# https://wiki.php.net/todo/php81#release_managers
+			# https://www.php.net/gpg-keys.php#gpg-8.1
+			"5289 95BF EDFB A719 1D46  839E F9BA 0ADA 31CB D89E", # krakjoe
+			"39B6 4134 3D8C 104B 2B14  6DC3 F9C3 9DC0 B969 8544", # ramsey
+			"F1F6 9223 8FBC 1666 E5A5  CCD4 199F 9DFE F6FF BAFD"  # patrickallaert
+		],
+
+		"8.0": [
+			# https://wiki.php.net/todo/php80#release_managers
+			# https://www.php.net/gpg-keys.php#gpg-8.0
+			"1729 F839 38DA 44E2 7BA0  F4D3 DBDB 3974 70D1 2172", # pollita
+			"BFDD D286 4282 4F81 18EF  7790 9B67 A5C1 2229 118F"  # carusogabriel
+		],
+
+		"7.4": [
+			# https://wiki.php.net/todo/php74#release_managers
+			# https://www.php.net/gpg-keys.php#gpg-7.4
+			"4267 0A7F E4D0 441C 8E46  3234 9E4F DC07 4A4E F02D", # petk
+			"5A52 8807 81F7 5560 8BF8  15FC 910D EB46 F53E A312"  # derick
+		],
+
+		"7.3": [
+			# https://wiki.php.net/todo/php73#release_managers
+			# https://www.php.net/gpg-keys.php#gpg-7.3
+			"CBAF 69F1 73A0 FEA4 B537  F470 D66C 9593 118B CCB6", # cmb
+			"F382 5282 6ACD 957E F380  D39F 2F79 56BC 5DA0 4B5D"  # stas
+		],
+	}[env.version | rtrimstr("-rc")] // error("missing GPG keys for " + env.version)
+	| map(gsub(" "; ""))
+	| join(" ")
+}}
 
 ENV PHP_VERSION {{ .version }}
 ENV PHP_URL="{{ .url }}" PHP_ASC_URL="{{ .ascUrl // "" }}"
