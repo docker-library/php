@@ -63,7 +63,7 @@ for version in "${versions[@]}"; do
 	else
 		apiUrl='https://qa.php.net/api.php?type=qa-releases&format=json'
 		apiJqExpr='
-			.releases[]
+			(.releases // [])[]
 			| select(.version | startswith(env.rcVersion))
 			| [
 				.version,
@@ -82,10 +82,16 @@ for version in "${versions[@]}"; do
 	unset IFS
 
 	if [ "${#possibles[@]}" -eq 0 ]; then
-		echo >&2
-		echo >&2 "error: unable to determine available releases of $version"
-		echo >&2
-		exit 1
+		if [ "$rcVersion" = "$version" ]; then
+			echo >&2
+			echo >&2 "error: unable to determine available releases of $version"
+			echo >&2
+			exit 1
+		else
+			echo >&2 "warning: skipping/removing '$version' (does not appear to exist upstream)"
+			json="$(jq <<<"$json" -c '.[env.version] = null')"
+			continue
+		fi
 	fi
 
 	# format of "possibles" array entries is "VERSION URL.TAR.XZ URL.TAR.XZ.ASC SHA256" (each value shell quoted)
