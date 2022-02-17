@@ -23,9 +23,9 @@
   },
   "7.3-rc": null,
   "7.4": {
-    "ascUrl": "https://www.php.net/distributions/php-7.4.27.tar.xz.asc",
-    "sha256": "3f8b937310f155822752229c2c2feb8cc2621e25a728e7b94d0d74c128c43d0c",
-    "url": "https://www.php.net/distributions/php-7.4.27.tar.xz",
+    "ascUrl": "https://www.php.net/distributions/php-7.4.28.tar.xz.asc",
+    "sha256": "9cc3b6f6217b60582f78566b3814532c4b71d517876c25013ae51811e65d8fce",
+    "url": "https://www.php.net/distributions/php-7.4.28.tar.xz",
     "variants": [
       "bullseye/cli",
       "bullseye/apache",
@@ -42,7 +42,7 @@
       "alpine3.14/fpm",
       "alpine3.14/zts"
     ],
-    "version": "7.4.27"
+    "version": "7.4.28"
   },
   "7.4-rc": null,
   "8.0": {
