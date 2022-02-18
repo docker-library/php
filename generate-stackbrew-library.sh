@@ -82,16 +82,27 @@ join() {
 }
 
 for version; do
-	export version
+	rcVersion="${version%-rc}"
+	export version rcVersion
 
 	if ! fullVersion="$(jq -er '.[env.version] | if . then .version else empty end' versions.json)"; then
 		continue
+	fi
+
+	if [ "$rcVersion" != "$version" ] && rcFullVersion="$(jq -er '.[env.rcVersion] | if . then .version else empty end' versions.json)"; then
+		# if this is a "-rc" release, let's make sure the release it contains isn't already GA (and thus something we should not publish anymore)
+		latestVersion="$({ echo "$fullVersion"; echo "$rcFullVersion"; } | sort -V | tail -1)"
+		if [[ "$fullVersion" == "$rcFullVersion"* ]] || [ "$latestVersion" = "$rcFullVersion" ]; then
+			# "x.y.z-rc1" == x.y.z*
+			continue
+		fi
 	fi
 
 	variants="$(jq -r '.[env.version].variants | map(@sh) | join(" ")' versions.json)"
 	eval "variants=( $variants )"
 
 	versionAliases=(
+		$fullVersion
 		$version
 		${aliases[$version]:-}
 	)
@@ -102,12 +113,11 @@ for version; do
 		dir="$version/$dir"
 		[ -f "$dir/Dockerfile" ] || continue
 
-		baseAliases=( $fullVersion "${versionAliases[@]}" )
-		variantAliases=( "${baseAliases[@]/%/-$variant}" )
+		variantAliases=( "${versionAliases[@]/%/-$variant}" )
 		variantAliases=( "${variantAliases[@]//latest-/}" )
 
 		if [ "$variant" = 'cli' ]; then
-			variantAliases+=( "${baseAliases[@]}" )
+			variantAliases+=( "${versionAliases[@]}" )
 		fi
 
 		suiteVariantAliases=( "${variantAliases[@]/%/-$suite}" )
