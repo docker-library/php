@@ -83,6 +83,11 @@ join() {
 
 for version; do
 	export version
+
+	if ! fullVersion="$(jq -er '.[env.version] | if . then .version else empty end' versions.json)"; then
+		continue
+	fi
+
 	variants="$(jq -r '.[env.version].variants | map(@sh) | join(" ")' versions.json)"
 	eval "variants=( $variants )"
 
@@ -96,8 +101,6 @@ for version; do
 		variant="$(basename "$dir")" # "cli", etc
 		dir="$version/$dir"
 		[ -f "$dir/Dockerfile" ] || continue
-
-		fullVersion="$(jq -r '.[env.version].version' versions.json)"
 
 		baseAliases=( $fullVersion "${versionAliases[@]}" )
 		variantAliases=( "${baseAliases[@]/%/-$variant}" )
