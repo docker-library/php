@@ -333,6 +333,15 @@ RUN set -eux; \
 		--with-readline \
 		--with-zlib \
 		\
+{{ if env.variant == "cli" then ( -}}
+# https://github.com/docker-library/php/pull/1259
+		--enable-phpdbg \
+		--enable-phpdbg-readline \
+{{ ) else ( -}}
+# https://github.com/bwoebi/phpdbg-docs/issues/1#issuecomment-163872806 ("phpdbg is primarily a CLI debugger, and is not suitable for debugging an fpm stack.")
+		--disable-phpdbg \
+{{ ) end -}}
+		\
 {{ if (.version | version_id) >= ("7.4" | version_id) then ( -}}
 # in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
 		--with-pear \

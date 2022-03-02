@@ -145,6 +145,10 @@ RUN set -eux; \
 		--with-readline \
 		--with-zlib \
 		\
+# https://github.com/docker-library/php/pull/1259
+		--enable-phpdbg \
+		--enable-phpdbg-readline \
+		\
 # in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
 		--with-pear \
 		\
