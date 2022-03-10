@@ -254,6 +254,7 @@ RUN set -eux; \
 			"argon2-dev",
 			"coreutils",
 			"curl-dev",
+			"gnu-libiconv-dev", # https://www.php.net/manual/en/intro.iconv.php "it'd be a good idea to install the GNU libiconv library"
 			"libsodium-dev",
 			"libxml2-dev",
 			"openssl-dev",
@@ -285,6 +286,15 @@ RUN set -eux; \
 -}}
 	; \
 	\
+{{ if is_alpine then ( -}}
+# make sure musl's iconv doesn't get used (https://www.php.net/manual/en/intro.iconv.php)
+	rm -vf /usr/include/iconv.h; \
+{{ if (.version | version_id) < ("8" | version_id) then ( -}}
+# PHP < 8 doesn't know to look deeper for GNU libiconv: https://github.com/php/php-src/commit/b480e6841ecd5317faa136647a2b8253a4c2d0df
+	ln -sv /usr/include/gnu-libiconv/*.h /usr/include/; \
+{{ ) else "" end -}}
+	\
+{{ ) else "" end -}}
 	export \
 		CFLAGS="$PHP_CFLAGS" \
 		CPPFLAGS="$PHP_CPPFLAGS" \
@@ -329,7 +339,7 @@ RUN set -eux; \
 		--with-sqlite3=/usr \
 		\
 		--with-curl \
-		--with-iconv=shared \
+		--with-iconv{{ if is_alpine then "=/usr" else "" end }} \
 		--with-openssl \
 		--with-readline \
 		--with-zlib \
@@ -439,9 +449,6 @@ COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 
 # sodium was built as a shared module (so that it can be replaced later if so desired), so let's enable it too (https://github.com/docker-library/php/issues/598)
 RUN docker-php-ext-enable sodium
-
-# iconv was built as a shared module (so it can be disabled later if desired)
-RUN docker-php-ext-enable iconv
 
 {{
 	# https://github.com/docker-library/php/issues/865
