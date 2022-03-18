@@ -180,13 +180,6 @@ ENV GPG_KEYS {{
 			"4267 0A7F E4D0 441C 8E46  3234 9E4F DC07 4A4E F02D", # petk
 			"5A52 8807 81F7 5560 8BF8  15FC 910D EB46 F53E A312"  # derick
 		],
-
-		"7.3": [
-			# https://wiki.php.net/todo/php73#release_managers
-			# https://www.php.net/gpg-keys.php#gpg-7.3
-			"CBAF 69F1 73A0 FEA4 B537  F470 D66C 9593 118B CCB6", # cmb
-			"F382 5282 6ACD 957E F380  D39F 2F79 56BC 5DA0 4B5D"  # stas
-		],
 	}[env.version | rtrimstr("-rc")] // error("missing GPG keys for " + env.version)
 	| map(gsub(" "; ""))
 	| join(" ")
@@ -491,9 +484,7 @@ RUN set -eux; \
 	{ \
 		echo '[global]'; \
 		echo 'error_log = /proc/self/fd/2'; \
-{{ if (.version | version_id) >= ("7.3" | version_id) then ( -}}
 		echo; echo '; https://github.com/docker-library/php/pull/725#issuecomment-443540114'; echo 'log_limit = 8192'; \
-{{ ) else "" end -}}
 		echo; \
 		echo '[www]'; \
 		echo '; if we send this to /proc/self/fd/1, it never appears'; \
@@ -503,9 +494,7 @@ RUN set -eux; \
 		echo; \
 		echo '; Ensure worker stdout and stderr are sent to the main error log.'; \
 		echo 'catch_workers_output = yes'; \
-{{ if (.version | version_id) >= ("7.3" | version_id) then ( -}}
 		echo 'decorate_workers_output = no'; \
-{{ ) else "" end -}}
 	} | tee php-fpm.d/docker.conf; \
 	{ \
 		echo '[global]'; \
