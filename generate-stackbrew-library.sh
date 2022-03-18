@@ -12,7 +12,7 @@ declare -A debianSuites=(
 )
 defaultAlpineVersion='3.15'
 declare -A alpineVersions=(
-	#
+	#[8.1]='3.15'
 )
 
 self="$(basename "$BASH_SOURCE")"
