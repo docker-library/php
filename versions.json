@@ -1,27 +1,4 @@
 {
-  "7.3": {
-    "ascUrl": "https://www.php.net/distributions/php-7.3.33.tar.xz.asc",
-    "sha256": "166eaccde933381da9516a2b70ad0f447d7cec4b603d07b9a916032b215b90cc",
-    "url": "https://www.php.net/distributions/php-7.3.33.tar.xz",
-    "variants": [
-      "bullseye/cli",
-      "bullseye/apache",
-      "bullseye/fpm",
-      "bullseye/zts",
-      "buster/cli",
-      "buster/apache",
-      "buster/fpm",
-      "buster/zts",
-      "alpine3.15/cli",
-      "alpine3.15/fpm",
-      "alpine3.15/zts",
-      "alpine3.14/cli",
-      "alpine3.14/fpm",
-      "alpine3.14/zts"
-    ],
-    "version": "7.3.33"
-  },
-  "7.3-rc": null,
   "7.4": {
     "ascUrl": "https://www.php.net/distributions/php-7.4.28.tar.xz.asc",
     "sha256": "9cc3b6f6217b60582f78566b3814532c4b71d517876c25013ae51811e65d8fce",
