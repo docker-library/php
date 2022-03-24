@@ -103,21 +103,34 @@ fi
 popDir="$PWD"
 for ext in $exts; do
 	cd "$ext"
+
 	[ -e Makefile ] || docker-php-ext-configure "$ext"
+
 	make -j"$j"
-	find modules \
-		-maxdepth 1 \
-		-name '*.so' \
-		-exec sh -euxc ' \
-			strip --strip-all "$@" || :
-		' -- '{}' +
+
+	if ! php -n -d 'display_errors=stderr' -r 'exit(ZEND_DEBUG_BUILD ? 0 : 1);' > /dev/null; then
+		# only "strip" modules if we aren't using a debug build of PHP
+		# (none of our builds are debug builds, but PHP might be recompiled with "--enable-debug" configure option)
+		# https://github.com/docker-library/php/issues/1268
+
+		find modules \
+			-maxdepth 1 \
+			-name '*.so' \
+			-exec sh -euxc ' \
+				strip --strip-all "$@" || :
+			' -- '{}' +
+	fi
+
 	make -j"$j" install
+
 	find modules \
 		-maxdepth 1 \
 		-name '*.so' \
 		-exec basename '{}' ';' \
 			| xargs -r docker-php-ext-enable ${iniName:+--ini-name "$iniName"}
+
 	make -j"$j" clean
+
 	cd "$popDir"
 done
 
