@@ -112,7 +112,6 @@ for ext in $exts; do
 		# only "strip" modules if we aren't using a debug build of PHP
 		# (none of our builds are debug builds, but PHP might be recompiled with "--enable-debug" configure option)
 		# https://github.com/docker-library/php/issues/1268
-
 		find modules \
 			-maxdepth 1 \
 			-name '*.so' \
