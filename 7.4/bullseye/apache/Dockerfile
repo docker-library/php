@@ -4,6 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
+
 FROM debian:bullseye-slim
 
 # prevent Debian's PHP packages from being installed
