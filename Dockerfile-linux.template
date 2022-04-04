@@ -15,6 +15,9 @@
 -}}
 FROM {{ env.from }}
 
+# Enables debug image when built with: --build-arg DEBUG=1
+ARG DEBUG
+
 {{ if is_alpine then "" else ( -}}
 # prevent Debian's PHP packages from being installed
 # https://github.com/docker-library/php/pull/542
@@ -385,11 +388,12 @@ RUN set -eux; \
 		--enable-maintainer-zts \
 {{ ) end -}}
 {{ ) else "" end -}}
+		${DEBUG:+--enable-debug} \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
 	make install; \
-	find \
+	if [ -z "$DEBUG" ] ; find \
 		/usr/local \
 		-type f \
 		-perm '/0111' \
@@ -397,6 +401,7 @@ RUN set -eux; \
 			strip --strip-all "$@" || : \
 		' -- '{}' + \
 	; \
+	fi ; \
 	make clean; \
 	\
 # https://github.com/docker-library/php/issues/692 (copy default example "php.ini" files somewhere easily discoverable)
