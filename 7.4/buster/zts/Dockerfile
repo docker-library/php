@@ -6,6 +6,9 @@
 
 FROM debian:buster-slim
 
+# Enables debug image when built with: --build-arg DEBUG=1
+ARG DEBUG
+
 # prevent Debian's PHP packages from being installed
 # https://github.com/docker-library/php/pull/542
 RUN set -eux; \
@@ -177,6 +180,7 @@ RUN set -eux; \
 		--enable-embed \
 		\
 		--enable-maintainer-zts \
+		${DEBUG:+--enable-debug} \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \

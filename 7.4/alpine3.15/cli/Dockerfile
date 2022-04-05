@@ -6,6 +6,9 @@
 
 FROM alpine:3.15
 
+# Enables debug image when built with: --build-arg DEBUG=1
+ARG DEBUG
+
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
 ENV PHPIZE_DEPS \
@@ -162,6 +165,7 @@ RUN set -eux; \
 # bundled pcre does not support JIT on s390x
 # https://manpages.debian.org/bullseye/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
 		$(test "$gnuArch" = 's390x-linux-musl' && echo '--without-pcre-jit') \
+		${DEBUG:+--enable-debug} \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \

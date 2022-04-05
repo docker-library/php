@@ -6,6 +6,9 @@
 
 FROM alpine:3.14
 
+# Enables debug image when built with: --build-arg DEBUG=1
+ARG DEBUG
+
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
 ENV PHPIZE_DEPS \
@@ -165,6 +168,7 @@ RUN set -eux; \
 		--enable-fpm \
 		--with-fpm-user=www-data \
 		--with-fpm-group=www-data \
+		${DEBUG:+--enable-debug} \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
