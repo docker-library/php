@@ -94,9 +94,6 @@ for version in "${versions[@]}"; do
 			if [[ "$suite" = alpine* ]]; then
 				if [ "$variant" = 'apache' ]; then
 					continue
-				elif [ "$variant" = 'zts' ] && [[ "$rcVersion" != 7.* ]]; then
-					# https://github.com/docker-library/php/issues/1074
-					continue
 				fi
 			fi
 			export suite variant
