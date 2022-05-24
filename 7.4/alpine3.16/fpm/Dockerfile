@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.14
+FROM alpine:3.16
 
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
@@ -55,11 +55,11 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
-ENV GPG_KEYS 528995BFEDFBA7191D46839EF9BA0ADA31CBD89E 39B641343D8C104B2B146DC3F9C39DC0B9698544 F1F692238FBC1666E5A5CCD4199F9DFEF6FFBAFD
+ENV GPG_KEYS 42670A7FE4D0441C8E4632349E4FDC074A4EF02D 5A52880781F755608BF815FC910DEB46F53EA312
 
-ENV PHP_VERSION 8.1.6
-ENV PHP_URL="https://www.php.net/distributions/php-8.1.6.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.1.6.tar.xz.asc"
-ENV PHP_SHA256="da38d65bb0d5dd56f711cd478204f2b62a74a2c2b0d2d523a78d6eb865b2364c"
+ENV PHP_VERSION 7.4.29
+ENV PHP_URL="https://www.php.net/distributions/php-7.4.29.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.4.29.tar.xz.asc"
+ENV PHP_SHA256="7d0f07869f33311ff3fe1138dc0d6c0d673c37fcb737eaed2c6c10a949f1aed6"
 
 RUN set -eux; \
 	\
@@ -107,6 +107,8 @@ RUN set -eux; \
 	\
 # make sure musl's iconv doesn't get used (https://www.php.net/manual/en/intro.iconv.php)
 	rm -vf /usr/include/iconv.h; \
+# PHP < 8 doesn't know to look deeper for GNU libiconv: https://github.com/php/php-src/commit/b480e6841ecd5317faa136647a2b8253a4c2d0df
+	ln -sv /usr/include/gnu-libiconv/*.h /usr/include/; \
 	\
 	export \
 		CFLAGS="$PHP_CFLAGS" \
