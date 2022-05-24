@@ -10,9 +10,9 @@ defaultDebianSuite='bullseye'
 declare -A debianSuites=(
 	#[7.4]='buster'
 )
-defaultAlpineVersion='3.15'
+defaultAlpineVersion='3.16'
 declare -A alpineVersions=(
-	#[8.1]='3.15'
+	#[8.1]='3.16'
 )
 
 self="$(basename "$BASH_SOURCE")"
