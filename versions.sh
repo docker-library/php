@@ -105,16 +105,22 @@ for version in "${versions[@]}"; do
 
 	export fullVersion url ascUrl sha256
 	json="$(
-		jq <<<"$json" -c \
-			--argjson variants "$variants" \
-			'.[env.version] = {
+		jq <<<"$json" -c --argjson variants "$variants" '
+			.[env.version] = {
 				version: env.fullVersion,
 				url: env.url,
 				ascUrl: env.ascUrl,
 				sha256: env.sha256,
 				variants: $variants,
-			}'
+			}
+		'
 	)"
+
+	if [ "$version" = "$rcVersion" ]; then
+		json="$(jq <<<"$json" -c '
+			.[env.version + "-rc"] //= null
+		')"
+	fi
 done
 
 jq <<<"$json" -S . > versions.json
