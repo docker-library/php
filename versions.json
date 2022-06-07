@@ -109,5 +109,6 @@
       "alpine3.15/zts"
     ],
     "version": "8.1.7RC1"
-  }
+  },
+  "8.2-rc": null
 }
