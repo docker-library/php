@@ -118,9 +118,9 @@ ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
 ENV GPG_KEYS 39B641343D8C104B2B146DC3F9C39DC0B9698544 E60913E4DF209907D8E30D96659A97C9CF2A795A 1198C0117593497A5EC5C199286AF1F9897469DC
 
-ENV PHP_VERSION 8.2.0alpha1
-ENV PHP_URL="https://downloads.php.net/~sergey/php-8.2.0alpha1.tar.xz" PHP_ASC_URL="https://downloads.php.net/~sergey/php-8.2.0alpha1.tar.xz.asc"
-ENV PHP_SHA256="08917e5986424c664d1bdf9fefdbcee39724e959e848c77247bdc268499ec58a"
+ENV PHP_VERSION 8.2.0alpha2
+ENV PHP_URL="https://downloads.php.net/~pierrick/php-8.2.0alpha2.tar.xz" PHP_ASC_URL="https://downloads.php.net/~pierrick/php-8.2.0alpha2.tar.xz.asc"
+ENV PHP_SHA256="c7a44ae890c8e6dbb69ab8a6bc6385ddaae34a35af4d9acf87ffa00f5158c2d8"
 
 RUN set -eux; \
 	\
