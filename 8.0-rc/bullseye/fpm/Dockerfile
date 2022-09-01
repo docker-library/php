@@ -225,6 +225,8 @@ RUN docker-php-ext-enable sodium
 ENTRYPOINT ["docker-php-entrypoint"]
 WORKDIR /var/www/html
 
+ENV PHP_PM_MAX_CHILDREN 5
+
 RUN set -eux; \
 	cd /usr/local/etc; \
 	if [ -d php-fpm.d ]; then \
@@ -261,6 +263,8 @@ RUN set -eux; \
 		echo; \
 		echo '[www]'; \
 		echo 'listen = 9000'; \
+		echo; \
+		echo 'pm.max_children = ${PHP_PM_MAX_CHILDREN}'; \
 	} | tee php-fpm.d/zz-docker.conf
 
 # Override stop signal to stop process gracefully
