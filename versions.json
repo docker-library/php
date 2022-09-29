@@ -90,9 +90,9 @@
   },
   "8.1-rc": null,
   "8.2-rc": {
-    "ascUrl": "https://downloads.php.net/~sergey/php-8.2.0RC2.tar.xz.asc",
-    "sha256": "06b5040d2ed868567175a3c2f7e3495acaf376fe8335142a3838c49dc7f5863d",
-    "url": "https://downloads.php.net/~sergey/php-8.2.0RC2.tar.xz",
+    "ascUrl": "https://downloads.php.net/~pierrick/php-8.2.0RC3.tar.xz.asc",
+    "sha256": "9965c3a339bf8f1e7d3dbaca8d8438285b6d9d09a01e1adaba6b357c5d8b458e",
+    "url": "https://downloads.php.net/~pierrick/php-8.2.0RC3.tar.xz",
     "variants": [
       "bullseye/cli",
       "bullseye/apache",
@@ -109,6 +109,6 @@
       "alpine3.15/fpm",
       "alpine3.15/zts"
     ],
-    "version": "8.2.0RC2"
+    "version": "8.2.0RC3"
   }
 }
