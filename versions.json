@@ -1,8 +1,8 @@
 {
   "7.4": {
-    "ascUrl": "https://www.php.net/distributions/php-7.4.30.tar.xz.asc",
-    "sha256": "ea72a34f32c67e79ac2da7dfe96177f3c451c3eefae5810ba13312ed398ba70d",
-    "url": "https://www.php.net/distributions/php-7.4.30.tar.xz",
+    "ascUrl": "https://www.php.net/distributions/php-7.4.32.tar.xz.asc",
+    "sha256": "323332c991e8ef30b1d219cb10f5e30f11b5f319ce4c6642a5470d75ade7864a",
+    "url": "https://www.php.net/distributions/php-7.4.32.tar.xz",
     "variants": [
       "bullseye/cli",
       "bullseye/apache",
@@ -19,7 +19,7 @@
       "alpine3.15/fpm",
       "alpine3.15/zts"
     ],
-    "version": "7.4.30"
+    "version": "7.4.32"
   },
   "7.4-rc": null,
   "8.0": {
