@@ -44,28 +44,7 @@
     ],
     "version": "8.0.24"
   },
-  "8.0-rc": {
-    "ascUrl": "https://downloads.php.net/~pollita/php-8.0.24RC1.tar.xz.asc",
-    "sha256": "210932e883098e44adaa7dc21ebfea95629cdd6ed55b35aae6bf983a4e5578cf",
-    "url": "https://downloads.php.net/~pollita/php-8.0.24RC1.tar.xz",
-    "variants": [
-      "bullseye/cli",
-      "bullseye/apache",
-      "bullseye/fpm",
-      "bullseye/zts",
-      "buster/cli",
-      "buster/apache",
-      "buster/fpm",
-      "buster/zts",
-      "alpine3.16/cli",
-      "alpine3.16/fpm",
-      "alpine3.16/zts",
-      "alpine3.15/cli",
-      "alpine3.15/fpm",
-      "alpine3.15/zts"
-    ],
-    "version": "8.0.24RC1"
-  },
+  "8.0-rc": null,
   "8.1": {
     "ascUrl": "https://www.php.net/distributions/php-8.1.11.tar.xz.asc",
     "sha256": "3005198d7303f87ab31bc30695de76e8ad62783f806b6ab9744da59fe41cc5bd",
