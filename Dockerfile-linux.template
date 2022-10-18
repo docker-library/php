@@ -393,6 +393,8 @@ RUN set -eux; \
 {{ ) else ( -}}
 		--enable-maintainer-zts \
 {{ ) end -}}
+# https://github.com/php/php-src/issues/9649#issuecomment-1264330874
+		--disable-zend-signals \
 {{ ) else "" end -}}
 	; \
 	make -j "$(nproc)"; \
