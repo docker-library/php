@@ -179,7 +179,8 @@ ENV GPG_KEYS {{
 			# https://wiki.php.net/todo/php80#release_managers
 			# https://www.php.net/gpg-keys.php#gpg-8.0
 			"1729 F839 38DA 44E2 7BA0  F4D3 DBDB 3974 70D1 2172", # pollita
-			"BFDD D286 4282 4F81 18EF  7790 9B67 A5C1 2229 118F"  # carusogabriel
+			"BFDD D286 4282 4F81 18EF  7790 9B67 A5C1 2229 118F", # carusogabriel
+			"2C16 C765 DBE5 4A08 8130  F1BC 4B9B 5F60 0B55 F3B4"  # carusogabriel
 		],
 
 		"7.4": [
