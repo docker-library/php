@@ -163,6 +163,8 @@ RUN set -eux; \
 		--disable-cgi \
 		\
 		--enable-zts \
+# https://externals.io/message/118859
+		--disable-zend-signals \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \

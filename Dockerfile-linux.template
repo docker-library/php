@@ -393,6 +393,8 @@ RUN set -eux; \
 {{ ) else ( -}}
 		--enable-maintainer-zts \
 {{ ) end -}}
+# https://externals.io/message/118859
+		--disable-zend-signals \
 {{ ) else "" end -}}
 	; \
 	make -j "$(nproc)"; \
