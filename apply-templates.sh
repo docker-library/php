@@ -71,6 +71,7 @@ for version; do
 		cp -a \
 			docker-php-entrypoint \
 			docker-php-ext-* \
+			docker-php-pecl-* \
 			docker-php-source \
 			"$version/$dir/"
 		if [ "$variant" = 'apache' ]; then

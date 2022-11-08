@@ -1,0 +1,89 @@
+#!/bin/sh
+set -e
+
+# prefer user supplied CFLAGS, but default to our PHP_CFLAGS
+: ${CFLAGS:=$PHP_CFLAGS}
+: ${CPPFLAGS:=$PHP_CPPFLAGS}
+: ${LDFLAGS:=$PHP_LDFLAGS}
+export CFLAGS CPPFLAGS LDFLAGS
+
+usage() {
+	echo "usage: $0 [-jN] [--ini-name file.ini] ext-name [ext-name ...]"
+	echo "   ie: $0 apcu redis"
+	echo "       $0 -j5 apcu redis grpc protobuf"
+	echo
+	echo 'if custom ./configure arguments are necessary, see docker-php-pecl-configure'
+}
+
+opts="$(getopt -o 'h?j:' --long 'help,ini-name:,jobs:' -- "$@" || { usage >&2 && false; })"
+eval set -- "$opts"
+
+j=1
+iniName=
+while true; do
+	flag="$1"
+	shift
+	case "$flag" in
+		--help|-h|'-?') usage && exit 0 ;;
+		--ini-name) iniName="$1" && shift ;;
+		--jobs|-j) j="$1" && shift ;;
+		--) break ;;
+		*)
+			{
+				echo "error: unknown flag: $flag"
+				usage
+			} >&2
+			exit 1
+			;;
+	esac
+done
+
+exts=
+for ext; do
+    if [ -z "$ext" ]; then
+        continue
+    fi
+    exts="$exts $ext"
+done
+
+if [ -z "$exts" ]; then
+    usage >&2
+    exit 1
+fi
+
+popDir="$PWD"
+for ext in $exts; do
+    docker-php-pecl-configure "$ext"
+    cd "/tmp/pear/temp/$ext"
+
+    make -j"$j"
+
+	if ! php -n -d 'display_errors=stderr' -r 'exit(ZEND_DEBUG_BUILD ? 0 : 1);' > /dev/null; then
+		# only "strip" modules if we aren't using a debug build of PHP
+		# (none of our builds are debug builds, but PHP might be recompiled with "--enable-debug" configure option)
+		# https://github.com/docker-library/php/issues/1268
+
+		find modules \
+			-maxdepth 1 \
+			-name '*.so' \
+			-exec sh -euxc ' \
+				strip --strip-all "$@" || :
+			' -- '{}' +
+	fi
+
+    make -j"$j" install
+
+	find modules \
+		-maxdepth 1 \
+		-name '*.so' \
+		-exec basename '{}' ';' \
+			| xargs -r docker-php-ext-enable ${iniName:+--ini-name "$iniName"}
+
+	make -j"$j" clean
+
+    cd "$popDir"
+done
+
+if [ "$pm" = 'apk' ] && [ -n "$apkDel" ]; then
+	apk del --no-network $apkDel
+fi
