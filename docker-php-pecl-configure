@@ -11,8 +11,6 @@ usage() {
 	echo "usage: $0 ext-name [configure flags]"
 	echo "   ie: $0 apcu --enable-apcu-spinlocks"
 	echo "       $0 -j5 apcu redis grpc protobuf"
-	echo
-	echo 'if custom ./configure arguments are necessary, see docker-php-pecl-configure'
 }
 
 if [ ! -d $tmpDir ]; then
