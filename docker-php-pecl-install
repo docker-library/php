@@ -40,23 +40,23 @@ done
 
 exts=
 for ext; do
-    if [ -z "$ext" ]; then
-        continue
-    fi
-    exts="$exts $ext"
+	if [ -z "$ext" ]; then
+		continue
+	fi
+	exts="$exts $ext"
 done
 
 if [ -z "$exts" ]; then
-    usage >&2
-    exit 1
+	usage >&2
+	exit 1
 fi
 
 popDir="$PWD"
 for ext in $exts; do
-    docker-php-pecl-configure "$ext"
-    cd "/tmp/pear/temp/$ext"
+	docker-php-pecl-configure "$ext"
+	cd "/tmp/pear/temp/$ext"
 
-    make -j"$j"
+	make -j"$j"
 
 	if ! php -n -d 'display_errors=stderr' -r 'exit(ZEND_DEBUG_BUILD ? 0 : 1);' > /dev/null; then
 		# only "strip" modules if we aren't using a debug build of PHP
@@ -71,7 +71,7 @@ for ext in $exts; do
 			' -- '{}' +
 	fi
 
-    make -j"$j" install
+	make -j"$j" install
 
 	find modules \
 		-maxdepth 1 \
@@ -81,7 +81,7 @@ for ext in $exts; do
 
 	make -j"$j" clean
 
-    cd "$popDir"
+	cd "$popDir"
 done
 
 if [ "$pm" = 'apk' ] && [ -n "$apkDel" ]; then

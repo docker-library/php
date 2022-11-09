@@ -9,27 +9,27 @@ export CFLAGS CPPFLAGS LDFLAGS
 
 usage() {
 	echo "usage: $0 ext-name [configure flags]"
-	echo "   ie: $0 apcu --enable-apcu-spinlocks"
-	echo "       $0 -j5 apcu redis grpc protobuf"
+	echo "    ie: $0 apcu --enable-apcu-spinlocks"
+	echo "        $0 -j5 apcu redis grpc protobuf"
 }
 
 if [ ! -d $tmpDir ]; then
-    if [ -e $tmpdir ]; then
-        rm -rf $tmpDir
-    fi
-    mkdir -p $tmpDir
+	if [ -e $tmpdir ]; then
+		rm -rf $tmpDir
+	fi
+	mkdir -p $tmpDir
 fi
 
 ext="$1"
 if [ -z "$ext" ]; then
-    usage >&2
-    exit 1
+	usage >&2
+	exit 1
 fi
 shift
 
 pm='unknown'
 if [ -e /lib/apk/db/installed ]; then
-    pm='apk'
+	pm='apk'
 fi
 
 if [ "$pm" = 'apk' ]; then
@@ -48,7 +48,7 @@ if command -v dpkg-architecture > /dev/null; then
 fi
 
 if [ ! -z "$http_proxy" ]; then
-    pear config-set http_proxy $http_proxy
+	pear config-set http_proxy $http_proxy
 fi
 
 pecl install --onlyreqdeps --nobuild "$ext"
