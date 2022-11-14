@@ -381,12 +381,13 @@ RUN set -eux; \
 {{ if env.variant == "apache" then ( -}}
 		\
 		--with-apxs2 \
-{{ ) elif env.variant == "fpm" then ( -}}
+{{ ) elif (env.variant == "fpm" or env.variant == "fpm-zts") then ( -}}
 		\
 		--enable-fpm \
 		--with-fpm-user=www-data \
 		--with-fpm-group=www-data \
-{{ ) elif env.variant == "zts" then ( -}}
+{{ ) else "" end -}}
+{{ if (env.variant == "zts" or env.variant == "fpm-zts") then ( -}}
 		\
 {{ if (.version | version_id) >= ("8" | version_id) then ( -}}
 		--enable-zts \
@@ -474,7 +475,7 @@ COPY apache2-foreground /usr/local/bin/
 WORKDIR /var/www/html
 
 EXPOSE 80
-{{ ) elif env.variant == "fpm" then ( -}}
+{{ ) elif (env.variant == "fpm" or env.variant == "fpm-zts") then ( -}}
 WORKDIR /var/www/html
 
 RUN set -eux; \

@@ -56,6 +56,7 @@ for version; do
 		case "$variant" in
 			apache) cmd='["apache2-foreground"]' ;;
 			fpm) cmd='["php-fpm"]' ;;
+			fpm-zts) cmd='["php-fpm"]' ;;
 			*) cmd='["php", "-a"]' ;;
 		esac
 		export cmd
