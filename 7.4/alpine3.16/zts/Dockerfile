@@ -164,6 +164,9 @@ RUN set -eux; \
 		\
 		--disable-cgi \
 		\
+# https://github.com/docker-library/php/pull/939#issuecomment-730501748
+		--enable-embed \
+		\
 		--enable-maintainer-zts \
 # https://externals.io/message/118859
 		--disable-zend-signals \

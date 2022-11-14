@@ -373,7 +373,7 @@ RUN set -eux; \
 		\
 		--disable-cgi \
 {{ ) end -}}
-{{ if (env.variant == "cli" or env.variant == "zts") and (is_alpine | not) then ( -}}
+{{ if (env.variant == "zts") or (env.variant == "cli" and (is_alpine | not)) then ( -}}
 		\
 # https://github.com/docker-library/php/pull/939#issuecomment-730501748
 		--enable-embed \
