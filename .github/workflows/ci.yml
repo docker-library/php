@@ -19,11 +19,11 @@ jobs:
       strategy: ${{ steps.generate-jobs.outputs.strategy }}
     steps:
       - uses: actions/checkout@v3
+      - uses: docker-library/bashbrew@HEAD
       - id: generate-jobs
         name: Generate Jobs
         run: |
-          git clone --depth 1 https://github.com/docker-library/bashbrew.git -b master ~/bashbrew
-          strategy="$(~/bashbrew/scripts/github-actions/generate.sh)"
+          strategy="$("$BASHBREW_SCRIPTS/github-actions/generate.sh")"
           echo "strategy=$strategy" >> "$GITHUB_OUTPUT"
           jq . <<<"$strategy" # sanity check / debugging aid
 
