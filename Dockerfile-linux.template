@@ -182,13 +182,6 @@ ENV GPG_KEYS {{
 			"BFDD D286 4282 4F81 18EF  7790 9B67 A5C1 2229 118F", # carusogabriel
 			"2C16 C765 DBE5 4A08 8130  F1BC 4B9B 5F60 0B55 F3B4"  # carusogabriel
 		],
-
-		"7.4": [
-			# https://wiki.php.net/todo/php74#release_managers
-			# https://www.php.net/gpg-keys.php#gpg-7.4
-			"4267 0A7F E4D0 441C 8E46  3234 9E4F DC07 4A4E F02D", # petk
-			"5A52 8807 81F7 5560 8BF8  15FC 910D EB46 F53E A312"  # derick
-		],
 	}[env.version | rtrimstr("-rc")] // error("missing GPG keys for " + env.version)
 	| map(gsub(" "; ""))
 	| join(" ")
@@ -263,9 +256,9 @@ RUN set -eux; \
 			"readline-dev",
 			"sqlite-dev",
 			# https://github.com/docker-library/php/issues/888
-			if (.version | version_id) >= ("7.4" | version_id) then "linux-headers" else empty end,
+			"linux-headers",
 			# oniguruma is part of mbstring in php 7.4+
-			if (.version | version_id) >= ("7.4" | version_id) then "oniguruma-dev" else empty end
+			"oniguruma-dev"
 		else
 			# debian packages
 			if env.variant == "apache" then "apache2-dev" else empty end,
@@ -278,7 +271,7 @@ RUN set -eux; \
 			"libxml2-dev",
 			"zlib1g-dev",
 			# oniguruma is part of mbstring in php 7.4+
-			if (.version | version_id) >= ("7.4" | version_id) then "libonig-dev" else empty end
+			"libonig-dev"
 		end ] | sort[] | (
 -}}
 		{{ . }} \
@@ -291,10 +284,6 @@ RUN set -eux; \
 {{ if is_alpine then ( -}}
 # make sure musl's iconv doesn't get used (https://www.php.net/manual/en/intro.iconv.php)
 	rm -vf /usr/include/iconv.h; \
-{{ if (.version | version_id) < ("8" | version_id) then ( -}}
-# PHP < 8 doesn't know to look deeper for GNU libiconv: https://github.com/php/php-src/commit/b480e6841ecd5317faa136647a2b8253a4c2d0df
-	ln -sv /usr/include/gnu-libiconv/*.h /usr/include/; \
-{{ ) else "" end -}}
 	\
 {{ ) else "" end -}}
 	export \
@@ -355,11 +344,9 @@ RUN set -eux; \
 		--disable-phpdbg \
 {{ ) end -}}
 		\
-{{ if (.version | version_id) >= ("7.4" | version_id) then ( -}}
 # in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
 		--with-pear \
 		\
-{{ ) else "" end -}}
 # bundled pcre does not support JIT on s390x
 # https://manpages.debian.org/bullseye/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
 {{ if is_alpine then ( -}}
@@ -388,11 +375,7 @@ RUN set -eux; \
 		--with-fpm-group=www-data \
 {{ ) elif env.variant == "zts" then ( -}}
 		\
-{{ if (.version | version_id) >= ("8" | version_id) then ( -}}
 		--enable-zts \
-{{ ) else ( -}}
-		--enable-maintainer-zts \
-{{ ) end -}}
 # https://externals.io/message/118859
 		--disable-zend-signals \
 {{ ) else "" end -}}
@@ -454,17 +437,6 @@ COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 # sodium was built as a shared module (so that it can be replaced later if so desired), so let's enable it too (https://github.com/docker-library/php/issues/598)
 RUN docker-php-ext-enable sodium
 
-{{
-	# https://github.com/docker-library/php/issues/865
-	# https://bugs.php.net/bug.php?id=76324
-	# https://github.com/php/php-src/pull/3632
-	# https://github.com/php/php-src/commit/2d03197749696ac3f8effba6b7977b0d8729fef3
-	if (is_alpine | not) and (.version | version_id) < ("7.4" | version_id) then (
--}}
-# temporary "freetype-config" workaround for https://github.com/docker-library/php/issues/865 (https://bugs.php.net/bug.php?id=76324)
-RUN { echo '#!/bin/sh'; echo 'exec pkg-config "$@" freetype2'; } > /usr/local/bin/freetype-config && chmod +x /usr/local/bin/freetype-config
-
-{{ ) else "" end -}}
 ENTRYPOINT ["docker-php-entrypoint"]
 {{ if env.variant == "apache" then ( -}}
 # https://httpd.apache.org/docs/2.4/stopping.html#gracefulstop
