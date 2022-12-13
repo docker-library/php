@@ -3,9 +3,9 @@
 1. Don't edit the Dockerfiles directly. They are generated using templates.
 2. Make any changes to the `*.template` files in the root of the repository.
 3. Make sure you've checked the [Requirements](#requirements) below.
-4. Regenerate the versions.json file by running `./versions.sh`.
-5. Run `./apply-templates.sh` script after making your changes.
-6. Once complete, (review and) commit all changes to the templates and Dockerfiles.
+4. Run `./update.sh` script after making your changes.
+5. Review and commit all changes to the templates and Dockerfiles.
+6. Open a pull request.
 
 ## Requirements
 
