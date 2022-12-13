@@ -80,7 +80,8 @@ for version; do
 
 		cmd="$(jq <<<"$cmd" -r '.[0]')"
 		if [ "$cmd" != 'php' ]; then
-			sed -i -e 's! php ! '"$cmd"' !g' "$version/$dir/docker-php-entrypoint"
+			sed -i.bak -e 's! php ! '"$cmd"' !g' "$version/$dir/docker-php-entrypoint" \
+				&& rm -f "$version/$dir/docker-php-entrypoint.bak"
 		fi
 	done
 done
