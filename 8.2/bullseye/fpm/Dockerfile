@@ -173,6 +173,9 @@ RUN set -eux; \
 		\
 		--disable-cgi \
 		\
+# https://github.com/docker-library/php/pull/939#issuecomment-730501748
+		--enable-embed \
+		\
 		--enable-fpm \
 		--with-fpm-user=www-data \
 		--with-fpm-group=www-data \
