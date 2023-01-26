@@ -376,10 +376,17 @@ RUN set -eux; \
 # https://externals.io/message/118859
 		--disable-zend-signals \
 {{ ) else "" end -}}
+{{ if env.DOCKER_PHP_ENABLE_DEBUG then ( -}}
+{{ # DOCKER_PHP_ENABLE_DEBUG is not used or supported by official-images; this is for users who want to build their own php image with debug enabled -}}
+{{ # example usage to regenerate Dockerfiles with debug enabled: "DOCKER_PHP_ENABLE_DEBUG=1 ./apply-templates" -}}
+		--enable-debug \
+{{ ) else "" end -}}
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
 	make install; \
+{{ if env.DOCKER_PHP_ENABLE_DEBUG then "" else ( -}}
+{{ # DOCKER_PHP_ENABLE_DEBUG is not used by official-images -}}
 	find \
 		/usr/local \
 		-type f \
@@ -388,6 +395,7 @@ RUN set -eux; \
 			strip --strip-all "$@" || : \
 		' -- '{}' + \
 	; \
+{{ ) end -}}
 	make clean; \
 	\
 # https://github.com/docker-library/php/issues/692 (copy default example "php.ini" files somewhere easily discoverable)
