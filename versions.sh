@@ -94,9 +94,9 @@ for version in "${versions[@]}"; do
 		if [ "$rcVersion" = '8.0' ] && [[ "$suite" = alpine* ]] && [ "$suite" != 'alpine3.16' ]; then
 			continue
 		fi
-		for variant in cli apache fpm zts; do
+		for variant in cli apache fpm zts dtrace; do
 			if [[ "$suite" = alpine* ]]; then
-				if [ "$variant" = 'apache' ]; then
+				if [ "$variant" = 'apache' ] || [ "$variant" = 'dtrace' ]; then
 					continue
 				fi
 			fi

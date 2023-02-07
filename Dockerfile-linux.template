@@ -187,6 +187,9 @@ ENV GPG_KEYS {{
 ENV PHP_VERSION {{ .version }}
 ENV PHP_URL="{{ .url }}" PHP_ASC_URL="{{ .ascUrl // "" }}"
 ENV PHP_SHA256="{{ .sha256 // "" }}"
+{{ if (env.variant == "dtrace") then ( -}}
+ENV USE_ZEND_DTRACE 1
+{{ ) else "" end -}}
 
 RUN set -eux; \
 	\
@@ -268,7 +271,8 @@ RUN set -eux; \
 			"libxml2-dev",
 			"zlib1g-dev",
 			# oniguruma is part of mbstring in php 7.4+
-			"libonig-dev"
+			"libonig-dev",
+            if env.variant == "dtrace" then "systemtap-sdt-dev" else empty end
 		end ] | sort[] | (
 -}}
 		{{ . }} \
@@ -375,6 +379,9 @@ RUN set -eux; \
 		--enable-zts \
 # https://externals.io/message/118859
 		--disable-zend-signals \
+{{ ) elif env.variant == "dtrace" then ( -}}
+		\
+		--enable-dtrace \
 {{ ) else "" end -}}
 	; \
 	make -j "$(nproc)"; \
