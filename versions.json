@@ -21,7 +21,7 @@
   "8.0-rc": null,
   "8.1": {
     "ascUrl": "https://www.php.net/distributions/php-8.1.16.tar.xz.asc",
-    "sha256": "7108b7347981ad6e610aaf3b3fb0f6444019ab6f59a872c1b55a29bc753eba93",
+    "sha256": "d61f13d96a58b93c39672b58f25e1ee4ce88500f4acb1430cb01a514875c1258",
     "url": "https://www.php.net/distributions/php-8.1.16.tar.xz",
     "variants": [
       "bullseye/cli",
