@@ -95,11 +95,6 @@ for version in "${versions[@]}"; do
 			continue
 		fi
 		for variant in cli apache fpm zts; do
-			if [[ "$suite" = alpine* ]]; then
-				if [ "$variant" = 'apache' ]; then
-					continue
-				fi
-			fi
 			export suite variant
 			variants="$(jq <<<"$variants" -c '. + [ env.suite + "/" + env.variant ]')"
 		done

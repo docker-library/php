@@ -82,6 +82,43 @@ RUN set -eux; \
 	chmod 777 /var/www/html
 
 {{ if env.variant == "apache" then ( -}}
+{{ if is_alpine then ( -}}
+ENV APACHE_CONFDIR /etc/apache2
+ENV APACHE_LOG_DIR=/var/log/apache2
+ENV APACHE_RUN_USER=apache
+ENV APACHE_RUN_GROUP=apache
+
+RUN apk add --no-cache \
+		apache2
+
+RUN sed -i 's/#LoadModule mpm_event_module/LoadModule mpm_event_module/' $APACHE_CONFDIR/httpd.conf; \
+	sed -i 's/LoadModule mpm_prefork_module/#LoadModule mpm_prefork_module/' $APACHE_CONFDIR/httpd.conf; \
+	sed -i 's/User apache/User $\{APACHE_RUN_USER\}/' $APACHE_CONFDIR/httpd.conf; \
+	sed -i 's/Group apache/Group $\{APACHE_RUN_GROUP\}/' $APACHE_CONFDIR/httpd.conf; \
+	sed -i 's/ErrorLog logs\/error.log/ErrorLog $\{APACHE_LOG_DIR\}\/error.log/' $APACHE_CONFDIR/httpd.conf; \
+	sed -i 's/\/var\/www\/localhost\/htdocs/\/var\/www\/html/' $APACHE_CONFDIR/httpd.conf; \
+	\
+# logs should go to stdout / stderr
+	ln -sfT /dev/stderr "$APACHE_LOG_DIR/error.log"; \
+	ln -sfT /dev/stdout "$APACHE_LOG_DIR/access.log"; \
+	ln -sfT /dev/stdout "$APACHE_LOG_DIR/other_vhosts_access.log"; \
+	chown -R --no-dereference "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$APACHE_LOG_DIR"
+
+# PHP files should be handled by PHP, and should be preferred over any other file type
+RUN { \
+		echo '<FilesMatch \.php$>'; \
+		echo '	SetHandler application/x-httpd-php'; \
+		echo '</FilesMatch>'; \
+		echo; \
+		echo 'DirectoryIndex disabled'; \
+		echo 'DirectoryIndex index.php index.html'; \
+		echo; \
+		echo '<Directory /var/www/>'; \
+		echo '	Options -Indexes'; \
+		echo '	AllowOverride All'; \
+		echo '</Directory>'; \
+	} | tee "$APACHE_CONFDIR/conf.d/docker-php.conf"
+{{ ) else ( -}}
 ENV APACHE_CONFDIR /etc/apache2
 ENV APACHE_ENVVARS $APACHE_CONFDIR/envvars
 
@@ -139,7 +176,7 @@ RUN { \
 		echo '</Directory>'; \
 	} | tee "$APACHE_CONFDIR/conf-available/docker-php.conf" \
 	&& a2enconf docker-php
-
+{{ ) end -}}
 {{ ) else "" end -}}
 # Apply stack smash protection to functions using local buffers and alloca()
 # Make PHP's main executable position-independent (improves ASLR security mechanism, and has no performance impact on x86_64)
@@ -243,6 +280,7 @@ RUN set -eux; \
 		[ if is_alpine then
 			# alpine packages
 			"$PHPIZE_DEPS",
+			if env.variant == "apache" then "apache2-dev" else empty end,
 			"argon2-dev",
 			"coreutils",
 			"curl-dev",
@@ -438,6 +476,10 @@ ENTRYPOINT ["docker-php-entrypoint"]
 {{ if env.variant == "apache" then ( -}}
 # https://httpd.apache.org/docs/2.4/stopping.html#gracefulstop
 STOPSIGNAL SIGWINCH
+
+{{ if is_alpine then ( -}}
+RUN sed -i 's/LoadModule php_module         lib\/apache2\/libphp.so/LoadModule php_module         modules\/libphp.so/' $APACHE_CONFDIR/httpd.conf
+{{ ) else "" end }}
 
 COPY apache2-foreground /usr/local/bin/
 WORKDIR /var/www/html

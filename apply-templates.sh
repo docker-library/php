@@ -74,7 +74,11 @@ for version; do
 			docker-php-source \
 			"$version/$dir/"
 		if [ "$variant" = 'apache' ]; then
+			if [ ${suite:0:6} = 'alpine' ]; then
+			cp -a apache2-foreground-alpine "$version/$dir/apache2-foreground"
+			else
 			cp -a apache2-foreground "$version/$dir/"
+			fi
 		fi
 
 		cmd="$(jq <<<"$cmd" -r '.[0]')"
