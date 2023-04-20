@@ -32,6 +32,7 @@ ENV PHPIZE_DEPS \
 RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
+		$PHPIZE_DEPS \
 		ca-certificates \
 		curl \
 		xz-utils \
@@ -101,7 +102,6 @@ RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
-		$PHPIZE_DEPS \
 		libargon2-dev \
 		libcurl4-openssl-dev \
 		libonig-dev \
