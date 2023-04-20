@@ -64,7 +64,6 @@ RUN set -eux; \
 RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
-		$PHPIZE_DEPS \
 		ca-certificates \
 		curl \
 		xz-utils \
@@ -259,6 +258,7 @@ RUN set -eux; \
 		else
 			# debian packages
 			if env.variant == "apache" then "apache2-dev" else empty end,
+			"$PHPIZE_DEPS",
 			"libargon2-dev",
 			"libcurl4-openssl-dev",
 			"libreadline-dev",
