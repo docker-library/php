@@ -68,7 +68,7 @@ RUN set -eux; \
 	\
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
-	apt-get install -y --no-install-recommends gnupg dirmngr; \
+	apt-get install -y --no-install-recommends gnupg; \
 	rm -rf /var/lib/apt/lists/*; \
 	\
 	mkdir -p /usr/src; \
