@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.16
+FROM alpine:3.18
 
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
@@ -55,11 +55,11 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
-ENV GPG_KEYS 39B641343D8C104B2B146DC3F9C39DC0B9698544 E60913E4DF209907D8E30D96659A97C9CF2A795A 1198C0117593497A5EC5C199286AF1F9897469DC
+ENV GPG_KEYS 528995BFEDFBA7191D46839EF9BA0ADA31CBD89E 39B641343D8C104B2B146DC3F9C39DC0B9698544 F1F692238FBC1666E5A5CCD4199F9DFEF6FFBAFD
 
-ENV PHP_VERSION 8.2.5
-ENV PHP_URL="https://www.php.net/distributions/php-8.2.5.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.2.5.tar.xz.asc"
-ENV PHP_SHA256="800738c359b7f1e67e40c22713d2d90276bc85ba1c21b43d99edd43c254c5f76"
+ENV PHP_VERSION 8.1.18
+ENV PHP_URL="https://www.php.net/distributions/php-8.1.18.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.1.18.tar.xz.asc"
+ENV PHP_SHA256="f3553370f8ba42729a9ce75eed17a2111d32433a43b615694f6a571b8bad0e39"
 
 RUN set -eux; \
 	\
