@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.16
+FROM alpine:3.18
 
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
@@ -57,9 +57,9 @@ ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
 ENV GPG_KEYS 39B641343D8C104B2B146DC3F9C39DC0B9698544 E60913E4DF209907D8E30D96659A97C9CF2A795A 1198C0117593497A5EC5C199286AF1F9897469DC
 
-ENV PHP_VERSION 8.2.5
-ENV PHP_URL="https://www.php.net/distributions/php-8.2.5.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.2.5.tar.xz.asc"
-ENV PHP_SHA256="800738c359b7f1e67e40c22713d2d90276bc85ba1c21b43d99edd43c254c5f76"
+ENV PHP_VERSION 8.2.6RC1
+ENV PHP_URL="https://downloads.php.net/~sergey/php-8.2.6RC1.tar.xz" PHP_ASC_URL="https://downloads.php.net/~sergey/php-8.2.6RC1.tar.xz.asc"
+ENV PHP_SHA256="324be0b12c83710de806b8a8ae81394da5bbcaff893e3fff7f2a9a9bd334336d"
 
 RUN set -eux; \
 	\
@@ -162,9 +162,12 @@ RUN set -eux; \
 		\
 		--disable-cgi \
 		\
-		--enable-fpm \
-		--with-fpm-user=www-data \
-		--with-fpm-group=www-data \
+# https://github.com/docker-library/php/pull/939#issuecomment-730501748
+		--enable-embed \
+		\
+		--enable-zts \
+# https://externals.io/message/118859
+		--disable-zend-signals \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
@@ -208,55 +211,4 @@ COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 RUN docker-php-ext-enable sodium
 
 ENTRYPOINT ["docker-php-entrypoint"]
-WORKDIR /var/www/html
-
-RUN set -eux; \
-	cd /usr/local/etc; \
-	if [ -d php-fpm.d ]; then \
-		# for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
-		sed 's!=NONE/!=!g' php-fpm.conf.default | tee php-fpm.conf > /dev/null; \
-		cp php-fpm.d/www.conf.default php-fpm.d/www.conf; \
-	else \
-		# PHP 5.x doesn't use "include=" by default, so we'll create our own simple config that mimics PHP 7+ for consistency
-		mkdir php-fpm.d; \
-		cp php-fpm.conf.default php-fpm.d/www.conf; \
-		{ \
-			echo '[global]'; \
-			echo 'include=etc/php-fpm.d/*.conf'; \
-		} | tee php-fpm.conf; \
-	fi; \
-	{ \
-		echo '[global]'; \
-		echo 'error_log = /proc/self/fd/2'; \
-		echo; echo '; https://github.com/docker-library/php/pull/725#issuecomment-443540114'; echo 'log_limit = 8192'; \
-		echo; \
-		echo '[www]'; \
-		echo '; php-fpm closes STDOUT on startup, so sending logs to /proc/self/fd/1 does not work.'; \
-		echo '; https://bugs.php.net/bug.php?id=73886'; \
-		echo 'access.log = /proc/self/fd/2'; \
-		echo; \
-		echo 'clear_env = no'; \
-		echo; \
-		echo '; Ensure worker stdout and stderr are sent to the main error log.'; \
-		echo 'catch_workers_output = yes'; \
-		echo 'decorate_workers_output = no'; \
-	} | tee php-fpm.d/docker.conf; \
-	{ \
-		echo '[global]'; \
-		echo 'daemonize = no'; \
-		echo; \
-		echo '[www]'; \
-		echo 'listen = 9000'; \
-	} | tee php-fpm.d/zz-docker.conf; \
-	mkdir -p "$PHP_INI_DIR/conf.d"; \
-	{ \
-		echo '; https://github.com/docker-library/php/issues/878#issuecomment-938595965'; \
-		echo 'fastcgi.logging = Off'; \
-	} > "$PHP_INI_DIR/conf.d/docker-fpm.ini"
-
-# Override stop signal to stop process gracefully
-# https://github.com/php/php-src/blob/17baa87faddc2550def3ae7314236826bc1b1398/sapi/fpm/php-fpm.8.in#L163
-STOPSIGNAL SIGQUIT
-
-EXPOSE 9000
-CMD ["php-fpm"]
+CMD ["php", "-a"]

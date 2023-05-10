@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.16
+FROM alpine:3.18
 
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
@@ -57,9 +57,9 @@ ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
 ENV GPG_KEYS 528995BFEDFBA7191D46839EF9BA0ADA31CBD89E 39B641343D8C104B2B146DC3F9C39DC0B9698544 F1F692238FBC1666E5A5CCD4199F9DFEF6FFBAFD
 
-ENV PHP_VERSION 8.1.18
-ENV PHP_URL="https://www.php.net/distributions/php-8.1.18.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.1.18.tar.xz.asc"
-ENV PHP_SHA256="f3553370f8ba42729a9ce75eed17a2111d32433a43b615694f6a571b8bad0e39"
+ENV PHP_VERSION 8.1.19RC1
+ENV PHP_URL="https://downloads.php.net/~patrickallaert/php-8.1.19RC1.tar.xz" PHP_ASC_URL="https://downloads.php.net/~patrickallaert/php-8.1.19RC1.tar.xz.asc"
+ENV PHP_SHA256="47f9da7fe28c2c20600a01e8298253a7ff3d96becfb3b04acb28ac4f3cffaecf"
 
 RUN set -eux; \
 	\
@@ -150,9 +150,8 @@ RUN set -eux; \
 		--with-readline \
 		--with-zlib \
 		\
-# https://github.com/docker-library/php/pull/1259
-		--enable-phpdbg \
-		--enable-phpdbg-readline \
+# https://github.com/bwoebi/phpdbg-docs/issues/1#issuecomment-163872806 ("phpdbg is primarily a CLI debugger, and is not suitable for debugging an fpm stack.")
+		--disable-phpdbg \
 		\
 # in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
 		--with-pear \
@@ -160,6 +159,15 @@ RUN set -eux; \
 # bundled pcre does not support JIT on s390x
 # https://manpages.debian.org/bullseye/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
 		$(test "$gnuArch" = 's390x-linux-musl' && echo '--without-pcre-jit') \
+		\
+		--disable-cgi \
+		\
+# https://github.com/docker-library/php/pull/939#issuecomment-730501748
+		--enable-embed \
+		\
+		--enable-zts \
+# https://externals.io/message/118859
+		--disable-zend-signals \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
