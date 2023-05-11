@@ -64,9 +64,9 @@
     "version": "8.1.19RC1"
   },
   "8.2": {
-    "ascUrl": "https://www.php.net/distributions/php-8.2.5.tar.xz.asc",
-    "sha256": "800738c359b7f1e67e40c22713d2d90276bc85ba1c21b43d99edd43c254c5f76",
-    "url": "https://www.php.net/distributions/php-8.2.5.tar.xz",
+    "ascUrl": "https://www.php.net/distributions/php-8.2.6.tar.xz.asc",
+    "sha256": "10b796f0ed45574229851212b30a596a76e70ae365322bcaaaf9c00fa7d58cca",
+    "url": "https://www.php.net/distributions/php-8.2.6.tar.xz",
     "variants": [
       "bullseye/cli",
       "bullseye/apache",
@@ -83,7 +83,7 @@
       "alpine3.17/fpm",
       "alpine3.17/zts"
     ],
-    "version": "8.2.5"
+    "version": "8.2.6"
   },
   "8.2-rc": {
     "ascUrl": "https://downloads.php.net/~sergey/php-8.2.6RC1.tar.xz.asc",
