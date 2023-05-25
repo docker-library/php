@@ -85,5 +85,26 @@
     ],
     "version": "8.2.6"
   },
-  "8.2-rc": null
+  "8.2-rc": {
+    "ascUrl": "https://downloads.php.net/~pierrick/php-8.2.7RC1.tar.xz.asc",
+    "sha256": "af19cc4c5b50034e59186c369fd152c47f86b8eb921b41d67b61e64b42217ce9",
+    "url": "https://downloads.php.net/~pierrick/php-8.2.7RC1.tar.xz",
+    "variants": [
+      "bullseye/cli",
+      "bullseye/apache",
+      "bullseye/fpm",
+      "bullseye/zts",
+      "buster/cli",
+      "buster/apache",
+      "buster/fpm",
+      "buster/zts",
+      "alpine3.18/cli",
+      "alpine3.18/fpm",
+      "alpine3.18/zts",
+      "alpine3.17/cli",
+      "alpine3.17/fpm",
+      "alpine3.17/zts"
+    ],
+    "version": "8.2.7RC1"
+  }
 }
