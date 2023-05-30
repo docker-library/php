@@ -96,7 +96,8 @@ for version in "${versions[@]}"; do
 			continue
 		fi
 		# https://github.com/docker-library/php/pull/1405
-		if [ "$suite" = 'alpine3.16' ] && [ "$rcVersion" != '8.0' ]; then
+		# 8.1 is temporary: https://github.com/docker-library/official-images/pull/14735 (should remove Alpine 3.16 support once Nextcloud 25 is EOL ~Oct 2023)
+		if [ "$suite" = 'alpine3.16' ] && [ "$rcVersion" != '8.0' ] && [ "$rcVersion" != '8.1' ]; then
 			continue
 		fi
 		for variant in cli apache fpm zts; do
