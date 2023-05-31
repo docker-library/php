@@ -46,7 +46,7 @@ RUN set -eux; \
 	[ ! -d /var/www/html ]; \
 	mkdir -p /var/www/html; \
 	chown www-data:www-data /var/www/html; \
-	chmod 777 /var/www/html
+	chmod 1777 /var/www/html
 
 # Apply stack smash protection to functions using local buffers and alloca()
 # Make PHP's main executable position-independent (improves ASLR security mechanism, and has no performance impact on x86_64)
@@ -68,7 +68,7 @@ RUN set -eux; \
 	\
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
-	apt-get install -y --no-install-recommends gnupg dirmngr; \
+	apt-get install -y --no-install-recommends gnupg; \
 	rm -rf /var/lib/apt/lists/*; \
 	\
 	mkdir -p /usr/src; \

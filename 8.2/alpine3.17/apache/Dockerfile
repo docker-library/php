@@ -43,7 +43,7 @@ RUN set -eux; \
 	[ ! -d /var/www/html ]; \
 	mkdir -p /var/www/html; \
 	chown www-data:www-data /var/www/html; \
-	chmod 777 /var/www/html
+	chmod 1777 /var/www/html
 
 ENV APACHE_CONFDIR /etc/apache2
 ENV APACHE_LOG_DIR=/var/log/apache2
@@ -92,9 +92,9 @@ ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
 ENV GPG_KEYS 39B641343D8C104B2B146DC3F9C39DC0B9698544 E60913E4DF209907D8E30D96659A97C9CF2A795A 1198C0117593497A5EC5C199286AF1F9897469DC
 
-ENV PHP_VERSION 8.2.3
-ENV PHP_URL="https://www.php.net/distributions/php-8.2.3.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.2.3.tar.xz.asc"
-ENV PHP_SHA256="b9b566686e351125d67568a33291650eb8dfa26614d205d70d82e6e92613d457"
+ENV PHP_VERSION 8.2.6
+ENV PHP_URL="https://www.php.net/distributions/php-8.2.6.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.2.6.tar.xz.asc"
+ENV PHP_SHA256="10b796f0ed45574229851212b30a596a76e70ae365322bcaaaf9c00fa7d58cca"
 
 RUN set -eux; \
 	\

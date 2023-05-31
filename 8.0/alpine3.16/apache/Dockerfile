@@ -43,7 +43,7 @@ RUN set -eux; \
 	[ ! -d /var/www/html ]; \
 	mkdir -p /var/www/html; \
 	chown www-data:www-data /var/www/html; \
-	chmod 777 /var/www/html
+	chmod 1777 /var/www/html
 
 ENV APACHE_CONFDIR /etc/apache2
 ENV APACHE_LOG_DIR=/var/log/apache2

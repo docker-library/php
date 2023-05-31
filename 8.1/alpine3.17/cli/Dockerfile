@@ -43,7 +43,7 @@ RUN set -eux; \
 	[ ! -d /var/www/html ]; \
 	mkdir -p /var/www/html; \
 	chown www-data:www-data /var/www/html; \
-	chmod 777 /var/www/html
+	chmod 1777 /var/www/html
 
 # Apply stack smash protection to functions using local buffers and alloca()
 # Make PHP's main executable position-independent (improves ASLR security mechanism, and has no performance impact on x86_64)
@@ -57,9 +57,9 @@ ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
 ENV GPG_KEYS 528995BFEDFBA7191D46839EF9BA0ADA31CBD89E 39B641343D8C104B2B146DC3F9C39DC0B9698544 F1F692238FBC1666E5A5CCD4199F9DFEF6FFBAFD
 
-ENV PHP_VERSION 8.1.16
-ENV PHP_URL="https://www.php.net/distributions/php-8.1.16.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.1.16.tar.xz.asc"
-ENV PHP_SHA256="d61f13d96a58b93c39672b58f25e1ee4ce88500f4acb1430cb01a514875c1258"
+ENV PHP_VERSION 8.1.19
+ENV PHP_URL="https://www.php.net/distributions/php-8.1.19.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.1.19.tar.xz.asc"
+ENV PHP_SHA256="f42f0e93467415b2d30aa5b7ac825f0079a74207e0033010383cdc1e13657379"
 
 RUN set -eux; \
 	\

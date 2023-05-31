@@ -46,7 +46,7 @@ RUN set -eux; \
 	[ ! -d /var/www/html ]; \
 	mkdir -p /var/www/html; \
 	chown www-data:www-data /var/www/html; \
-	chmod 777 /var/www/html
+	chmod 1777 /var/www/html
 
 ENV APACHE_CONFDIR /etc/apache2
 ENV APACHE_ENVVARS $APACHE_CONFDIR/envvars
@@ -75,7 +75,7 @@ RUN set -eux; \
 		mkdir -p "$dir"; \
 		chown "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$dir"; \
 # allow running as an arbitrary user (https://github.com/docker-library/php/issues/743)
-		chmod 777 "$dir"; \
+		chmod 1777 "$dir"; \
 	done; \
 	\
 # delete the "index.html" that installing Apache drops in here
@@ -125,7 +125,7 @@ RUN set -eux; \
 	\
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
-	apt-get install -y --no-install-recommends gnupg dirmngr; \
+	apt-get install -y --no-install-recommends gnupg; \
 	rm -rf /var/lib/apt/lists/*; \
 	\
 	mkdir -p /usr/src; \
