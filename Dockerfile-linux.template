@@ -156,6 +156,14 @@ ENV GPG_KEYS {{
 		# https://www.php.net/gpg-keys.php
 		# https://www.php.net/downloads.php
 
+		"8.3": [
+			# https://wiki.php.net/todo/php83#release_managers
+			# https://www.php.net/gpg-keys.php#gpg-8.3
+			"1198 C011 7593 497A 5EC5  C199 286A F1F9 8974 69DC",  # pierrick
+			"C28D937575603EB4ABB725861C0779DC5C0A9DE4", # bukka
+			"AFD8 691F DAED F03B DF6E  4605 63F1 5A9B 7153 76CA" # ericmann
+		],
+
 		"8.2": [
 			# https://wiki.php.net/todo/php82#release_managers
 			# https://www.php.net/gpg-keys.php#gpg-8.2
