@@ -112,5 +112,27 @@
       "alpine3.17/zts"
     ],
     "version": "8.2.7RC1"
+  },
+  "8.3-rc": {
+    "ascUrl": "https://downloads.php.net/~jakub/php-8.3.0alpha1.tar.xz.asc",
+    "sha256": "7df01cbae615cccdc01a811094a74326119080e1141988fd57aeefd6b751165c",
+    "url": "https://downloads.php.net/~jakub/php-8.3.0alpha1.tar.xz",
+    "variants": [
+      "bullseye/cli",
+      "bullseye/apache",
+      "bullseye/fpm",
+      "bullseye/zts",
+      "buster/cli",
+      "buster/apache",
+      "buster/fpm",
+      "buster/zts",
+      "alpine3.18/cli",
+      "alpine3.18/fpm",
+      "alpine3.18/zts",
+      "alpine3.17/cli",
+      "alpine3.17/fpm",
+      "alpine3.17/zts"
+    ],
+    "version": "8.3.0alpha1"
   }
 }

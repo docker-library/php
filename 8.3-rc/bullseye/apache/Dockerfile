@@ -1,21 +1,11 @@
-{{
-	def version_id:
-		# https://www.php.net/phpversion
-		# $version_id = $major_version * 10000 + $minor_version * 100 + $release_version;
-		sub("[a-zA-Z].*$"; "")
-		| split(".")
-		| (
-			(.[0] // 0 | tonumber) * 10000
-			+ (.[1] // 0 | tonumber) * 100
-			+ (.[2] // 0 | tonumber)
-		)
-	;
-	def is_alpine:
-		env.from | startswith("alpine")
--}}
-FROM {{ env.from }}
+#
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
+#
+# PLEASE DO NOT EDIT IT DIRECTLY.
+#
 
-{{ if is_alpine then "" else ( -}}
+FROM debian:bullseye-slim
+
 # prevent Debian's PHP packages from being installed
 # https://github.com/docker-library/php/pull/542
 RUN set -eux; \
@@ -25,42 +15,20 @@ RUN set -eux; \
 		echo 'Pin-Priority: -1'; \
 	} > /etc/apt/preferences.d/no-debian-php
 
-{{ ) end -}}
 # dependencies required for running "phpize"
-{{ if is_alpine then ( -}}
-# these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
-{{ ) else ( -}}
 # (see persistent deps below)
-{{ ) end -}}
 ENV PHPIZE_DEPS \
 		autoconf \
-		dpkg-dev {{ if is_alpine then "dpkg " else "" end }}\
+		dpkg-dev \
 		file \
 		g++ \
 		gcc \
 		libc-dev \
 		make \
-		{{ if is_alpine then "pkgconf" else "pkg-config" end }} \
+		pkg-config \
 		re2c
 
 # persistent / runtime deps
-{{ if is_alpine then ( -}}
-RUN apk add --no-cache \
-		ca-certificates \
-		curl \
-		tar \
-		xz \
-# https://github.com/docker-library/php/issues/494
-		openssl
-
-# ensure www-data user exists
-RUN set -eux; \
-	adduser -u 82 -D -S -G www-data www-data
-# 82 is the standard uid/gid for "www-data" in Alpine
-# https://git.alpinelinux.org/aports/tree/main/apache2/apache2.pre-install?h=3.14-stable
-# https://git.alpinelinux.org/aports/tree/main/lighttpd/lighttpd.pre-install?h=3.14-stable
-# https://git.alpinelinux.org/aports/tree/main/nginx/nginx.pre-install?h=3.14-stable
-{{ ) else ( -}}
 RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
@@ -70,7 +38,6 @@ RUN set -eux; \
 		xz-utils \
 	; \
 	rm -rf /var/lib/apt/lists/*
-{{ ) end -}}
 
 ENV PHP_INI_DIR /usr/local/etc/php
 RUN set -eux; \
@@ -81,7 +48,6 @@ RUN set -eux; \
 	chown www-data:www-data /var/www/html; \
 	chmod 1777 /var/www/html
 
-{{ if env.variant == "apache" then ( -}}
 ENV APACHE_CONFDIR /etc/apache2
 ENV APACHE_ENVVARS $APACHE_CONFDIR/envvars
 
@@ -140,7 +106,6 @@ RUN { \
 	} | tee "$APACHE_CONFDIR/conf-available/docker-php.conf" \
 	&& a2enconf docker-php
 
-{{ ) else "" end -}}
 # Apply stack smash protection to functions using local buffers and alloca()
 # Make PHP's main executable position-independent (improves ASLR security mechanism, and has no performance impact on x86_64)
 # Enable optimization (-O2)
@@ -151,61 +116,18 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
-ENV GPG_KEYS {{
-	{
-		# https://www.php.net/gpg-keys.php
-		# https://www.php.net/downloads.php
+ENV GPG_KEYS 1198C0117593497A5EC5C199286AF1F9897469DC C28D937575603EB4ABB725861C0779DC5C0A9DE4 AFD8691FDAEDF03BDF6E460563F15A9B715376CA
 
-		"8.3": [
-			# https://wiki.php.net/todo/php83#release_managers
-			# https://www.php.net/gpg-keys.php#gpg-8.3
-			"1198 C011 7593 497A 5EC5  C199 286A F1F9 8974 69DC",  # pierrick
-			"C28D937575603EB4ABB725861C0779DC5C0A9DE4", # bukka
-			"AFD8 691F DAED F03B DF6E  4605 63F1 5A9B 7153 76CA" # ericmann
-		],
-
-		"8.2": [
-			# https://wiki.php.net/todo/php82#release_managers
-			# https://www.php.net/gpg-keys.php#gpg-8.2
-			"39B6 4134 3D8C 104B 2B14  6DC3 F9C3 9DC0 B969 8544", # ramsey
-			"E609 13E4 DF20 9907 D8E3  0D96 659A 97C9 CF2A 795A", # sergey
-			"1198 C011 7593 497A 5EC5  C199 286A F1F9 8974 69DC"  # pierrick
-		],
-
-		"8.1": [
-			# https://wiki.php.net/todo/php81#release_managers
-			# https://www.php.net/gpg-keys.php#gpg-8.1
-			"5289 95BF EDFB A719 1D46  839E F9BA 0ADA 31CB D89E", # krakjoe
-			"39B6 4134 3D8C 104B 2B14  6DC3 F9C3 9DC0 B969 8544", # ramsey
-			"F1F6 9223 8FBC 1666 E5A5  CCD4 199F 9DFE F6FF BAFD"  # patrickallaert
-		],
-
-		"8.0": [
-			# https://wiki.php.net/todo/php80#release_managers
-			# https://www.php.net/gpg-keys.php#gpg-8.0
-			"1729 F839 38DA 44E2 7BA0  F4D3 DBDB 3974 70D1 2172", # pollita
-			"BFDD D286 4282 4F81 18EF  7790 9B67 A5C1 2229 118F", # carusogabriel
-			"2C16 C765 DBE5 4A08 8130  F1BC 4B9B 5F60 0B55 F3B4"  # carusogabriel
-		],
-	}[env.version | rtrimstr("-rc")] // error("missing GPG keys for " + env.version)
-	| map(gsub(" "; ""))
-	| join(" ")
-}}
-
-ENV PHP_VERSION {{ .version }}
-ENV PHP_URL="{{ .url }}" PHP_ASC_URL="{{ .ascUrl // "" }}"
-ENV PHP_SHA256="{{ .sha256 // "" }}"
+ENV PHP_VERSION 8.3.0alpha1
+ENV PHP_URL="https://downloads.php.net/~jakub/php-8.3.0alpha1.tar.xz" PHP_ASC_URL="https://downloads.php.net/~jakub/php-8.3.0alpha1.tar.xz.asc"
+ENV PHP_SHA256="7df01cbae615cccdc01a811094a74326119080e1141988fd57aeefd6b751165c"
 
 RUN set -eux; \
 	\
-{{ if is_alpine then ( -}}
-	apk add --no-cache --virtual .fetch-deps gnupg; \
-{{ ) else ( -}}
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends gnupg; \
 	rm -rf /var/lib/apt/lists/*; \
-{{ ) end -}}
 	\
 	mkdir -p /usr/src; \
 	cd /usr/src; \
@@ -227,70 +149,29 @@ RUN set -eux; \
 		rm -rf "$GNUPGHOME"; \
 	fi; \
 	\
-{{ if is_alpine then ( -}}
-	apk del --no-network .fetch-deps
-{{ ) else ( -}}
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark > /dev/null; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
-{{ ) end -}}
 
 COPY docker-php-source /usr/local/bin/
 
 RUN set -eux; \
-{{ if is_alpine then ( -}}
-	apk add --no-cache --virtual .build-deps \
-{{ ) else ( -}}
 	\
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
-{{ ) end -}}
-{{
-	[
-		[ if is_alpine then
-			# alpine packages
-			"$PHPIZE_DEPS",
-			"argon2-dev",
-			"coreutils",
-			"curl-dev",
-			"gnu-libiconv-dev", # https://www.php.net/manual/en/intro.iconv.php "it'd be a good idea to install the GNU libiconv library"
-			"libsodium-dev",
-			"libxml2-dev",
-			"openssl-dev",
-			"readline-dev",
-			"sqlite-dev",
-			# https://github.com/docker-library/php/issues/888
-			"linux-headers",
-			# oniguruma is part of mbstring in php 7.4+
-			"oniguruma-dev"
-		else
-			# debian packages
-			if env.variant == "apache" then "apache2-dev" else empty end,
-			"libargon2-dev",
-			"libcurl4-openssl-dev",
-			"libreadline-dev",
-			"libsodium-dev",
-			"libsqlite3-dev",
-			"libssl-dev",
-			"libxml2-dev",
-			"zlib1g-dev",
-			# oniguruma is part of mbstring in php 7.4+
-			"libonig-dev"
-		end ] | sort[] | (
--}}
-		{{ . }} \
-{{
-		)
-	] | add
--}}
+		apache2-dev \
+		libargon2-dev \
+		libcurl4-openssl-dev \
+		libonig-dev \
+		libreadline-dev \
+		libsodium-dev \
+		libsqlite3-dev \
+		libssl-dev \
+		libxml2-dev \
+		zlib1g-dev \
 	; \
 	\
-{{ if is_alpine then ( -}}
-# make sure musl's iconv doesn't get used (https://www.php.net/manual/en/intro.iconv.php)
-	rm -vf /usr/include/iconv.h; \
-	\
-{{ ) else "" end -}}
 	export \
 		CFLAGS="$PHP_CFLAGS" \
 		CPPFLAGS="$PHP_CPPFLAGS" \
@@ -299,13 +180,11 @@ RUN set -eux; \
 	docker-php-source extract; \
 	cd /usr/src/php; \
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
-{{ if is_alpine then "" else ( -}}
 	debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
 # https://bugs.php.net/bug.php?id=74125
 	if [ ! -d /usr/include/curl ]; then \
 		ln -sT "/usr/include/$debMultiarch/curl" /usr/local/include/curl; \
 	fi; \
-{{ ) end -}}
 	./configure \
 		--build="$gnuArch" \
 		--with-config-file-path="$PHP_INI_DIR" \
@@ -335,55 +214,25 @@ RUN set -eux; \
 		--with-sqlite3=/usr \
 		\
 		--with-curl \
-		--with-iconv{{ if is_alpine then "=/usr" else "" end }} \
+		--with-iconv \
 		--with-openssl \
 		--with-readline \
 		--with-zlib \
 		\
-{{ if env.variant == "cli" then ( -}}
-# https://github.com/docker-library/php/pull/1259
-		--enable-phpdbg \
-		--enable-phpdbg-readline \
-{{ ) else ( -}}
 # https://github.com/bwoebi/phpdbg-docs/issues/1#issuecomment-163872806 ("phpdbg is primarily a CLI debugger, and is not suitable for debugging an fpm stack.")
 		--disable-phpdbg \
-{{ ) end -}}
 		\
 # in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
 		--with-pear \
 		\
 # bundled pcre does not support JIT on s390x
 # https://manpages.debian.org/bullseye/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
-{{ if is_alpine then ( -}}
-		$(test "$gnuArch" = 's390x-linux-musl' && echo '--without-pcre-jit') \
-{{ ) else ( -}}
 		$(test "$gnuArch" = 's390x-linux-gnu' && echo '--without-pcre-jit') \
 		--with-libdir="lib/$debMultiarch" \
-{{ ) end -}}
-{{ # https://github.com/docker-library/php/issues/280 -}}
-{{ if env.variant == "cli" then "" else ( -}}
 		\
 		--disable-cgi \
-{{ ) end -}}
-{{ if (env.variant == "zts") or (env.variant == "cli" and (is_alpine | not)) then ( -}}
-		\
-# https://github.com/docker-library/php/pull/939#issuecomment-730501748
-		--enable-embed \
-{{ ) else "" end -}}
-{{ if env.variant == "apache" then ( -}}
 		\
 		--with-apxs2 \
-{{ ) elif env.variant == "fpm" then ( -}}
-		\
-		--enable-fpm \
-		--with-fpm-user=www-data \
-		--with-fpm-group=www-data \
-{{ ) elif env.variant == "zts" then ( -}}
-		\
-		--enable-zts \
-# https://externals.io/message/118859
-		--disable-zend-signals \
-{{ ) else "" end -}}
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
@@ -404,17 +253,6 @@ RUN set -eux; \
 	cd /; \
 	docker-php-source delete; \
 	\
-{{ if is_alpine then ( -}}
-	runDeps="$( \
-		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
-			| tr ',' '\n' \
-			| sort -u \
-			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
-	)"; \
-	apk add --no-cache $runDeps; \
-	\
-	apk del --no-network .build-deps; \
-{{ ) else ( -}}
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; \
@@ -428,7 +266,6 @@ RUN set -eux; \
 	; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	rm -rf /var/lib/apt/lists/*; \
-{{ ) end -}}
 	\
 # update pecl channel definitions https://github.com/docker-library/php/issues/443
 	pecl update-channels; \
@@ -443,7 +280,6 @@ COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 RUN docker-php-ext-enable sodium
 
 ENTRYPOINT ["docker-php-entrypoint"]
-{{ if env.variant == "apache" then ( -}}
 # https://httpd.apache.org/docs/2.4/stopping.html#gracefulstop
 STOPSIGNAL SIGWINCH
 
@@ -451,57 +287,4 @@ COPY apache2-foreground /usr/local/bin/
 WORKDIR /var/www/html
 
 EXPOSE 80
-{{ ) elif env.variant == "fpm" then ( -}}
-WORKDIR /var/www/html
-
-RUN set -eux; \
-	cd /usr/local/etc; \
-	if [ -d php-fpm.d ]; then \
-		# for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
-		sed 's!=NONE/!=!g' php-fpm.conf.default | tee php-fpm.conf > /dev/null; \
-		cp php-fpm.d/www.conf.default php-fpm.d/www.conf; \
-	else \
-		# PHP 5.x doesn't use "include=" by default, so we'll create our own simple config that mimics PHP 7+ for consistency
-		mkdir php-fpm.d; \
-		cp php-fpm.conf.default php-fpm.d/www.conf; \
-		{ \
-			echo '[global]'; \
-			echo 'include=etc/php-fpm.d/*.conf'; \
-		} | tee php-fpm.conf; \
-	fi; \
-	{ \
-		echo '[global]'; \
-		echo 'error_log = /proc/self/fd/2'; \
-		echo; echo '; https://github.com/docker-library/php/pull/725#issuecomment-443540114'; echo 'log_limit = 8192'; \
-		echo; \
-		echo '[www]'; \
-		echo '; php-fpm closes STDOUT on startup, so sending logs to /proc/self/fd/1 does not work.'; \
-		echo '; https://bugs.php.net/bug.php?id=73886'; \
-		echo 'access.log = /proc/self/fd/2'; \
-		echo; \
-		echo 'clear_env = no'; \
-		echo; \
-		echo '; Ensure worker stdout and stderr are sent to the main error log.'; \
-		echo 'catch_workers_output = yes'; \
-		echo 'decorate_workers_output = no'; \
-	} | tee php-fpm.d/docker.conf; \
-	{ \
-		echo '[global]'; \
-		echo 'daemonize = no'; \
-		echo; \
-		echo '[www]'; \
-		echo 'listen = 9000'; \
-	} | tee php-fpm.d/zz-docker.conf; \
-	mkdir -p "$PHP_INI_DIR/conf.d"; \
-	{ \
-		echo '; https://github.com/docker-library/php/issues/878#issuecomment-938595965'; \
-		echo 'fastcgi.logging = Off'; \
-	} > "$PHP_INI_DIR/conf.d/docker-fpm.ini"
-
-# Override stop signal to stop process gracefully
-# https://github.com/php/php-src/blob/17baa87faddc2550def3ae7314236826bc1b1398/sapi/fpm/php-fpm.8.in#L163
-STOPSIGNAL SIGQUIT
-
-EXPOSE 9000
-{{ ) else "" end -}}
-CMD {{ env.cmd }}
+CMD ["apache2-foreground"]
