@@ -1,8 +1,8 @@
 {
   "8.0": {
-    "ascUrl": "https://www.php.net/distributions/php-8.0.28.tar.xz.asc",
-    "sha256": "5e07278a1f315a67d36a676c01343ca2d4da5ec5bdb15d018e4248b3012bc0cd",
-    "url": "https://www.php.net/distributions/php-8.0.28.tar.xz",
+    "ascUrl": "https://www.php.net/distributions/php-8.0.29.tar.xz.asc",
+    "sha256": "14db2fbf26c07d0eb2c9fab25dbde7e27726a3e88452cca671f0896bbb683ca9",
+    "url": "https://www.php.net/distributions/php-8.0.29.tar.xz",
     "variants": [
       "bullseye/cli",
       "bullseye/apache",
@@ -16,7 +16,7 @@
       "alpine3.16/fpm",
       "alpine3.16/zts"
     ],
-    "version": "8.0.28"
+    "version": "8.0.29"
   },
   "8.0-rc": null,
   "8.1": {
