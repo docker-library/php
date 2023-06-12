@@ -383,7 +383,7 @@ RUN set -eux; \
 		--enable-zts \
 # https://externals.io/message/118859
 		--disable-zend-signals \
-{{ if ((.version | version_id) >= ("8.2.4" | version_id) and (.version | version_id) < ("8.3" | version_id)) or ((.version | version_id) >= ("8.1.17" | version_id) and (.version | version_id) < ("8.2" | version_id)) then ( -}}
+{{ if [ "8.1", "8.2" ] | index(env.version | rtrimstr("-rc")) then ( -}}
 		--enable-zend-max-execution-timers \
 {{ ) else "" end -}}
 {{ ) else "" end -}}
