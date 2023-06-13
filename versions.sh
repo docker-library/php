@@ -85,6 +85,7 @@ for version in "${versions[@]}"; do
 	variants='[]'
 	# order here controls the order of the library/ file
 	for suite in \
+		bookworm \
 		bullseye \
 		buster \
 		alpine3.18 \
@@ -93,6 +94,13 @@ for version in "${versions[@]}"; do
 	; do
 		# https://github.com/docker-library/php/pull/1348
 		if [ "$rcVersion" = '8.0' ] && [[ "$suite" = alpine* ]] && [ "$suite" != 'alpine3.16' ]; then
+			continue
+		fi
+		# 8.0 doesn't support OpenSSL 3, which is the only version in bookworm
+		# only keep two variants of Debian per version of php
+		if [ "$rcVersion" = '8.0' ] && [ "$suite" = 'bookworm' ]; then
+			continue
+		elif [ "$rcVersion" != '8.0' ] && [ "$suite" = 'buster' ]; then
 			continue
 		fi
 		# https://github.com/docker-library/php/pull/1405
