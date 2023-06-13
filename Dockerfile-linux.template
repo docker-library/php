@@ -383,6 +383,9 @@ RUN set -eux; \
 		--enable-zts \
 # https://externals.io/message/118859
 		--disable-zend-signals \
+{{ if [ "8.1", "8.2" ] | index(env.version | rtrimstr("-rc")) then ( -}}
+		--enable-zend-max-execution-timers \
+{{ ) else "" end -}}
 {{ ) else "" end -}}
 	; \
 	make -j "$(nproc)"; \
