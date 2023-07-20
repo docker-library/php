@@ -45,9 +45,9 @@
     "version": "8.1.21"
   },
   "8.1-rc": {
-    "ascUrl": "https://downloads.php.net/~patrickallaert/php-8.1.21RC1.tar.xz.asc",
-    "sha256": "29c3528e598767314951ae6354b53411ad4347ebd920d1bb2a1e847257b8b930",
-    "url": "https://downloads.php.net/~patrickallaert/php-8.1.21RC1.tar.xz",
+    "ascUrl": "https://downloads.php.net/~ramsey/php-8.1.22RC1.tar.xz.asc",
+    "sha256": "abeb3bcc26ddb07e17b4957ac7febb86c8d3a29d2863864deb7c0508f424ed57",
+    "url": "https://downloads.php.net/~ramsey/php-8.1.22RC1.tar.xz",
     "variants": [
       "bookworm/cli",
       "bookworm/apache",
@@ -67,7 +67,7 @@
       "alpine3.16/fpm",
       "alpine3.16/zts"
     ],
-    "version": "8.1.21RC1"
+    "version": "8.1.22RC1"
   },
   "8.2": {
     "ascUrl": "https://www.php.net/distributions/php-8.2.8.tar.xz.asc",
