@@ -185,7 +185,8 @@ ENV GPG_KEYS {{
 			# https://www.php.net/gpg-keys.php#gpg-8.0
 			"1729 F839 38DA 44E2 7BA0  F4D3 DBDB 3974 70D1 2172", # pollita
 			"BFDD D286 4282 4F81 18EF  7790 9B67 A5C1 2229 118F", # carusogabriel
-			"2C16 C765 DBE5 4A08 8130  F1BC 4B9B 5F60 0B55 F3B4"  # carusogabriel
+			"2C16 C765 DBE5 4A08 8130  F1BC 4B9B 5F60 0B55 F3B4", # carusogabriel
+			"39B6 4134 3D8C 104B 2B14  6DC3 F9C3 9DC0 B969 8544"  # ramsey
 		],
 	}[env.version | rtrimstr("-rc")] // error("missing GPG keys for " + env.version)
 	| map(gsub(" "; ""))
