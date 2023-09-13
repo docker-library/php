@@ -117,6 +117,8 @@ RUN set -eux; \
 		CFLAGS="$PHP_CFLAGS" \
 		CPPFLAGS="$PHP_CPPFLAGS" \
 		LDFLAGS="$PHP_LDFLAGS" \
+# https://github.com/php/php-src/blob/789867e844dc0465fe01a703a1bef2a7dba0c62b/configure.ac#L1500-L1502
+		PHP_BUILD_PROVIDER='https://github.com/docker-library/php' \
 	; \
 	docker-php-source extract; \
 	cd /usr/src/php; \
