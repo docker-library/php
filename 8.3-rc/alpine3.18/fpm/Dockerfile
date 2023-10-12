@@ -22,7 +22,7 @@ ENV PHPIZE_DEPS \
 # persistent / runtime deps
 RUN apk add --no-cache \
 		ca-certificates \
-		curl \
+		'curl>=8.4' \
 		tar \
 		xz \
 # https://github.com/docker-library/php/issues/494
