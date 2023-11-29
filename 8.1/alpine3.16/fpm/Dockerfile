@@ -209,6 +209,7 @@ RUN docker-php-ext-enable sodium
 
 ENTRYPOINT ["docker-php-entrypoint"]
 WORKDIR /var/www/html
+ENV PHP_FPM_DIR /usr/local/etc/php-fpm.d
 
 RUN set -eux; \
 	cd /usr/local/etc; \
