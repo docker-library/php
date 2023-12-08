@@ -48,9 +48,9 @@ ENV PHPIZE_DEPS \
 RUN apk add --no-cache \
 		ca-certificates \
 		curl \
+		openssl \
 		tar \
-		xz \
-		openssl
+		xz
 
 # ensure www-data user exists
 RUN set -eux; \
