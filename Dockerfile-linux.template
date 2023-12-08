@@ -48,10 +48,9 @@ ENV PHPIZE_DEPS \
 RUN apk add --no-cache \
 		ca-certificates \
 		curl \
+		openssl \
 		tar \
-		xz \
-# https://github.com/docker-library/php/issues/494
-		openssl
+		xz
 
 # ensure www-data user exists
 RUN set -eux; \
