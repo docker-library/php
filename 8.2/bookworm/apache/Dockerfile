@@ -70,6 +70,8 @@ RUN set -eux; \
 		"$APACHE_LOCK_DIR" \
 		"$APACHE_RUN_DIR" \
 		"$APACHE_LOG_DIR" \
+# https://salsa.debian.org/apache-team/apache2/-/commit/b97ca8714890ead1ba6c095699dde752e8433205
+		"$APACHE_RUN_DIR/socks" \
 	; do \
 		rm -rvf "$dir"; \
 		mkdir -p "$dir"; \
