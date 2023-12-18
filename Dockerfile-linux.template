@@ -338,7 +338,7 @@ RUN set -eux; \
 		--with-readline \
 		--with-zlib \
 		\
-{{ if env.variant == "cli" then ( -}}
+{{ if [ "cli", "zts" ] | index(env.variant) then ( -}}
 # https://github.com/docker-library/php/pull/1259
 		--enable-phpdbg \
 		--enable-phpdbg-readline \
@@ -359,10 +359,11 @@ RUN set -eux; \
 		--with-libdir="lib/$debMultiarch" \
 {{ ) end -}}
 {{ # https://github.com/docker-library/php/issues/280 -}}
-{{ if env.variant == "cli" then "" else ( -}}
+{{ if [ "cli", "zts" ] | index(env.variant) then "" else ( -}}
 		\
 		--disable-cgi \
 {{ ) end -}}
+{{ # zts + alpine special cased for embed (otherwise zts is effectively cli): https://github.com/docker-library/php/pull/1342 -}}
 {{ if (env.variant == "zts") or (env.variant == "cli" and (is_alpine | not)) then ( -}}
 		\
 # https://github.com/docker-library/php/pull/939#issuecomment-730501748
