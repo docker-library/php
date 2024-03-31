@@ -46,8 +46,11 @@ for version; do
 		export suite variant
 
 		alpineVer="${suite#alpine}" # "3.12", etc
+		ubuntuVer="${suite#ubuntu-}" # "jammy", etc
 		if [ "$suite" != "$alpineVer" ]; then
 			from="alpine:$alpineVer"
+		elif [ "$suite" != "$ubuntuVer" ]; then
+			from="ubuntu:$ubuntuVer"
 		else
 			from="debian:$suite-slim"
 		fi

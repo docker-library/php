@@ -17,7 +17,15 @@
       "alpine3.19/zts",
       "alpine3.18/cli",
       "alpine3.18/fpm",
-      "alpine3.18/zts"
+      "alpine3.18/zts",
+      "ubuntu-focal/cli",
+      "ubuntu-focal/apache",
+      "ubuntu-focal/fpm",
+      "ubuntu-focal/zts",
+      "ubuntu-jammy/cli",
+      "ubuntu-jammy/apache",
+      "ubuntu-jammy/fpm",
+      "ubuntu-jammy/zts"
     ],
     "version": "8.1.27"
   },
@@ -40,7 +48,15 @@
       "alpine3.19/zts",
       "alpine3.18/cli",
       "alpine3.18/fpm",
-      "alpine3.18/zts"
+      "alpine3.18/zts",
+      "ubuntu-focal/cli",
+      "ubuntu-focal/apache",
+      "ubuntu-focal/fpm",
+      "ubuntu-focal/zts",
+      "ubuntu-jammy/cli",
+      "ubuntu-jammy/apache",
+      "ubuntu-jammy/fpm",
+      "ubuntu-jammy/zts"
     ],
     "version": "8.2.17"
   },
@@ -62,7 +78,15 @@
       "alpine3.19/zts",
       "alpine3.18/cli",
       "alpine3.18/fpm",
-      "alpine3.18/zts"
+      "alpine3.18/zts",
+      "ubuntu-focal/cli",
+      "ubuntu-focal/apache",
+      "ubuntu-focal/fpm",
+      "ubuntu-focal/zts",
+      "ubuntu-jammy/cli",
+      "ubuntu-jammy/apache",
+      "ubuntu-jammy/fpm",
+      "ubuntu-jammy/zts"
     ],
     "version": "8.2.18RC1"
   },
@@ -84,7 +108,15 @@
       "alpine3.19/zts",
       "alpine3.18/cli",
       "alpine3.18/fpm",
-      "alpine3.18/zts"
+      "alpine3.18/zts",
+      "ubuntu-focal/cli",
+      "ubuntu-focal/apache",
+      "ubuntu-focal/fpm",
+      "ubuntu-focal/zts",
+      "ubuntu-jammy/cli",
+      "ubuntu-jammy/apache",
+      "ubuntu-jammy/fpm",
+      "ubuntu-jammy/zts"
     ],
     "version": "8.3.4"
   },
@@ -106,7 +138,15 @@
       "alpine3.19/zts",
       "alpine3.18/cli",
       "alpine3.18/fpm",
-      "alpine3.18/zts"
+      "alpine3.18/zts",
+      "ubuntu-focal/cli",
+      "ubuntu-focal/apache",
+      "ubuntu-focal/fpm",
+      "ubuntu-focal/zts",
+      "ubuntu-jammy/cli",
+      "ubuntu-jammy/apache",
+      "ubuntu-jammy/fpm",
+      "ubuntu-jammy/zts"
     ],
     "version": "8.3.5RC1"
   }

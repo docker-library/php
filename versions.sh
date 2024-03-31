@@ -89,6 +89,8 @@ for version in "${versions[@]}"; do
 		bullseye \
 		alpine3.19 \
 		alpine3.18 \
+		ubuntu-focal \
+		ubuntu-jammy \
 	; do
 		for variant in cli apache fpm zts; do
 			if [[ "$suite" = alpine* ]]; then
