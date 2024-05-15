@@ -55,7 +55,9 @@ for version; do
 
 		case "$variant" in
 			apache) cmd='["apache2-foreground"]' ;;
+			apache-zts) cmd='["apache2-foreground"]' ;;
 			fpm) cmd='["php-fpm"]' ;;
+			fpm-zts) cmd='["php-fpm"]' ;;
 			*) cmd='["php", "-a"]' ;;
 		esac
 		export cmd
@@ -79,7 +81,11 @@ for version; do
 
 		cmd="$(jq <<<"$cmd" -r '.[0]')"
 		if [ "$cmd" != 'php' ]; then
-			sed -i -e 's! php ! '"$cmd"' !g' "$version/$dir/docker-php-entrypoint"
+		  if [[ "$(uname -a)" == "Darwin"* ]]; then
+		    sed -i '' -e 's! php ! '"$cmd"' !g' "$version/$dir/docker-php-entrypoint"
+      else
+        sed -i -e 's! php ! '"$cmd"' !g' "$version/$dir/docker-php-entrypoint"
+      fi;
 		fi
 	done
 done
