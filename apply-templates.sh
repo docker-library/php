@@ -81,11 +81,11 @@ for version; do
 
 		cmd="$(jq <<<"$cmd" -r '.[0]')"
 		if [ "$cmd" != 'php' ]; then
-		  if [[ "$(uname -a)" == "Darwin"* ]]; then
-		    sed -i '' -e 's! php ! '"$cmd"' !g' "$version/$dir/docker-php-entrypoint"
-      else
-        sed -i -e 's! php ! '"$cmd"' !g' "$version/$dir/docker-php-entrypoint"
-      fi;
+			if [[ "$(uname -a)" == "Darwin"* ]]; then
+				sed -i '' -e 's! php ! '"$cmd"' !g' "$version/$dir/docker-php-entrypoint"
+			else
+				sed -i -e 's! php ! '"$cmd"' !g' "$version/$dir/docker-php-entrypoint"
+			fi;
 		fi
 	done
 done
