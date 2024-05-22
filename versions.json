@@ -15,9 +15,9 @@
       "alpine3.19/cli",
       "alpine3.19/fpm",
       "alpine3.19/zts",
-      "alpine3.18/cli",
-      "alpine3.18/fpm",
-      "alpine3.18/zts"
+      "alpine3.20/cli",
+      "alpine3.20/fpm",
+      "alpine3.20/zts"
     ],
     "version": "8.1.28"
   },
@@ -38,9 +38,9 @@
       "alpine3.19/cli",
       "alpine3.19/fpm",
       "alpine3.19/zts",
-      "alpine3.18/cli",
-      "alpine3.18/fpm",
-      "alpine3.18/zts"
+      "alpine3.20/cli",
+      "alpine3.20/fpm",
+      "alpine3.20/zts"
     ],
     "version": "8.2.19"
   },
@@ -61,9 +61,9 @@
       "alpine3.19/cli",
       "alpine3.19/fpm",
       "alpine3.19/zts",
-      "alpine3.18/cli",
-      "alpine3.18/fpm",
-      "alpine3.18/zts"
+      "alpine3.20/cli",
+      "alpine3.20/fpm",
+      "alpine3.20/zts"
     ],
     "version": "8.3.7"
   },
