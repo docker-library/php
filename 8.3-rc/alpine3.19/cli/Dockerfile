@@ -157,9 +157,6 @@ RUN set -eux; \
 # in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
 		--with-pear \
 		\
-# bundled pcre does not support JIT on s390x
-# https://manpages.debian.org/bullseye/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
-		$(test "$gnuArch" = 's390x-linux-musl' && echo '--without-pcre-jit') \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
