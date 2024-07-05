@@ -46,9 +46,9 @@
   },
   "8.2-rc": null,
   "8.3": {
-    "ascUrl": "https://www.php.net/distributions/php-8.3.8.tar.xz.asc",
-    "sha256": "aea358b56186f943c2bbd350c9005b9359133d47e954cfc561385319ae5bb8d7",
-    "url": "https://www.php.net/distributions/php-8.3.8.tar.xz",
+    "ascUrl": "https://www.php.net/distributions/php-8.3.9.tar.xz.asc",
+    "sha256": "bf4d7b8ea60a356064f88485278bd6f941a230ec16f0fc401574ce1445ad6c77",
+    "url": "https://www.php.net/distributions/php-8.3.9.tar.xz",
     "variants": [
       "bookworm/cli",
       "bookworm/apache",
@@ -65,7 +65,7 @@
       "alpine3.19/fpm",
       "alpine3.19/zts"
     ],
-    "version": "8.3.8"
+    "version": "8.3.9"
   },
   "8.3-rc": {
     "ascUrl": "https://downloads.php.net/~jakub/php-8.3.9RC1.tar.xz.asc",
