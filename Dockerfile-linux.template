@@ -198,15 +198,27 @@ ENV GPG_KEYS {{
 ENV PHP_VERSION {{ .version }}
 ENV PHP_URL="{{ .url }}" PHP_ASC_URL="{{ .ascUrl // "" }}"
 ENV PHP_SHA256="{{ .sha256 // "" }}"
+{{ if .version == "8.4.0alpha1" then ( -}}
+ENV PHP_PDO_PATCH_URL="https://patch-diff.githubusercontent.com/raw/php/php-src/pull/14797.patch"
+ENV PHP_PDO_PATCH_SHA256="d9f33beda1ffffc66299377a0946b1fe2916382e320084568ae6ee2a6d1fb19e"
+{{ ) else "" end -}}
 
 RUN set -eux; \
 	\
 {{ if is_alpine then ( -}}
 	apk add --no-cache --virtual .fetch-deps gnupg; \
+{{ if .version == "8.4.0alpha1" then ( -}}
+	# Add patchutils; see https://github.com/docker-library/php/pull/1526
+	apk add --no-cache --virtual .patch-deps patchutils; \
+{{ ) else "" end -}}
 {{ ) else ( -}}
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends gnupg; \
+{{ if .version == "8.4.0alpha1" then ( -}}
+	# Add patchutils; see https://github.com/docker-library/php/pull/1526
+	apt-get install -y --no-install-recommends patchutils; \
+{{ ) else "" end -}}
 	rm -rf /var/lib/apt/lists/*; \
 {{ ) end -}}
 	\
@@ -229,8 +241,20 @@ RUN set -eux; \
 		gpgconf --kill all; \
 		rm -rf "$GNUPGHOME"; \
 	fi; \
+{{ if .version == "8.4.0alpha1" then ( -}}
+	\
+	# Add patch; see https://github.com/docker-library/php/pull/1526
+	curl -fsSL -o php-pdo.patch https://patch-diff.githubusercontent.com/raw/php/php-src/pull/14797.patch; \
+	echo "d9f33beda1ffffc66299377a0946b1fe2916382e320084568ae6ee2a6d1fb19e php-pdo.patch" | sha256sum -c -; \
+	TEMPFILE=$(mktemp); \
+	filterdiff -p1 -x 'NEWS' < php-pdo.patch >$TEMPFILE; \
+	mv $TEMPFILE php-pdo.patch; \
+{{ ) else "" end -}}
 	\
 {{ if is_alpine then ( -}}
+{{ if .version == "8.4.0alpha1" then ( -}}
+	apk del --no-network .patch-deps; \
+{{ ) else "" end -}}
 	apk del --no-network .fetch-deps
 {{ ) else ( -}}
 	apt-mark auto '.*' > /dev/null; \
@@ -261,6 +285,7 @@ RUN set -eux; \
 			"libsodium-dev",
 			"libxml2-dev",
 			"openssl-dev",
+			if .version == "8.4.0alpha1" then "patch" else empty end,
 			"readline-dev",
 			"sqlite-dev",
 			# https://github.com/docker-library/php/issues/888
@@ -304,6 +329,11 @@ RUN set -eux; \
 	; \
 	docker-php-source extract; \
 	cd /usr/src/php; \
+{{ if .version == "8.4.0alpha1" then ( -}}
+# Apply patch; see https://github.com/docker-library/php/pull/1526
+	patch -p1 < ../php-pdo.patch; \
+	./buildconf -f; \
+{{ ) else "" end -}}
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
 {{ if is_alpine then "" else ( -}}
 	debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
