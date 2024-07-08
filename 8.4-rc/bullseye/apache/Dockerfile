@@ -121,8 +121,6 @@ ENV GPG_KEYS AFD8691FDAEDF03BDF6E460563F15A9B715376CA 9D7F99A0CB8F05C8A6958D6256
 ENV PHP_VERSION 8.4.0alpha1
 ENV PHP_URL="https://downloads.php.net/~saki/php-8.4.0alpha1.tar.xz" PHP_ASC_URL="https://downloads.php.net/~saki/php-8.4.0alpha1.tar.xz.asc"
 ENV PHP_SHA256="65903a7add51350540b567f8cd2d964ac11366bf33e1b287489765feac45278e"
-ENV PHP_PDO_PATCH_URL="https://patch-diff.githubusercontent.com/raw/php/php-src/pull/14797.patch"
-ENV PHP_PDO_PATCH_SHA256="d9f33beda1ffffc66299377a0946b1fe2916382e320084568ae6ee2a6d1fb19e"
 
 RUN set -eux; \
 	\
@@ -154,11 +152,10 @@ RUN set -eux; \
 	fi; \
 	\
 	# Add patch; see https://github.com/docker-library/php/pull/1526
-	curl -fsSL -o php-pdo.patch https://patch-diff.githubusercontent.com/raw/php/php-src/pull/14797.patch; \
-	echo "d9f33beda1ffffc66299377a0946b1fe2916382e320084568ae6ee2a6d1fb19e php-pdo.patch" | sha256sum -c -; \
-	TEMPFILE=$(mktemp); \
-	filterdiff -p1 -x 'NEWS' < php-pdo.patch >$TEMPFILE; \
-	mv $TEMPFILE php-pdo.patch; \
+	curl -fsSL -o php-pdo.patch 'https://github.com/php/php-src/pull/14797.patch?full_index=1'; \
+	echo '3a95762048a56ec0f59cb9ee18df49751ffb0bdd0e91e021b57f69ac7af62996 *php-pdo.patch' | sha256sum -c -; \
+	filterdiff -p1 -x 'NEWS' < php-pdo.patch > php-pdo.patch.filtered; \
+	mv php-pdo.patch.filtered php-pdo.patch; \
 	\
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark > /dev/null; \
