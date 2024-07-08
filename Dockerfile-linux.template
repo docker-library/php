@@ -159,12 +159,20 @@ ENV GPG_KEYS {{
 		# https://www.php.net/gpg-keys.php
 		# https://www.php.net/downloads.php
 
+		"8.4": [
+			# https://wiki.php.net/todo/php84#release_managers
+			# https://www.php.net/gpg-keys.php#gpg-8.4
+			"AFD8 691F DAED F03B DF6E  4605 63F1 5A9B 7153 76CA", # ericmann
+			"9D7F 99A0 CB8F 05C8 A695  8D62 56A9 7AF7 600A 39A6", # calvinb
+			"0616 E93D 95AF 4712 43E2  6761 7704 26E1 7EBB B3DD"  # saki
+		],
+
 		"8.3": [
 			# https://wiki.php.net/todo/php83#release_managers
 			# https://www.php.net/gpg-keys.php#gpg-8.3
-			"1198 C011 7593 497A 5EC5  C199 286A F1F9 8974 69DC",  # pierrick
-			"C28D937575603EB4ABB725861C0779DC5C0A9DE4", # bukka
-			"AFD8 691F DAED F03B DF6E  4605 63F1 5A9B 7153 76CA" # ericmann
+			"1198 C011 7593 497A 5EC5  C199 286A F1F9 8974 69DC", # pierrick
+			"C28D937575603EB4ABB725861C0779DC5C0A9DE4",           # bukka
+			"AFD8 691F DAED F03B DF6E  4605 63F1 5A9B 7153 76CA"  # ericmann
 		],
 
 		"8.2": [
@@ -195,10 +203,18 @@ RUN set -eux; \
 	\
 {{ if is_alpine then ( -}}
 	apk add --no-cache --virtual .fetch-deps gnupg; \
+{{ if .version == "8.4.0alpha1" then ( -}}
+	# Add patchutils; see https://github.com/docker-library/php/pull/1526
+	apk add --no-cache --virtual .patch-deps patchutils; \
+{{ ) else "" end -}}
 {{ ) else ( -}}
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends gnupg; \
+{{ if .version == "8.4.0alpha1" then ( -}}
+	# Add patchutils; see https://github.com/docker-library/php/pull/1526
+	apt-get install -y --no-install-recommends patchutils; \
+{{ ) else "" end -}}
 	rm -rf /var/lib/apt/lists/*; \
 {{ ) end -}}
 	\
@@ -221,8 +237,19 @@ RUN set -eux; \
 		gpgconf --kill all; \
 		rm -rf "$GNUPGHOME"; \
 	fi; \
+{{ if .version == "8.4.0alpha1" then ( -}}
+	\
+	# Add patch; see https://github.com/docker-library/php/pull/1526
+	curl -fsSL -o php-pdo.patch 'https://github.com/php/php-src/pull/14797.patch?full_index=1'; \
+	echo '3a95762048a56ec0f59cb9ee18df49751ffb0bdd0e91e021b57f69ac7af62996 *php-pdo.patch' | sha256sum -c -; \
+	filterdiff -p1 -x 'NEWS' < php-pdo.patch > php-pdo.patch.filtered; \
+	mv php-pdo.patch.filtered php-pdo.patch; \
+{{ ) else "" end -}}
 	\
 {{ if is_alpine then ( -}}
+{{ if .version == "8.4.0alpha1" then ( -}}
+	apk del --no-network .patch-deps; \
+{{ ) else "" end -}}
 	apk del --no-network .fetch-deps
 {{ ) else ( -}}
 	apt-mark auto '.*' > /dev/null; \
@@ -253,6 +280,7 @@ RUN set -eux; \
 			"libsodium-dev",
 			"libxml2-dev",
 			"openssl-dev",
+			if .version == "8.4.0alpha1" then "patch" else empty end,
 			"readline-dev",
 			"sqlite-dev",
 			# https://github.com/docker-library/php/issues/888
@@ -296,6 +324,11 @@ RUN set -eux; \
 	; \
 	docker-php-source extract; \
 	cd /usr/src/php; \
+{{ if .version == "8.4.0alpha1" then ( -}}
+# Apply patch; see https://github.com/docker-library/php/pull/1526
+	patch -p1 < ../php-pdo.patch; \
+	./buildconf -f; \
+{{ ) else "" end -}}
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
 {{ if is_alpine then "" else ( -}}
 	debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
