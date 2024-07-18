@@ -56,15 +56,13 @@ ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
 ENV GPG_KEYS AFD8691FDAEDF03BDF6E460563F15A9B715376CA 9D7F99A0CB8F05C8A6958D6256A97AF7600A39A6 0616E93D95AF471243E26761770426E17EBBB3DD
 
-ENV PHP_VERSION 8.4.0alpha1
-ENV PHP_URL="https://downloads.php.net/~saki/php-8.4.0alpha1.tar.xz" PHP_ASC_URL="https://downloads.php.net/~saki/php-8.4.0alpha1.tar.xz.asc"
-ENV PHP_SHA256="65903a7add51350540b567f8cd2d964ac11366bf33e1b287489765feac45278e"
+ENV PHP_VERSION 8.4.0alpha2
+ENV PHP_URL="https://downloads.php.net/~calvinb/php-8.4.0alpha2.tar.xz" PHP_ASC_URL="https://downloads.php.net/~calvinb/php-8.4.0alpha2.tar.xz.asc"
+ENV PHP_SHA256="12495b447da6aeb0e16b3db1a9d68f5c9d41bcc097ff1cc5d43732a47a7fd5b1"
 
 RUN set -eux; \
 	\
 	apk add --no-cache --virtual .fetch-deps gnupg; \
-	# Add patchutils; see https://github.com/docker-library/php/pull/1526
-	apk add --no-cache --virtual .patch-deps patchutils; \
 	\
 	mkdir -p /usr/src; \
 	cd /usr/src; \
@@ -86,13 +84,6 @@ RUN set -eux; \
 		rm -rf "$GNUPGHOME"; \
 	fi; \
 	\
-	# Add patch; see https://github.com/docker-library/php/pull/1526
-	curl -fsSL -o php-pdo.patch 'https://github.com/php/php-src/pull/14797.patch?full_index=1'; \
-	echo '3a95762048a56ec0f59cb9ee18df49751ffb0bdd0e91e021b57f69ac7af62996 *php-pdo.patch' | sha256sum -c -; \
-	filterdiff -p1 -x 'NEWS' < php-pdo.patch > php-pdo.patch.filtered; \
-	mv php-pdo.patch.filtered php-pdo.patch; \
-	\
-	apk del --no-network .patch-deps; \
 	apk del --no-network .fetch-deps
 
 COPY docker-php-source /usr/local/bin/
@@ -109,7 +100,6 @@ RUN set -eux; \
 		linux-headers \
 		oniguruma-dev \
 		openssl-dev \
-		patch \
 		readline-dev \
 		sqlite-dev \
 	; \
@@ -127,9 +117,6 @@ RUN set -eux; \
 	; \
 	docker-php-source extract; \
 	cd /usr/src/php; \
-# Apply patch; see https://github.com/docker-library/php/pull/1526
-	patch -p1 < ../php-pdo.patch; \
-	./buildconf -f; \
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
 	./configure \
 		--build="$gnuArch" \
