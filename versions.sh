@@ -90,6 +90,10 @@ for version in "${versions[@]}"; do
 		alpine3.21 \
 		alpine3.20 \
 	; do
+		# https://github.com/docker-library/php/pull/1552
+		if [ "$rcVersion" = '8.1' ] && [[ "$suite" = alpine* ]] && [ "$suite" != 'alpine3.20' ]; then
+			continue
+		fi
 		for variant in cli apache fpm zts; do
 			if [[ "$suite" = alpine* ]]; then
 				if [ "$variant" = 'apache' ]; then
