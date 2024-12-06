@@ -87,9 +87,13 @@ for version in "${versions[@]}"; do
 	for suite in \
 		bookworm \
 		bullseye \
+		alpine3.21 \
 		alpine3.20 \
-		alpine3.19 \
 	; do
+		# https://github.com/docker-library/php/pull/1552
+		if [ "$rcVersion" = '8.1' ] && [[ "$suite" = alpine* ]] && [ "$suite" != 'alpine3.20' ]; then
+			continue
+		fi
 		for variant in cli apache fpm zts; do
 			if [[ "$suite" = alpine* ]]; then
 				if [ "$variant" = 'apache' ]; then
