@@ -87,8 +87,8 @@ for version in "${versions[@]}"; do
 	for suite in \
 		bookworm \
 		bullseye \
+		alpine3.21 \
 		alpine3.20 \
-		alpine3.19 \
 	; do
 		for variant in cli apache fpm zts; do
 			if [[ "$suite" = alpine* ]]; then
