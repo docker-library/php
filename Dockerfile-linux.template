@@ -491,6 +491,7 @@ COPY apache2-foreground /usr/local/bin/
 WORKDIR /var/www/html
 
 EXPOSE 80
+EXPOSE 443
 {{ ) elif env.variant == "fpm" then ( -}}
 WORKDIR /var/www/html
 
