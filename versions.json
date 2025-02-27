@@ -67,7 +67,28 @@
     ],
     "version": "8.3.17"
   },
-  "8.3-rc": null,
+  "8.3-rc": {
+    "ascUrl": "https://downloads.php.net/~eric/php-8.3.18RC1.tar.xz.asc",
+    "sha256": "35106196ffb5ce6c425530ef8b16804a1ba7f1055d917a41276a4f0920e10bc4",
+    "url": "https://downloads.php.net/~eric/php-8.3.18RC1.tar.xz",
+    "variants": [
+      "bookworm/cli",
+      "bookworm/apache",
+      "bookworm/fpm",
+      "bookworm/zts",
+      "bullseye/cli",
+      "bullseye/apache",
+      "bullseye/fpm",
+      "bullseye/zts",
+      "alpine3.21/cli",
+      "alpine3.21/fpm",
+      "alpine3.21/zts",
+      "alpine3.20/cli",
+      "alpine3.20/fpm",
+      "alpine3.20/zts"
+    ],
+    "version": "8.3.18RC1"
+  },
   "8.4": {
     "ascUrl": "https://www.php.net/distributions/php-8.4.4.tar.xz.asc",
     "sha256": "05a6c9a2cc894dd8be719ecab221b311886d5e0c02cb6fac648dd9b3459681ac",
