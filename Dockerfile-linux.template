@@ -442,7 +442,9 @@ RUN set -eux; \
 	cp -v php.ini-* "$PHP_INI_DIR/"; \
 	\
 	cd /; \
+{{ if env.DOCKER_PHP_ENABLE_DEBUG then "" else ( -}}
 	docker-php-source delete; \
+{{ ) end -}}
 	\
 {{ if is_alpine then ( -}}
 	runDeps="$( \
