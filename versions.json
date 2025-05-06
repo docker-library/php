@@ -1,8 +1,9 @@
 {
   "8.1": {
+    "version": "8.1.32",
+    "url": "https://www.php.net/distributions/php-8.1.32.tar.xz",
     "ascUrl": "https://www.php.net/distributions/php-8.1.32.tar.xz.asc",
     "sha256": "c582ac682a280bbc69bc2186c21eb7e3313cc73099be61a6bc1d2cd337cbf383",
-    "url": "https://www.php.net/distributions/php-8.1.32.tar.xz",
     "variants": [
       "bookworm/cli",
       "bookworm/apache",
@@ -18,14 +19,14 @@
       "alpine3.20/cli",
       "alpine3.20/fpm",
       "alpine3.20/zts"
-    ],
-    "version": "8.1.32"
+    ]
   },
   "8.1-rc": null,
   "8.2": {
+    "version": "8.2.28",
+    "url": "https://www.php.net/distributions/php-8.2.28.tar.xz",
     "ascUrl": "https://www.php.net/distributions/php-8.2.28.tar.xz.asc",
     "sha256": "af8c9153153a7f489153b7a74f2f29a5ee36f5cb2c6c6929c98411a577e89c91",
-    "url": "https://www.php.net/distributions/php-8.2.28.tar.xz",
     "variants": [
       "bookworm/cli",
       "bookworm/apache",
@@ -41,14 +42,14 @@
       "alpine3.20/cli",
       "alpine3.20/fpm",
       "alpine3.20/zts"
-    ],
-    "version": "8.2.28"
+    ]
   },
   "8.2-rc": null,
   "8.3": {
+    "version": "8.3.20",
+    "url": "https://www.php.net/distributions/php-8.3.20.tar.xz",
     "ascUrl": "https://www.php.net/distributions/php-8.3.20.tar.xz.asc",
     "sha256": "f15914e071b5bddaf1475b5f2ba68107e8b8846655f9e89690fb7cd410b0db6c",
-    "url": "https://www.php.net/distributions/php-8.3.20.tar.xz",
     "variants": [
       "bookworm/cli",
       "bookworm/apache",
@@ -64,13 +65,13 @@
       "alpine3.20/cli",
       "alpine3.20/fpm",
       "alpine3.20/zts"
-    ],
-    "version": "8.3.20"
+    ]
   },
   "8.3-rc": {
+    "version": "8.3.21RC1",
+    "url": "https://downloads.php.net/~eric/php-8.3.21RC1.tar.xz",
     "ascUrl": "https://downloads.php.net/~eric/php-8.3.21RC1.tar.xz.asc",
     "sha256": "6d8bf25e0584cfcb83243fd7d1a90c06d428f1204eea93bb3c027c6e3344a23e",
-    "url": "https://downloads.php.net/~eric/php-8.3.21RC1.tar.xz",
     "variants": [
       "bookworm/cli",
       "bookworm/apache",
@@ -86,13 +87,13 @@
       "alpine3.20/cli",
       "alpine3.20/fpm",
       "alpine3.20/zts"
-    ],
-    "version": "8.3.21RC1"
+    ]
   },
   "8.4": {
+    "version": "8.4.6",
+    "url": "https://www.php.net/distributions/php-8.4.6.tar.xz",
     "ascUrl": "https://www.php.net/distributions/php-8.4.6.tar.xz.asc",
     "sha256": "089b08a5efef02313483325f3bacd8c4fe311cf1e1e56749d5cc7d059e225631",
-    "url": "https://www.php.net/distributions/php-8.4.6.tar.xz",
     "variants": [
       "bookworm/cli",
       "bookworm/apache",
@@ -108,13 +109,13 @@
       "alpine3.20/cli",
       "alpine3.20/fpm",
       "alpine3.20/zts"
-    ],
-    "version": "8.4.6"
+    ]
   },
   "8.4-rc": {
+    "version": "8.4.7RC1",
+    "url": "https://downloads.php.net/~saki/php-8.4.7RC1.tar.xz",
     "ascUrl": "https://downloads.php.net/~saki/php-8.4.7RC1.tar.xz.asc",
     "sha256": "6cb37632eb65ee311cb4427ad070b6ab27fdaf13e8f0103701b2b78907326c93",
-    "url": "https://downloads.php.net/~saki/php-8.4.7RC1.tar.xz",
     "variants": [
       "bookworm/cli",
       "bookworm/apache",
@@ -130,7 +131,6 @@
       "alpine3.20/cli",
       "alpine3.20/fpm",
       "alpine3.20/zts"
-    ],
-    "version": "8.4.7RC1"
+    ]
   }
 }

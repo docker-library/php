@@ -3,6 +3,8 @@ set -Eeuo pipefail
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
+# TODO consume https://www.php.net/releases/branches.php and https://www.php.net/release-candidates.php?format=json here like in Go, Julia, etc (so we can have a canonical "here's all the versions possible" mode, and more automated metadata like EOL 👀)
+
 versions=( "$@" )
 if [ ${#versions[@]} -eq 0 ]; then
 	versions=( */ )
@@ -52,16 +54,9 @@ for version in "${versions[@]}"; do
 	unset IFS
 
 	if [ "${#possibles[@]}" -eq 0 ]; then
-		if [ "$rcVersion" = "$version" ]; then
-			echo >&2
-			echo >&2 "error: unable to determine available releases of $version"
-			echo >&2
-			exit 1
-		else
-			echo >&2 "warning: skipping/removing '$version' (does not appear to exist upstream)"
-			json="$(jq <<<"$json" -c '.[env.version] = null')"
-			continue
-		fi
+		echo >&2 "warning: skipping/removing '$version' (does not appear to exist upstream)"
+		json="$(jq <<<"$json" -c '.[env.version] = null')"
+		continue
 	fi
 
 	# format of "possibles" array entries is "VERSION URL.TAR.XZ URL.TAR.XZ.ASC SHA256" (each value shell quoted)
@@ -116,11 +111,15 @@ for version in "${versions[@]}"; do
 		'
 	)"
 
-	if [ "$version" = "$rcVersion" ]; then
-		json="$(jq <<<"$json" -c '
-			.[env.version + "-rc"] //= null
-		')"
-	fi
+	# make sure RCs and releases have corresponding pairs
+	json="$(jq <<<"$json" -c '
+		.[
+			env.version
+			+ if env.version == env.rcVersion then
+				"-rc"
+			else "" end
+		] //= null
+	')"
 done
 
-jq <<<"$json" -S . > versions.json
+jq <<<"$json" 'to_entries | sort_by(.key) | from_entries' > versions.json
