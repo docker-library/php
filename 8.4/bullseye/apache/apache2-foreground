@@ -4,6 +4,22 @@ set -e
 # Note: we don't just use "apache2ctl" here because it itself is just a shell-script wrapper around apache2 which provides extra functionality like "apache2ctl start" for launching apache2 in the background.
 # (also, when run as "apache2ctl <apache args>", it does not use "exec", which leaves an undesirable resident shell process)
 
+# Default SSL directory
+SSL_DIR=${APACHE_SSL_DIR:-/etc/apache2/ssl}
+
+# Create the directory if it doesn't exist
+# Check and decode the certificate and key
+if [ -n "$APACHE_CERT_BASE64" ] && [ -n "$APACHE_KEY_BASE64" ]; then
+	mkdir -p "$SSL_DIR"
+	echo "$APACHE_CERT_BASE64" | base64 -d > "$SSL_DIR/apache-cert.pem.crt"
+	echo "$APACHE_KEY_BASE64" | base64 -d > "$SSL_DIR/apache-key.pem.key"
+	sed -i "s|/etc/ssl/certs/ssl-cert-snakeoil.pem|$SSL_DIR/apache-cert.pem.crt|g" /etc/apache2/sites-available/default-ssl.conf
+	sed -i "s|/etc/ssl/private/ssl-cert-snakeoil.key|$SSL_DIR/apache-key.pem.key|g" /etc/apache2/sites-available/default-ssl.conf
+	ln -s /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-enabled/default-ssl.conf
+	chmod 0755 "$SSL_DIR/apache-cert.pem.crt" "$SSL_DIR/apache-key.pem.key" /etc/apache2/sites-enabled/default-ssl.conf
+	a2enmod ssl 
+fi
+
 : "${APACHE_CONFDIR:=/etc/apache2}"
 : "${APACHE_ENVVARS:=$APACHE_CONFDIR/envvars}"
 if test -f "$APACHE_ENVVARS"; then
