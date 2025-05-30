@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.20
+FROM alpine:3.22
 
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
@@ -54,11 +54,11 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
-ENV GPG_KEYS 528995BFEDFBA7191D46839EF9BA0ADA31CBD89E 39B641343D8C104B2B146DC3F9C39DC0B9698544 F1F692238FBC1666E5A5CCD4199F9DFEF6FFBAFD
+ENV GPG_KEYS 1198C0117593497A5EC5C199286AF1F9897469DC C28D937575603EB4ABB725861C0779DC5C0A9DE4 AFD8691FDAEDF03BDF6E460563F15A9B715376CA
 
-ENV PHP_VERSION 8.1.32
-ENV PHP_URL="https://www.php.net/distributions/php-8.1.32.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.1.32.tar.xz.asc"
-ENV PHP_SHA256="c582ac682a280bbc69bc2186c21eb7e3313cc73099be61a6bc1d2cd337cbf383"
+ENV PHP_VERSION 8.3.22
+ENV PHP_URL="https://www.php.net/distributions/php-8.3.22.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.3.22.tar.xz.asc"
+ENV PHP_SHA256="66c86889059bd27ccf460590ca48fcaf3261349cc9bdba2023ac6a265beabf36"
 
 RUN set -eux; \
 	\
@@ -100,8 +100,6 @@ RUN set -eux; \
 		linux-headers \
 		oniguruma-dev \
 		openssl-dev \
-		patch \
-		patchutils \
 		readline-dev \
 		sqlite-dev \
 	; \
@@ -119,17 +117,6 @@ RUN set -eux; \
 	; \
 	docker-php-source extract; \
 	cd /usr/src/php; \
-# Apply patches; see https://github.com/docker-library/php/pull/1552
-	# https://github.com/php/php-src/issues/11678
-	curl -fL 'https://github.com/php/php-src/commit/577b8ae4226368e66fee7a9b5c58f9e2428372fc.patch?full_index=1' -o 11678.patch; \
-	echo '6edc20c3bb3e7cc13515abce7f2fffa8ebea6cf7469abfbc78fcdc120350b239 *11678.patch' | sha256sum -c -; \
-	patch -p1 < 11678.patch; \
-	rm 11678.patch; \
-	# https://github.com/php/php-src/issues/14834
-	curl -fL 'https://github.com/php/php-src/commit/67259e451d5d58b4842776c5696a66d74e157609.patch?full_index=1' -o 14834.patch; \
-	echo 'ed10a1b254091ad676ed204e55628ecbd6c8962004d6185a1821cedecd526c0f *14834.patch' | sha256sum -c -; \
-	filterdiff -x '*/NEWS' 14834.patch | patch -p1; \
-	rm 14834.patch; \
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
 	./configure \
 		--build="$gnuArch" \
@@ -145,8 +132,6 @@ RUN set -eux; \
 # https://github.com/docker-library/php/issues/822
 		--with-pic \
 		\
-# --enable-ftp is included here for compatibility with existing versions. ftp_ssl_connect() needed ftp to be compiled statically before PHP 7.0 (see https://github.com/docker-library/php/issues/236).
-		--enable-ftp \
 # --enable-mbstring is included here because otherwise there's no way to get pecl to use it properly (see https://github.com/docker-library/php/issues/195)
 		--enable-mbstring \
 # --enable-mysqlnd is included here because it's harder to compile after the fact than extensions are (since it's a plugin for several extensions, not an extension in itself)
@@ -172,10 +157,6 @@ RUN set -eux; \
 # in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
 		--with-pear \
 		\
-# bundled pcre does not support JIT on riscv64 until 10.41 (php 8.3+)
-# https://github.com/PCRE2Project/pcre2/commits/pcre2-10.41/src/sljit/sljitNativeRISCV_64.c
-# https://github.com/php/php-src/tree/php-8.3.0/ext/pcre/pcre2lib
-		$(test "$gnuArch" = 'riscv64-linux-musl' && echo '--without-pcre-jit') \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
