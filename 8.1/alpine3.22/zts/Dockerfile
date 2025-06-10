@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.20
+FROM alpine:3.22
 
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
@@ -130,6 +130,12 @@ RUN set -eux; \
 	echo 'ed10a1b254091ad676ed204e55628ecbd6c8962004d6185a1821cedecd526c0f *14834.patch' | sha256sum -c -; \
 	filterdiff -x '*/NEWS' 14834.patch | patch -p1; \
 	rm 14834.patch; \
+	# https://github.com/php/php-src/issues/18743 "Incompatibility in Inline TLS Assembly on Alpine 3.22 with zend_jit_ir.c"
+	# https://github.com/docker-library/php/pull/1580
+	curl -fL 'https://github.com/php/php-src/commit/6b105d4bc57e20a2472c9a6ff11fba32768556d4.patch?full_index=1' -o 18743.patch; \
+	echo '037e1610ae5d444e9a8c3ecd9d5f0cd215fd0aac90bdd7b9f0b259bffdf3566b *18743.patch' | sha256sum -c -; \
+	filterdiff -x '*/NEWS' 18743.patch | patch -p1; \
+	rm 18743.patch; \
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
 	./configure \
 		--build="$gnuArch" \

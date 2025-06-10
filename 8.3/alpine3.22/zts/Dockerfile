@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.20
+FROM alpine:3.22
 
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
@@ -100,6 +100,8 @@ RUN set -eux; \
 		linux-headers \
 		oniguruma-dev \
 		openssl-dev \
+		patch \
+		patchutils \
 		readline-dev \
 		sqlite-dev \
 	; \
@@ -117,6 +119,12 @@ RUN set -eux; \
 	; \
 	docker-php-source extract; \
 	cd /usr/src/php; \
+	# https://github.com/php/php-src/issues/18743 "Incompatibility in Inline TLS Assembly on Alpine 3.22 with zend_jit_ir.c"
+	# https://github.com/docker-library/php/pull/1580
+	curl -fL 'https://github.com/php/php-src/commit/b3c8afe272a6919248986c703c2e1defc73ff707.patch?full_index=1' -o 18743.patch; \
+	echo 'b334f73434c9732a4b27a42eb5d417e10df842e854c02a3e753b2479f8978bf5 *18743.patch' | sha256sum -c -; \
+	filterdiff -x '*/NEWS' 18743.patch | patch -p1; \
+	rm 18743.patch; \
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
 	./configure \
 		--build="$gnuArch" \
@@ -150,18 +158,20 @@ RUN set -eux; \
 		--with-readline \
 		--with-zlib \
 		\
-# https://github.com/bwoebi/phpdbg-docs/issues/1#issuecomment-163872806 ("phpdbg is primarily a CLI debugger, and is not suitable for debugging an fpm stack.")
-		--disable-phpdbg \
+# https://github.com/docker-library/php/pull/1259
+		--enable-phpdbg \
+		--enable-phpdbg-readline \
 		\
 # in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
 		--with-pear \
 		\
 		\
-		--disable-cgi \
+# https://github.com/docker-library/php/pull/939#issuecomment-730501748
+		--enable-embed \
 		\
-		--enable-fpm \
-		--with-fpm-user=www-data \
-		--with-fpm-group=www-data \
+		--enable-zts \
+# https://externals.io/message/118859
+		--disable-zend-signals \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
@@ -205,55 +215,4 @@ COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 RUN docker-php-ext-enable sodium
 
 ENTRYPOINT ["docker-php-entrypoint"]
-WORKDIR /var/www/html
-
-RUN set -eux; \
-	cd /usr/local/etc; \
-	if [ -d php-fpm.d ]; then \
-		# for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
-		sed 's!=NONE/!=!g' php-fpm.conf.default | tee php-fpm.conf > /dev/null; \
-		cp php-fpm.d/www.conf.default php-fpm.d/www.conf; \
-	else \
-		# PHP 5.x doesn't use "include=" by default, so we'll create our own simple config that mimics PHP 7+ for consistency
-		mkdir php-fpm.d; \
-		cp php-fpm.conf.default php-fpm.d/www.conf; \
-		{ \
-			echo '[global]'; \
-			echo 'include=etc/php-fpm.d/*.conf'; \
-		} | tee php-fpm.conf; \
-	fi; \
-	{ \
-		echo '[global]'; \
-		echo 'error_log = /proc/self/fd/2'; \
-		echo; echo '; https://github.com/docker-library/php/pull/725#issuecomment-443540114'; echo 'log_limit = 8192'; \
-		echo; \
-		echo '[www]'; \
-		echo '; php-fpm closes STDOUT on startup, so sending logs to /proc/self/fd/1 does not work.'; \
-		echo '; https://bugs.php.net/bug.php?id=73886'; \
-		echo 'access.log = /proc/self/fd/2'; \
-		echo; \
-		echo 'clear_env = no'; \
-		echo; \
-		echo '; Ensure worker stdout and stderr are sent to the main error log.'; \
-		echo 'catch_workers_output = yes'; \
-		echo 'decorate_workers_output = no'; \
-	} | tee php-fpm.d/docker.conf; \
-	{ \
-		echo '[global]'; \
-		echo 'daemonize = no'; \
-		echo; \
-		echo '[www]'; \
-		echo 'listen = 9000'; \
-	} | tee php-fpm.d/zz-docker.conf; \
-	mkdir -p "$PHP_INI_DIR/conf.d"; \
-	{ \
-		echo '; https://github.com/docker-library/php/issues/878#issuecomment-938595965'; \
-		echo 'fastcgi.logging = Off'; \
-	} > "$PHP_INI_DIR/conf.d/docker-fpm.ini"
-
-# Override stop signal to stop process gracefully
-# https://github.com/php/php-src/blob/17baa87faddc2550def3ae7314236826bc1b1398/sapi/fpm/php-fpm.8.in#L163
-STOPSIGNAL SIGQUIT
-
-EXPOSE 9000
-CMD ["php-fpm"]
+CMD ["php", "-a"]
