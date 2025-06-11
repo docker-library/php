@@ -117,6 +117,13 @@ for version; do
 			)
 		)
 		| .[0]
+		# intl will not compile on Alpine 3.22 causing build failures for downstream images (joomla, mediawiki, wordpress): https://github.com/docker-library/php/issues/1585
+		# since PHP 8.1 is EOL at the end of the year and wont likely get fixes, keep the default Alpine at 3.21
+		| if env.version == "8.1" then
+			"alpine3.21"
+		else
+			.
+		end
 	' versions.json)"
 
 	for dir in "${variants[@]}"; do
