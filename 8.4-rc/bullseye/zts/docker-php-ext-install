@@ -126,7 +126,7 @@ for ext in $exts; do
 	find modules \
 		-maxdepth 1 \
 		-name '*.so' \
-		-exec basename '{}' ';' \
+		-exec basename '{}' '.so' ';' \
 			| xargs -r docker-php-ext-enable ${iniName:+--ini-name "$iniName"}
 
 	make -j"$j" clean
