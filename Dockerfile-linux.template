@@ -524,7 +524,7 @@ RUN set -eux; \
 
 COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 
-{{ if IN(rcVersion; "8.1", "8.2", "8.3", "8.4") then ( -}}
+{{ if IN(rcVersion; "8.1", "8.2", "8.3", "8.4", "8.5") then ( -}}
 # enable OPcache by default (https://wiki.php.net/rfc/make_opcache_required)
 RUN docker-php-ext-enable opcache
 {{ ) else "" end -}}
