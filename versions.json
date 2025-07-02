@@ -90,5 +90,6 @@
       "alpine3.21/zts"
     ]
   },
-  "8.4-rc": null
+  "8.4-rc": null,
+  "8.5-rc": null
 }

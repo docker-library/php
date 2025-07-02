@@ -176,6 +176,14 @@ ENV GPG_KEYS {{
 		# https://www.php.net/gpg-keys.php
 		# https://www.php.net/downloads.php
 
+		"8.5": [
+			# https://wiki.php.net/todo/php85#release_managers
+			# https://www.php.net/gpg-keys.php#gpg-8.5
+			"1198 C011 7593 497A 5EC5  C199 286A F1F9 8974 69DC", # pierrick
+			"49D9 AF6B C72A 80D6 6917  19C8 AA23 F5BE 9C70 97D4", # edorian
+			"D95C 03BC 702B E951 5344  AE33 74E4 4BC9 0677 01A5"  # daniels
+		],
+
 		"8.4": [
 			# https://wiki.php.net/todo/php84#release_managers
 			# https://www.php.net/gpg-keys.php#gpg-8.4
