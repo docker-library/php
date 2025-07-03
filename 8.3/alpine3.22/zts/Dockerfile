@@ -56,9 +56,9 @@ ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
 ENV GPG_KEYS 1198C0117593497A5EC5C199286AF1F9897469DC C28D937575603EB4ABB725861C0779DC5C0A9DE4 AFD8691FDAEDF03BDF6E460563F15A9B715376CA
 
-ENV PHP_VERSION 8.3.22
-ENV PHP_URL="https://www.php.net/distributions/php-8.3.22.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.3.22.tar.xz.asc"
-ENV PHP_SHA256="66c86889059bd27ccf460590ca48fcaf3261349cc9bdba2023ac6a265beabf36"
+ENV PHP_VERSION 8.3.23
+ENV PHP_URL="https://www.php.net/distributions/php-8.3.23.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.3.23.tar.xz.asc"
+ENV PHP_SHA256="08be64700f703bca6ff1284bf1fdaffa37ae1b9734b6559f8350248e8960a6db"
 
 RUN set -eux; \
 	\
@@ -100,8 +100,6 @@ RUN set -eux; \
 		linux-headers \
 		oniguruma-dev \
 		openssl-dev \
-		patch \
-		patchutils \
 		readline-dev \
 		sqlite-dev \
 	; \
@@ -119,12 +117,6 @@ RUN set -eux; \
 	; \
 	docker-php-source extract; \
 	cd /usr/src/php; \
-	# https://github.com/php/php-src/issues/18743 "Incompatibility in Inline TLS Assembly on Alpine 3.22 with zend_jit_ir.c"
-	# https://github.com/docker-library/php/pull/1580
-	curl -fL 'https://github.com/php/php-src/commit/b3c8afe272a6919248986c703c2e1defc73ff707.patch?full_index=1' -o 18743.patch; \
-	echo 'b334f73434c9732a4b27a42eb5d417e10df842e854c02a3e753b2479f8978bf5 *18743.patch' | sha256sum -c -; \
-	filterdiff -x '*/NEWS' 18743.patch | patch -p1; \
-	rm 18743.patch; \
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
 	./configure \
 		--build="$gnuArch" \

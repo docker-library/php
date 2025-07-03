@@ -46,10 +46,10 @@
   },
   "8.2-rc": null,
   "8.3": {
-    "version": "8.3.22",
-    "url": "https://www.php.net/distributions/php-8.3.22.tar.xz",
-    "ascUrl": "https://www.php.net/distributions/php-8.3.22.tar.xz.asc",
-    "sha256": "66c86889059bd27ccf460590ca48fcaf3261349cc9bdba2023ac6a265beabf36",
+    "version": "8.3.23",
+    "url": "https://www.php.net/distributions/php-8.3.23.tar.xz",
+    "ascUrl": "https://www.php.net/distributions/php-8.3.23.tar.xz.asc",
+    "sha256": "08be64700f703bca6ff1284bf1fdaffa37ae1b9734b6559f8350248e8960a6db",
     "variants": [
       "bookworm/cli",
       "bookworm/apache",
