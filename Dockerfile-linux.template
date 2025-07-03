@@ -27,11 +27,8 @@
 		# https://github.com/php/php-src/issues/18743 "Incompatibility in Inline TLS Assembly on Alpine 3.22 with zend_jit_ir.c"
 		env.variant == "zts" # only needed for ZTS builds
 		and is_alpine
-		and (env.from != "alpine:3.21") # only needed for Alpine 3.22+
-		and (
-			IN(rcVersion; "8.1", "8.2")
-			or IN(.version; "8.3.22", "8.4.8") # https://github.com/docker-library/php/pull/1580#issuecomment-2955259172
-		)
+		and env.from != "alpine:3.21" # only needed for Alpine 3.22+
+		and IN(rcVersion; "8.1", "8.2")
 -}}
 FROM {{ env.from }}
 
@@ -344,7 +341,6 @@ RUN set -eux; \
 		# https://github.com/docker-library/php/pull/1580#issuecomment-2957191901
 		{
 			"8.1": { url: "https://github.com/php/php-src/commit/6b105d4bc57e20a2472c9a6ff11fba32768556d4.patch?full_index=1", sha256: "037e1610ae5d444e9a8c3ecd9d5f0cd215fd0aac90bdd7b9f0b259bffdf3566b" },
-			"8.4": { url: "https://github.com/php/php-src/commit/4c7220322bc74b0fc8416e1958cadd7bc51fe1b7.diff?full_index=1", sha256: "a19e795b24c52d4d1aa3d45b67339e1b62a5365b37cf4418b83e2709fc98bcb5" },
 		}[rcVersion]
 		// { url: "https://github.com/php/php-src/commit/b3c8afe272a6919248986c703c2e1defc73ff707.patch?full_index=1", sha256: "b334f73434c9732a4b27a42eb5d417e10df842e854c02a3e753b2479f8978bf5" }
 		| (
