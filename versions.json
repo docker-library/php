@@ -94,7 +94,7 @@
   "8.5-rc": {
     "version": "8.5.0alpha1",
     "url": "https://downloads.php.net/~daniels/php-8.5.0alpha1.tar.xz",
-    "ascUrl": "https://downloads.php.net/~daniels/php-8.5.0alpha1.tar.xz.asc",
+    "ascUrl": "",
     "sha256": "f21c207b350de8555b9630a7ac7d0893c553186f1b5027236728b29cc99fe4b4",
     "variants": [
       "bookworm/cli",
