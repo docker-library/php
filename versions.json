@@ -114,7 +114,7 @@
   "8.4-rc": {
     "version": "8.4.11RC1",
     "url": "https://downloads.php.net/~calvinb/php-8.4.11RC1.tar.xz",
-    "ascUrl": "",
+    "ascUrl": "https://downloads.php.net/~calvinb/php-8.4.11RC1.tar.xz.asc",
     "sha256": "7568a75d1f220fe224dc56b17f9252bdc366ad9afcc35d8785d58cd1222f6e1f",
     "variants": [
       "bookworm/cli",
