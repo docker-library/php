@@ -70,7 +70,7 @@
   "8.3-rc": {
     "version": "8.3.24RC1",
     "url": "https://downloads.php.net/~jakub/php-8.3.24RC1.tar.xz",
-    "ascUrl": "https://downloads.php.net/~jakub/php-8.3.24RC1.tar.xz.asc",
+    "ascUrl": "",
     "sha256": "58ac41b231d3d0c7e44f2f6826511c3bed0a09490da4708dac80c7cefc020533",
     "variants": [
       "bookworm/cli",
