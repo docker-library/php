@@ -518,11 +518,11 @@ RUN set -eux; \
 
 COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 
-{{ if IN(rcVersion; "8.1", "8.2", "8.3", "8.4", "8.5") then ( -}}
+{{ if IN(rcVersion; "8.1", "8.2", "8.3", "8.4") then ( -}}
 # enable OPcache by default (https://wiki.php.net/rfc/make_opcache_required)
 RUN docker-php-ext-enable opcache
-{{ ) else "" end -}}
 
+{{ ) else "" end -}}
 # sodium was built as a shared module (so that it can be replaced later if so desired), so let's enable it too (https://github.com/docker-library/php/issues/598)
 RUN docker-php-ext-enable sodium
 
