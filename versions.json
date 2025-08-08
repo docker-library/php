@@ -92,10 +92,10 @@
   },
   "8.4-rc": null,
   "8.5-rc": {
-    "version": "8.5.0alpha2",
-    "url": "https://downloads.php.net/~edorian/php-8.5.0alpha2.tar.xz",
-    "ascUrl": "https://downloads.php.net/~edorian/php-8.5.0alpha2.tar.xz.asc",
-    "sha256": "94d41a8168988e5faa744780ad870ee50dd5175b474477cb701fddddf1a696a1",
+    "version": "8.5.0alpha4",
+    "url": "https://downloads.php.net/~daniels/php-8.5.0alpha4.tar.xz",
+    "ascUrl": "https://downloads.php.net/~daniels/php-8.5.0alpha4.tar.xz.asc",
+    "sha256": "5d33e15942d89956814f1521540210c58174c7f72dd277deda6b99709173e2db",
     "variants": [
       "bookworm/cli",
       "bookworm/apache",
