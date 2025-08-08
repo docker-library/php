@@ -16,6 +16,12 @@
 	def rcVersion:
 		env.version | rtrimstr("-rc")
 	;
+	def clean_apt:
+		# TODO once bookworm is EOL, remove this and just hard-code "apt-get dist-clean" instead
+		if env.from | contains("bookworm") then
+			"rm -rf /var/lib/apt/lists/*"
+		else "apt-get dist-clean" end
+	;
 	def need_patch_11678:
 		# https://github.com/docker-library/php/pull/1552
 		# https://github.com/php/php-src/issues/11678 "Build fails on musl 1.2.4 - lfs64" stream_cookie_seeker
@@ -85,7 +91,7 @@ RUN set -eux; \
 		curl \
 		xz-utils \
 	; \
-	rm -rf /var/lib/apt/lists/*
+	{{ clean_apt }}
 {{ ) end -}}
 
 ENV PHP_INI_DIR /usr/local/etc/php
@@ -104,7 +110,7 @@ ENV APACHE_ENVVARS $APACHE_CONFDIR/envvars
 RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends apache2; \
-	rm -rf /var/lib/apt/lists/*; \
+	{{ clean_apt }}; \
 	\
 # generically convert lines like
 #   export APACHE_RUN_USER=www-data
@@ -120,10 +126,8 @@ RUN set -eux; \
 		"$APACHE_LOCK_DIR" \
 		"$APACHE_RUN_DIR" \
 		"$APACHE_LOG_DIR" \
-{{ if env.suite == "bullseye" then "" else ( -}}
 # https://salsa.debian.org/apache-team/apache2/-/commit/b97ca8714890ead1ba6c095699dde752e8433205
 		"$APACHE_RUN_DIR/socks" \
-{{ ) end -}}
 	; do \
 		rm -rvf "$dir"; \
 		mkdir -p "$dir"; \
@@ -232,7 +236,7 @@ RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends gnupg; \
-	rm -rf /var/lib/apt/lists/*; \
+	{{ clean_apt }}; \
 {{ ) end -}}
 	\
 	mkdir -p /usr/src; \
@@ -500,13 +504,14 @@ RUN set -eux; \
 	find /usr/local -type f -executable -exec ldd '{}' ';' \
 		| awk '/=>/ { so = $(NF-1); if (index(so, "/usr/local/") == 1) { next }; gsub("^/(usr/)?", "", so); printf "*%s\n", so }' \
 		| sort -u \
-		| xargs -r dpkg-query --search \
-		| cut -d: -f1 \
+		| xargs -rt dpkg-query --search \
+# https://manpages.debian.org/trixie/dpkg/dpkg-query.1.en.html#S (we ignore diversions and it'll be really unusual for more than one package to provide any given .so file)
+		| awk 'sub(":$", "", $1) { print $1 }' \
 		| sort -u \
 		| xargs -r apt-mark manual \
 	; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-	rm -rf /var/lib/apt/lists/*; \
+	{{ clean_apt }}; \
 {{ ) end -}}
 	\
 # update pecl channel definitions https://github.com/docker-library/php/issues/443

@@ -80,8 +80,8 @@ for version in "${versions[@]}"; do
 	variants='[]'
 	# order here controls the order of the library/ file
 	for suite in \
+		trixie \
 		bookworm \
-		bullseye \
 		alpine3.22 \
 		alpine3.21 \
 	; do
