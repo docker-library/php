@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 
 # prevent Debian's PHP packages from being installed
 # https://github.com/docker-library/php/pull/542
@@ -37,7 +37,7 @@ RUN set -eux; \
 		curl \
 		xz-utils \
 	; \
-	rm -rf /var/lib/apt/lists/*
+	apt-get dist-clean
 
 ENV PHP_INI_DIR /usr/local/etc/php
 RUN set -eux; \
@@ -69,7 +69,7 @@ RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends gnupg; \
-	rm -rf /var/lib/apt/lists/*; \
+	apt-get dist-clean; \
 	\
 	mkdir -p /usr/src; \
 	cd /usr/src; \
@@ -161,9 +161,8 @@ RUN set -eux; \
 		--with-readline \
 		--with-zlib \
 		\
-# https://github.com/docker-library/php/pull/1259
-		--enable-phpdbg \
-		--enable-phpdbg-readline \
+# https://github.com/bwoebi/phpdbg-docs/issues/1#issuecomment-163872806 ("phpdbg is primarily a CLI debugger, and is not suitable for debugging an fpm stack.")
+		--disable-phpdbg \
 		\
 # in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
 		--with-pear \
@@ -174,8 +173,11 @@ RUN set -eux; \
 		$(test "$gnuArch" = 'riscv64-linux-gnu' && echo '--without-pcre-jit') \
 		--with-libdir="lib/$debMultiarch" \
 		\
-# https://github.com/docker-library/php/pull/939#issuecomment-730501748
-		--enable-embed \
+		--disable-cgi \
+		\
+		--enable-fpm \
+		--with-fpm-user=www-data \
+		--with-fpm-group=www-data \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
@@ -209,7 +211,7 @@ RUN set -eux; \
 		| xargs -r apt-mark manual \
 	; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-	rm -rf /var/lib/apt/lists/*; \
+	apt-get dist-clean; \
 	\
 # update pecl channel definitions https://github.com/docker-library/php/issues/443
 	pecl update-channels; \
@@ -227,4 +229,55 @@ RUN docker-php-ext-enable opcache
 RUN docker-php-ext-enable sodium
 
 ENTRYPOINT ["docker-php-entrypoint"]
-CMD ["php", "-a"]
+WORKDIR /var/www/html
+
+RUN set -eux; \
+	cd /usr/local/etc; \
+	if [ -d php-fpm.d ]; then \
+		# for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
+		sed 's!=NONE/!=!g' php-fpm.conf.default | tee php-fpm.conf > /dev/null; \
+		cp php-fpm.d/www.conf.default php-fpm.d/www.conf; \
+	else \
+		# PHP 5.x doesn't use "include=" by default, so we'll create our own simple config that mimics PHP 7+ for consistency
+		mkdir php-fpm.d; \
+		cp php-fpm.conf.default php-fpm.d/www.conf; \
+		{ \
+			echo '[global]'; \
+			echo 'include=etc/php-fpm.d/*.conf'; \
+		} | tee php-fpm.conf; \
+	fi; \
+	{ \
+		echo '[global]'; \
+		echo 'error_log = /proc/self/fd/2'; \
+		echo; echo '; https://github.com/docker-library/php/pull/725#issuecomment-443540114'; echo 'log_limit = 8192'; \
+		echo; \
+		echo '[www]'; \
+		echo '; php-fpm closes STDOUT on startup, so sending logs to /proc/self/fd/1 does not work.'; \
+		echo '; https://bugs.php.net/bug.php?id=73886'; \
+		echo 'access.log = /proc/self/fd/2'; \
+		echo; \
+		echo 'clear_env = no'; \
+		echo; \
+		echo '; Ensure worker stdout and stderr are sent to the main error log.'; \
+		echo 'catch_workers_output = yes'; \
+		echo 'decorate_workers_output = no'; \
+	} | tee php-fpm.d/docker.conf; \
+	{ \
+		echo '[global]'; \
+		echo 'daemonize = no'; \
+		echo; \
+		echo '[www]'; \
+		echo 'listen = 9000'; \
+	} | tee php-fpm.d/zz-docker.conf; \
+	mkdir -p "$PHP_INI_DIR/conf.d"; \
+	{ \
+		echo '; https://github.com/docker-library/php/issues/878#issuecomment-938595965'; \
+		echo 'fastcgi.logging = Off'; \
+	} > "$PHP_INI_DIR/conf.d/docker-fpm.ini"
+
+# Override stop signal to stop process gracefully
+# https://github.com/php/php-src/blob/17baa87faddc2550def3ae7314236826bc1b1398/sapi/fpm/php-fpm.8.in#L163
+STOPSIGNAL SIGQUIT
+
+EXPOSE 9000
+CMD ["php-fpm"]

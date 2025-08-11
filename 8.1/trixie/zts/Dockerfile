@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 
 # prevent Debian's PHP packages from being installed
 # https://github.com/docker-library/php/pull/542
@@ -37,7 +37,7 @@ RUN set -eux; \
 		curl \
 		xz-utils \
 	; \
-	rm -rf /var/lib/apt/lists/*
+	apt-get dist-clean
 
 ENV PHP_INI_DIR /usr/local/etc/php
 RUN set -eux; \
@@ -69,7 +69,7 @@ RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends gnupg; \
-	rm -rf /var/lib/apt/lists/*; \
+	apt-get dist-clean; \
 	\
 	mkdir -p /usr/src; \
 	cd /usr/src; \
@@ -176,6 +176,11 @@ RUN set -eux; \
 		\
 # https://github.com/docker-library/php/pull/939#issuecomment-730501748
 		--enable-embed \
+		\
+		--enable-zts \
+# https://externals.io/message/118859
+		--disable-zend-signals \
+		--enable-zend-max-execution-timers \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
@@ -209,7 +214,7 @@ RUN set -eux; \
 		| xargs -r apt-mark manual \
 	; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-	rm -rf /var/lib/apt/lists/*; \
+	apt-get dist-clean; \
 	\
 # update pecl channel definitions https://github.com/docker-library/php/issues/443
 	pecl update-channels; \
