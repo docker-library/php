@@ -91,26 +91,5 @@
     ]
   },
   "8.4-rc": null,
-  "8.5-rc": {
-    "version": "8.5.0RC5",
-    "url": "https://downloads.php.net/~daniels/php-8.5.0RC5.tar.xz",
-    "ascUrl": "https://downloads.php.net/~daniels/php-8.5.0RC5.tar.xz.asc",
-    "sha256": "4964cdbaf2447afba100c4199ec9c59c41ca4cc23db8d1e38ac7e57aab028954",
-    "variants": [
-      "trixie/cli",
-      "trixie/apache",
-      "trixie/fpm",
-      "trixie/zts",
-      "bookworm/cli",
-      "bookworm/apache",
-      "bookworm/fpm",
-      "bookworm/zts",
-      "alpine3.22/cli",
-      "alpine3.22/fpm",
-      "alpine3.22/zts",
-      "alpine3.21/cli",
-      "alpine3.21/fpm",
-      "alpine3.21/zts"
-    ]
-  }
+  "8.5-rc": null
 }
