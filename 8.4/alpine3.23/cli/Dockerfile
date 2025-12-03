@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.21
+FROM alpine:3.23
 
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
@@ -54,11 +54,11 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
-ENV GPG_KEYS 39B641343D8C104B2B146DC3F9C39DC0B9698544 E60913E4DF209907D8E30D96659A97C9CF2A795A 1198C0117593497A5EC5C199286AF1F9897469DC
+ENV GPG_KEYS AFD8691FDAEDF03BDF6E460563F15A9B715376CA 9D7F99A0CB8F05C8A6958D6256A97AF7600A39A6 0616E93D95AF471243E26761770426E17EBBB3DD
 
-ENV PHP_VERSION 8.2.29
-ENV PHP_URL="https://www.php.net/distributions/php-8.2.29.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.2.29.tar.xz.asc"
-ENV PHP_SHA256="475f991afd2d5b901fb410be407d929bc00c46285d3f439a02c59e8b6fe3589c"
+ENV PHP_VERSION 8.4.15
+ENV PHP_URL="https://www.php.net/distributions/php-8.4.15.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.4.15.tar.xz.asc"
+ENV PHP_SHA256="a060684f614b8344f9b34c334b6ba8db1177555997edb5b1aceab0a4b807da7e"
 
 RUN set -eux; \
 	\
@@ -155,18 +155,6 @@ RUN set -eux; \
 # in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
 		--with-pear \
 		\
-# bundled pcre does not support JIT on riscv64 until 10.41 (php 8.3+)
-# https://github.com/PCRE2Project/pcre2/commits/pcre2-10.41/src/sljit/sljitNativeRISCV_64.c
-# https://github.com/php/php-src/tree/php-8.3.0/ext/pcre/pcre2lib
-		$(test "$gnuArch" = 'riscv64-linux-musl' && echo '--without-pcre-jit') \
-		\
-# https://github.com/docker-library/php/pull/939#issuecomment-730501748
-		--enable-embed \
-		\
-		--enable-zts \
-# https://externals.io/message/118859
-		--disable-zend-signals \
-		--enable-zend-max-execution-timers \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
