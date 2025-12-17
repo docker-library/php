@@ -127,8 +127,10 @@ RUN set -eux; \
 	if [ ! -d /usr/include/curl ]; then \
 		ln -sT "/usr/include/$debMultiarch/curl" /usr/local/include/curl; \
 	fi; \
+	test "$PHP_INI_DIR" != "${PHP_INI_DIR%/php}"; \
 	./configure \
 		--build="$gnuArch" \
+		--sysconfdir="${PHP_INI_DIR%/php}" \
 		--with-config-file-path="$PHP_INI_DIR" \
 		--with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
 		\
@@ -223,20 +225,11 @@ ENTRYPOINT ["docker-php-entrypoint"]
 WORKDIR /var/www/html
 
 RUN set -eux; \
-	cd /usr/local/etc; \
-	if [ -d php-fpm.d ]; then \
-		# for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
-		sed 's!=NONE/!=!g' php-fpm.conf.default | tee php-fpm.conf > /dev/null; \
-		cp php-fpm.d/www.conf.default php-fpm.d/www.conf; \
-	else \
-		# PHP 5.x doesn't use "include=" by default, so we'll create our own simple config that mimics PHP 7+ for consistency
-		mkdir php-fpm.d; \
-		cp php-fpm.conf.default php-fpm.d/www.conf; \
-		{ \
-			echo '[global]'; \
-			echo 'include=etc/php-fpm.d/*.conf'; \
-		} | tee php-fpm.conf; \
-	fi; \
+	cd "${PHP_INI_DIR%/php}"; \
+	\
+	cp -v php-fpm.conf.default php-fpm.conf; \
+	cp -v php-fpm.d/www.conf.default php-fpm.d/www.conf; \
+	\
 	{ \
 		echo '[global]'; \
 		echo 'error_log = /proc/self/fd/2'; \
