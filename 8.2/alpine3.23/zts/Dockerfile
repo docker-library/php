@@ -124,8 +124,10 @@ RUN set -eux; \
 	filterdiff -x '*/NEWS' 18743.patch | patch -p1; \
 	rm 18743.patch; \
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+	test "$PHP_INI_DIR" != "${PHP_INI_DIR%/php}"; \
 	./configure \
 		--build="$gnuArch" \
+		--sysconfdir="${PHP_INI_DIR%/php}" \
 		--with-config-file-path="$PHP_INI_DIR" \
 		--with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
 		\
