@@ -134,26 +134,5 @@
       "alpine3.22/zts"
     ]
   },
-  "8.5-rc": {
-    "version": "8.5.1RC2",
-    "url": "https://downloads.php.net/~edorian/php-8.5.1RC2.tar.xz",
-    "ascUrl": "https://downloads.php.net/~edorian/php-8.5.1RC2.tar.xz.asc",
-    "sha256": "18b766c67022ef5e84b15e4adc7e9041811668977e16f91fe02bf7c7e3231299",
-    "variants": [
-      "trixie/cli",
-      "trixie/apache",
-      "trixie/fpm",
-      "trixie/zts",
-      "bookworm/cli",
-      "bookworm/apache",
-      "bookworm/fpm",
-      "bookworm/zts",
-      "alpine3.23/cli",
-      "alpine3.23/fpm",
-      "alpine3.23/zts",
-      "alpine3.22/cli",
-      "alpine3.22/fpm",
-      "alpine3.22/zts"
-    ]
-  }
+  "8.5-rc": null
 }
