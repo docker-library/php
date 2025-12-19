@@ -56,9 +56,9 @@ ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
 ENV GPG_KEYS 528995BFEDFBA7191D46839EF9BA0ADA31CBD89E 39B641343D8C104B2B146DC3F9C39DC0B9698544 F1F692238FBC1666E5A5CCD4199F9DFEF6FFBAFD
 
-ENV PHP_VERSION 8.1.33
-ENV PHP_URL="https://www.php.net/distributions/php-8.1.33.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.1.33.tar.xz.asc"
-ENV PHP_SHA256="9db83bf4590375562bc1a10b353cccbcf9fcfc56c58b7c8fb814e6865bb928d1"
+ENV PHP_VERSION 8.1.34
+ENV PHP_URL="https://www.php.net/distributions/php-8.1.34.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.1.34.tar.xz.asc"
+ENV PHP_SHA256="ffa9e0982e82eeaea848f57687b425ed173aa278fe563001310ae2638db5c251"
 
 RUN set -eux; \
 	\
@@ -123,6 +123,13 @@ RUN set -eux; \
 	echo '6edc20c3bb3e7cc13515abce7f2fffa8ebea6cf7469abfbc78fcdc120350b239 *11678.patch' | sha256sum -c -; \
 	patch -p1 < 11678.patch; \
 	rm 11678.patch; \
+	# https://github.com/php/php-src/pull/19131
+	# this backported commit broke our ability to apply 14834, which is the fix we need, so this is applied as a reverse patch to undo it
+	# 19131 was for FreeBSD, so doesn't apply to this alpine build
+	curl -fL 'https://github.com/php/php-src/commit/a5df26691d1b1f71b964b869510473a5d5413999.patch?full_index=1' -o 19131.patch; \
+	echo 'c98c01c74d3a6da197116f8511b16fed361ca6bbb6a8af8df629a933f541c213 *19131.patch' | sha256sum -c -; \
+	patch --reverse -p1 < 19131.patch; \
+	rm 19131.patch; \
 	# https://github.com/php/php-src/issues/14834
 	curl -fL 'https://github.com/php/php-src/commit/67259e451d5d58b4842776c5696a66d74e157609.patch?full_index=1' -o 14834.patch; \
 	echo 'ed10a1b254091ad676ed204e55628ecbd6c8962004d6185a1821cedecd526c0f *14834.patch' | sha256sum -c -; \
