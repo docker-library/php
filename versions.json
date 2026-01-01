@@ -1,27 +1,4 @@
 {
-  "8.1": {
-    "version": "8.1.34",
-    "url": "https://www.php.net/distributions/php-8.1.34.tar.xz",
-    "ascUrl": "https://www.php.net/distributions/php-8.1.34.tar.xz.asc",
-    "sha256": "ffa9e0982e82eeaea848f57687b425ed173aa278fe563001310ae2638db5c251",
-    "variants": [
-      "trixie/cli",
-      "trixie/apache",
-      "trixie/fpm",
-      "trixie/zts",
-      "bookworm/cli",
-      "bookworm/apache",
-      "bookworm/fpm",
-      "bookworm/zts",
-      "alpine3.22/cli",
-      "alpine3.22/fpm",
-      "alpine3.22/zts",
-      "alpine3.21/cli",
-      "alpine3.21/fpm",
-      "alpine3.21/zts"
-    ]
-  },
-  "8.1-rc": null,
   "8.2": {
     "version": "8.2.30",
     "url": "https://www.php.net/distributions/php-8.2.30.tar.xz",
