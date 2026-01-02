@@ -77,45 +77,36 @@ for version in "${versions[@]}"; do
 		ascUrl="$url.asc"
 	fi
 
-	variants='[]'
-	# order here controls the order of the library/ file
-	for suite in \
-		trixie \
-		bookworm \
-		alpine3.23 \
-		alpine3.22 \
-		alpine3.21 \
-	; do
-		for variant in cli apache fpm zts; do
-			if [[ "$suite" = alpine* ]]; then
-				if [ "$variant" = 'apache' ]; then
-					continue
-				fi
-				if [[ "$rcVersion" = '8.1' ]] && [[ "$suite" = 'alpine3.23' ]]; then
-					# Keep PHP 8.1 with Alpine 3.21 default until end of year; see also https://github.com/docker-library/php/blob/9ab2e4b37addffaa10f06d9e5f54f7bd1f5ef18f/generate-stackbrew-library.sh#L120
-					continue
-				fi
-				if [[ "$rcVersion" != '8.1' ]] && [[ "$suite" = 'alpine3.21' ]]; then
-					# Keep Alpine 3.21 just for 8.1
-					continue
-				fi
-			fi
-			export suite variant
-			variants="$(jq <<<"$variants" -c '. + [ env.suite + "/" + env.variant ]')"
-		done
-	done
-
 	echo "$version: $fullVersion"
 
 	export fullVersion url ascUrl sha256
 	json="$(
-		jq <<<"$json" -c --argjson variants "$variants" '
+		jq <<<"$json" -c '
 			.[env.version] = {
 				version: env.fullVersion,
 				url: env.url,
 				ascUrl: env.ascUrl,
 				sha256: env.sha256,
-				variants: $variants,
+				variants: [
+					# order here controls the order of the library/ file
+					(
+						"trixie",
+						"bookworm",
+						"alpine3.23",
+						"alpine3.22",
+						empty
+					) as $suite
+					| (
+						"cli",
+						"apache",
+						"fpm",
+						"zts",
+						empty
+					) as $variant
+					| if $suite | startswith("alpine") and $variant == "apache" then empty else
+						"\($suite)/\($variant)"
+					end
+				],
 			}
 		'
 	)"
