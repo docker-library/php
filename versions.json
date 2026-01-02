@@ -90,7 +90,28 @@
       "alpine3.22/zts"
     ]
   },
-  "8.4-rc": null,
+  "8.4-rc": {
+    "version": "8.4.17RC1",
+    "url": "https://downloads.php.net/~calvinb/php-8.4.17RC1.tar.xz",
+    "ascUrl": "https://downloads.php.net/~calvinb/php-8.4.17RC1.tar.xz.asc",
+    "sha256": "0d86b6a92d8af1b25671c3abe558d035f26aefb48218fada3757406e1cbf4dd8",
+    "variants": [
+      "trixie/cli",
+      "trixie/apache",
+      "trixie/fpm",
+      "trixie/zts",
+      "bookworm/cli",
+      "bookworm/apache",
+      "bookworm/fpm",
+      "bookworm/zts",
+      "alpine3.23/cli",
+      "alpine3.23/fpm",
+      "alpine3.23/zts",
+      "alpine3.22/cli",
+      "alpine3.22/fpm",
+      "alpine3.22/zts"
+    ]
+  },
   "8.5": {
     "version": "8.5.1",
     "url": "https://www.php.net/distributions/php-8.5.1.tar.xz",
