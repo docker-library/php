@@ -22,19 +22,13 @@
 			"rm -rf /var/lib/apt/lists/*"
 		else "apt-get dist-clean" end
 	;
-	def need_patch_11678:
-		# https://github.com/docker-library/php/pull/1552
-		# https://github.com/php/php-src/issues/11678 "Build fails on musl 1.2.4 - lfs64" stream_cookie_seeker
-		# https://github.com/php/php-src/issues/14834 "Error installing PHP when --with-pear is used" xml errors
-		is_alpine and rcVersion == "8.1"
-	;
 	def need_patch_18743:
 		# https://github.com/docker-library/php/pull/1580
 		# https://github.com/php/php-src/issues/18743 "Incompatibility in Inline TLS Assembly on Alpine 3.22 with zend_jit_ir.c"
 		env.variant == "zts" # only needed for ZTS builds
 		and is_alpine
 		and env.from != "alpine:3.21" # only needed for Alpine 3.22+
-		and IN(rcVersion; "8.1", "8.2")
+		and IN(rcVersion; "8.2")
 -}}
 FROM {{ env.from }}
 
@@ -211,14 +205,6 @@ ENV GPG_KEYS {{
 			"E609 13E4 DF20 9907 D8E3  0D96 659A 97C9 CF2A 795A", # sergey
 			"1198 C011 7593 497A 5EC5  C199 286A F1F9 8974 69DC"  # pierrick
 		],
-
-		"8.1": [
-			# https://wiki.php.net/todo/php81#release_managers
-			# https://www.php.net/gpg-keys.php#gpg-8.1
-			"5289 95BF EDFB A719 1D46  839E F9BA 0ADA 31CB D89E", # krakjoe
-			"39B6 4134 3D8C 104B 2B14  6DC3 F9C3 9DC0 B969 8544", # ramsey
-			"F1F6 9223 8FBC 1666 E5A5  CCD4 199F 9DFE F6FF BAFD"  # patrickallaert
-		],
 	}[rcVersion] // error("missing GPG keys for " + rcVersion)
 	| map(gsub(" "; ""))
 	| join(" ")
@@ -288,8 +274,8 @@ RUN set -eux; \
 			"libsodium-dev",
 			"libxml2-dev",
 			"openssl-dev",
-			# https://github.com/docker-library/php/pull/1552 (11678) & https://github.com/docker-library/php/pull/1580 (14834)
-			if need_patch_11678 or need_patch_18743 then "patch", "patchutils" else empty end,
+			# https://github.com/docker-library/php/pull/1580 (14834)
+			if need_patch_18743 then "patch", "patchutils" else empty end,
 			"readline-dev",
 			"sqlite-dev",
 			# https://github.com/docker-library/php/issues/888
@@ -333,33 +319,9 @@ RUN set -eux; \
 	; \
 	docker-php-source extract; \
 	cd /usr/src/php; \
-{{ if need_patch_11678 then ( -}}
-# Apply patches; see https://github.com/docker-library/php/pull/1552
-	# https://github.com/php/php-src/issues/11678
-	curl -fL 'https://github.com/php/php-src/commit/577b8ae4226368e66fee7a9b5c58f9e2428372fc.patch?full_index=1' -o 11678.patch; \
-	echo '6edc20c3bb3e7cc13515abce7f2fffa8ebea6cf7469abfbc78fcdc120350b239 *11678.patch' | sha256sum -c -; \
-	patch -p1 < 11678.patch; \
-	rm 11678.patch; \
-	# https://github.com/php/php-src/pull/19131
-	# this backported commit broke our ability to apply 14834, which is the fix we need, so this is applied as a reverse patch to undo it
-	# 19131 was for FreeBSD, so doesn't apply to this alpine build
-	curl -fL 'https://github.com/php/php-src/commit/a5df26691d1b1f71b964b869510473a5d5413999.patch?full_index=1' -o 19131.patch; \
-	echo 'c98c01c74d3a6da197116f8511b16fed361ca6bbb6a8af8df629a933f541c213 *19131.patch' | sha256sum -c -; \
-	patch --reverse -p1 < 19131.patch; \
-	rm 19131.patch; \
-	# https://github.com/php/php-src/issues/14834
-	curl -fL 'https://github.com/php/php-src/commit/67259e451d5d58b4842776c5696a66d74e157609.patch?full_index=1' -o 14834.patch; \
-	echo 'ed10a1b254091ad676ed204e55628ecbd6c8962004d6185a1821cedecd526c0f *14834.patch' | sha256sum -c -; \
-	filterdiff -x '*/NEWS' 14834.patch | patch -p1; \
-	rm 14834.patch; \
-{{ ) else "" end -}}
 {{
 	if need_patch_18743 then
-		# https://github.com/docker-library/php/pull/1580#issuecomment-2957191901
-		{
-			"8.1": { url: "https://github.com/php/php-src/commit/6b105d4bc57e20a2472c9a6ff11fba32768556d4.patch?full_index=1", sha256: "037e1610ae5d444e9a8c3ecd9d5f0cd215fd0aac90bdd7b9f0b259bffdf3566b" },
-		}[rcVersion]
-		// { url: "https://github.com/php/php-src/commit/b3c8afe272a6919248986c703c2e1defc73ff707.patch?full_index=1", sha256: "b334f73434c9732a4b27a42eb5d417e10df842e854c02a3e753b2479f8978bf5" }
+		{ url: "https://github.com/php/php-src/commit/b3c8afe272a6919248986c703c2e1defc73ff707.patch?full_index=1", sha256: "b334f73434c9732a4b27a42eb5d417e10df842e854c02a3e753b2479f8978bf5" }
 		| (
 -}}
 	# https://github.com/php/php-src/issues/18743 "Incompatibility in Inline TLS Assembly on Alpine 3.22 with zend_jit_ir.c"
@@ -391,10 +353,6 @@ RUN set -eux; \
 # https://github.com/docker-library/php/issues/822
 		--with-pic \
 		\
-{{ if rcVersion == "8.1" then ( -}}
-# --enable-ftp is included here for compatibility with existing versions. ftp_ssl_connect() needed ftp to be compiled statically before PHP 7.0 (see https://github.com/docker-library/php/issues/236).
-		--enable-ftp \
-{{ ) else "" end -}}
 # --enable-mbstring is included here because otherwise there's no way to get pecl to use it properly (see https://github.com/docker-library/php/issues/195)
 		--enable-mbstring \
 # --enable-mysqlnd is included here because it's harder to compile after the fact than extensions are (since it's a plugin for several extensions, not an extension in itself)
@@ -425,7 +383,7 @@ RUN set -eux; \
 # in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
 		--with-pear \
 		\
-{{ if rcVersion | IN("8.1", "8.2") then ( -}}
+{{ if rcVersion | IN("8.2") then ( -}}
 # bundled pcre does not support JIT on riscv64 until 10.41 (php 8.3+)
 # https://github.com/PCRE2Project/pcre2/commits/pcre2-10.41/src/sljit/sljitNativeRISCV_64.c
 # https://github.com/php/php-src/tree/php-8.3.0/ext/pcre/pcre2lib
@@ -462,7 +420,7 @@ RUN set -eux; \
 		--enable-zts \
 # https://externals.io/message/118859
 		--disable-zend-signals \
-{{ if rcVersion | IN("8.1", "8.2") then ( -}}
+{{ if rcVersion | IN("8.2") then ( -}}
 		--enable-zend-max-execution-timers \
 {{ ) else "" end -}}
 {{ ) else "" end -}}
@@ -530,7 +488,7 @@ RUN set -eux; \
 
 COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 
-{{ if IN(rcVersion; "8.1", "8.2", "8.3", "8.4") then ( -}}
+{{ if IN(rcVersion; "8.2", "8.3", "8.4") then ( -}}
 # enable OPcache by default (https://wiki.php.net/rfc/make_opcache_required)
 RUN docker-php-ext-enable opcache
 
