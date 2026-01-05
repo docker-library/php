@@ -27,7 +27,6 @@
 		# https://github.com/php/php-src/issues/18743 "Incompatibility in Inline TLS Assembly on Alpine 3.22 with zend_jit_ir.c"
 		env.variant == "zts" # only needed for ZTS builds
 		and is_alpine
-		and env.from != "alpine:3.21" # only needed for Alpine 3.22+
 		and IN(rcVersion; "8.2")
 -}}
 FROM {{ env.from }}
@@ -274,7 +273,7 @@ RUN set -eux; \
 			"libsodium-dev",
 			"libxml2-dev",
 			"openssl-dev",
-			# https://github.com/docker-library/php/pull/1580 (14834)
+			# https://github.com/docker-library/php/pull/1580 (18743)
 			if need_patch_18743 then "patch", "patchutils" else empty end,
 			"readline-dev",
 			"sqlite-dev",
@@ -319,15 +318,11 @@ RUN set -eux; \
 	; \
 	docker-php-source extract; \
 	cd /usr/src/php; \
-{{
-	if need_patch_18743 then
-		{ url: "https://github.com/php/php-src/commit/b3c8afe272a6919248986c703c2e1defc73ff707.patch?full_index=1", sha256: "b334f73434c9732a4b27a42eb5d417e10df842e854c02a3e753b2479f8978bf5" }
-		| (
--}}
+{{ if need_patch_18743 then ( -}}
 	# https://github.com/php/php-src/issues/18743 "Incompatibility in Inline TLS Assembly on Alpine 3.22 with zend_jit_ir.c"
 	# https://github.com/docker-library/php/pull/1580
-	curl -fL {{ .url | @sh }} -o 18743.patch; \
-	echo {{ "\(.sha256) *18743.patch" | @sh }} | sha256sum -c -; \
+	curl -fL 'https://github.com/php/php-src/commit/b3c8afe272a6919248986c703c2e1defc73ff707.patch?full_index=1' -o 18743.patch; \
+	echo 'b334f73434c9732a4b27a42eb5d417e10df842e854c02a3e753b2479f8978bf5 *18743.patch' | sha256sum -c -; \
 	filterdiff -x '*/NEWS' 18743.patch | patch -p1; \
 	rm 18743.patch; \
 {{ ) else "" end -}}
