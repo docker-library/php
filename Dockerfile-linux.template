@@ -27,7 +27,6 @@
 		# https://github.com/php/php-src/issues/18743 "Incompatibility in Inline TLS Assembly on Alpine 3.22 with zend_jit_ir.c"
 		env.variant == "zts" # only needed for ZTS builds
 		and is_alpine
-		and env.from != "alpine:3.21" # only needed for Alpine 3.22+
 		and IN(rcVersion; "8.2")
 -}}
 FROM {{ env.from }}
