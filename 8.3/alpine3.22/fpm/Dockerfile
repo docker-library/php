@@ -56,9 +56,9 @@ ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
 ENV GPG_KEYS 1198C0117593497A5EC5C199286AF1F9897469DC C28D937575603EB4ABB725861C0779DC5C0A9DE4 AFD8691FDAEDF03BDF6E460563F15A9B715376CA
 
-ENV PHP_VERSION 8.3.29
-ENV PHP_URL="https://www.php.net/distributions/php-8.3.29.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.3.29.tar.xz.asc"
-ENV PHP_SHA256="f7950ca034b15a78f5de9f1b22f4d9bad1dd497114d175cb1672a4ca78077af5"
+ENV PHP_VERSION 8.3.30
+ENV PHP_URL="https://www.php.net/distributions/php-8.3.30.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.3.30.tar.xz.asc"
+ENV PHP_SHA256="67f084d36852daab6809561a7c8023d130ca07fc6af8fb040684dd1414934d48"
 
 RUN set -eux; \
 	\
@@ -216,6 +216,11 @@ RUN set -eux; \
 	cp -v php-fpm.conf.default php-fpm.conf; \
 	cp -v php-fpm.d/www.conf.default php-fpm.d/www.conf; \
 	\
+	# comment out localhost-only listen address
+	grep -E '^listen = 127.0.0.1:9000' php-fpm.d/www.conf; \
+	sed -ri 's/^(listen = 127.0.0.1:9000)/;\1/' php-fpm.d/www.conf; \
+	grep -E '^;listen = 127.0.0.1:9000' php-fpm.d/www.conf; \
+	\
 	{ \
 		echo '[global]'; \
 		echo 'error_log = /proc/self/fd/2'; \
@@ -231,13 +236,13 @@ RUN set -eux; \
 		echo '; Ensure worker stdout and stderr are sent to the main error log.'; \
 		echo 'catch_workers_output = yes'; \
 		echo 'decorate_workers_output = no'; \
+		echo; \
+		echo '; default listen adddress for easy override in later php-fpm.d/*.conf files'; \
+		echo 'listen = 9000'; \
 	} | tee php-fpm.d/docker.conf; \
 	{ \
 		echo '[global]'; \
 		echo 'daemonize = no'; \
-		echo; \
-		echo '[www]'; \
-		echo 'listen = 9000'; \
 	} | tee php-fpm.d/zz-docker.conf; \
 	mkdir -p "$PHP_INI_DIR/conf.d"; \
 	{ \
