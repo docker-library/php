@@ -546,6 +546,10 @@ RUN set -eux; \
 		echo; \
 		echo '[www]'; \
 		echo 'listen = 9000'; \
+{{ ) elif env.version | IN("8.2", "8.3", "8.4", "8.5") then ( -}}
+		echo; \
+		echo '; the [www] ini section below is for backwards compatibility and will be removed in 8.6+'; \
+		echo '[www]'; \
 {{ ) else "" end -}}
 	} | tee php-fpm.d/zz-docker.conf; \
 	mkdir -p "$PHP_INI_DIR/conf.d"; \
