@@ -243,6 +243,9 @@ RUN set -eux; \
 	{ \
 		echo '[global]'; \
 		echo 'daemonize = no'; \
+		echo; \
+		echo '; the [www] ini section below is for backwards compatibility and will be removed in 8.6+'; \
+		echo '[www]'; \
 	} | tee php-fpm.d/zz-docker.conf; \
 	mkdir -p "$PHP_INI_DIR/conf.d"; \
 	{ \
