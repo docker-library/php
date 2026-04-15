@@ -41,6 +41,24 @@ usage() {
 	echo 'the output of "php -i" to see which modules are already loaded.'
 }
 
+phpModuleLoaded() {
+	php -d 'display_errors=stderr' -r '
+		$ext = strtolower($argv[1]);
+		$loaded = array_map("strtolower", get_loaded_extensions());
+		$loaded = array_merge($loaded, array_map("strtolower", get_loaded_extensions(true)));
+		$aliases = [
+			"opcache" => ["zend opcache"],
+		];
+		$needles = array_merge([$ext], $aliases[$ext] ?? []);
+		foreach ($needles as $needle) {
+			if (in_array($needle, $loaded, true)) {
+				exit(0);
+			}
+		}
+		exit(1);
+	' -- "$1"
+}
+
 opts="$(getopt -o 'h?j:' --long 'help,ini-name:,jobs:' -- "$@" || { usage >&2 && false; })"
 eval set -- "$opts"
 
@@ -108,6 +126,22 @@ for ext in $exts; do
 
 	make -j"$j"
 
+	modules="$(find modules \
+		-maxdepth 1 \
+		-name '*.so' \
+		-print \
+	)"
+	if [ -z "$modules" ]; then
+		if phpModuleLoaded "$ext"; then
+			echo >&2
+			echo >&2 "warning: $ext is already built into PHP; skipping installation"
+			echo >&2
+			make -j"$j" clean
+			cd "$popDir"
+			continue
+		fi
+	fi
+
 	if ! php -n -d 'display_errors=stderr' -r 'exit(ZEND_DEBUG_BUILD ? 0 : 1);' > /dev/null; then
 		# only "strip" modules if we aren't using a debug build of PHP
 		# (none of our builds are debug builds, but PHP might be recompiled with "--enable-debug" configure option)
@@ -123,11 +157,10 @@ for ext in $exts; do
 
 	make -j"$j" install
 
-	find modules \
-		-maxdepth 1 \
-		-name '*.so' \
-		-exec basename '{}' '.so' ';' \
-			| xargs -r docker-php-ext-enable ${iniName:+--ini-name "$iniName"}
+	printf '%s\n' "$modules" \
+		| xargs -r -n1 basename \
+		| sed 's/\.so$//' \
+		| xargs -r docker-php-ext-enable ${iniName:+--ini-name "$iniName"}
 
 	make -j"$j" clean
 
