@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.22
+FROM alpine:3.24
 
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
@@ -98,6 +98,8 @@ RUN set -eux; \
 		linux-headers \
 		oniguruma-dev \
 		openssl-dev \
+		patch \
+		patchutils \
 		readline-dev \
 		sqlite-dev \
 	; \
@@ -115,6 +117,12 @@ RUN set -eux; \
 	; \
 	docker-php-source extract; \
 	cd /usr/src/php; \
+	# https://github.com/php/php-src/issues/18743 "Incompatibility in Inline TLS Assembly on Alpine 3.22 with zend_jit_ir.c"
+	# https://github.com/docker-library/php/pull/1580
+	curl -fL 'https://github.com/php/php-src/commit/b3c8afe272a6919248986c703c2e1defc73ff707.patch?full_index=1' -o 18743.patch; \
+	echo 'b334f73434c9732a4b27a42eb5d417e10df842e854c02a3e753b2479f8978bf5 *18743.patch' | sha256sum -c -; \
+	filterdiff -x '*/NEWS' 18743.patch | patch -p1; \
+	rm 18743.patch; \
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
 	test "$PHP_INI_DIR" != "${PHP_INI_DIR%/php}"; \
 	./configure \
@@ -161,6 +169,14 @@ RUN set -eux; \
 # https://github.com/PCRE2Project/pcre2/commits/pcre2-10.41/src/sljit/sljitNativeRISCV_64.c
 # https://github.com/php/php-src/tree/php-8.3.0/ext/pcre/pcre2lib
 		$(test "$gnuArch" = 'riscv64-linux-musl' && echo '--without-pcre-jit') \
+		\
+# https://github.com/docker-library/php/pull/939#issuecomment-730501748
+		--enable-embed \
+		\
+		--enable-zts \
+# https://externals.io/message/118859
+		--disable-zend-signals \
+		--enable-zend-max-execution-timers \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \

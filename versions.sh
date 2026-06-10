@@ -92,8 +92,8 @@ for version in "${versions[@]}"; do
 					(
 						"trixie",
 						"bookworm",
+						"alpine3.24",
 						"alpine3.23",
-						"alpine3.22",
 						empty
 					) as $suite
 					| (
