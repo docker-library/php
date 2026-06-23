@@ -33,7 +33,7 @@ for version in "${versions[@]}"; do
 			) ]
 		'
 	else
-		apiUrl='https://www.php.net/release-candidates.php?format=json'
+		apiUrl='https://www.php.net/pre-release-builds.php?format=json'
 		apiJqExpr='
 			(.releases // [])[]
 			| select(.version | startswith(env.rcVersion))
