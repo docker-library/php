@@ -3,7 +3,7 @@ set -Eeuo pipefail
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
-# TODO consume https://www.php.net/releases/branches.php and https://www.php.net/release-candidates.php?format=json here like in Go, Julia, etc (so we can have a canonical "here's all the versions possible" mode, and more automated metadata like EOL 👀)
+# TODO consume https://www.php.net/releases/branches.php and https://www.php.net/pre-release-builds.php?format=json here like in Go, Julia, etc (so we can have a canonical "here's all the versions possible" mode, and more automated metadata like EOL 👀)
 
 versions=( "$@" )
 if [ ${#versions[@]} -eq 0 ]; then
@@ -33,7 +33,7 @@ for version in "${versions[@]}"; do
 			) ]
 		'
 	else
-		apiUrl='https://www.php.net/release-candidates.php?format=json'
+		apiUrl='https://www.php.net/pre-release-builds.php?format=json'
 		apiJqExpr='
 			(.releases // [])[]
 			| select(.version | startswith(env.rcVersion))
