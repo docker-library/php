@@ -520,13 +520,11 @@ RUN set -eux; \
 	\
 	cp -v php-fpm.conf.default php-fpm.conf; \
 	cp -v php-fpm.d/www.conf.default php-fpm.d/www.conf; \
-{{ if .version | IN("8.2.30", "8.3.29", "8.4.16", "8.5.1") then "" else ( -}}
 	\
 	# comment out localhost-only listen address
 	grep -E '^listen = 127.0.0.1:9000' php-fpm.d/www.conf; \
 	sed -ri 's/^(listen = 127.0.0.1:9000)/;\1/' php-fpm.d/www.conf; \
 	grep -E '^;listen = 127.0.0.1:9000' php-fpm.d/www.conf; \
-{{ ) end -}}
 	\
 	{ \
 		echo '[global]'; \
