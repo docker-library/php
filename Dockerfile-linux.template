@@ -177,6 +177,14 @@ ENV GPG_KEYS {{
 		# https://www.php.net/gpg-keys.php
 		# https://www.php.net/downloads.php
 
+		"8.6": [
+			# https://wiki.php.net/todo/php86#release_managers
+			# https://www.php.net/gpg-keys.php#gpg-8.6
+			"D95C 03BC 702B E951 5344  AE33 74E4 4BC9 0677 01A5", # daniels
+			"0168 95DE 9A47 5111 D537  A6E6 9134 FF30 BC5A 99B5", # mbeccati
+			"5CFF 17B6 4DC1 C244 F5D0  EAC3 E435 35E2 EB19 010E"  # svpernova09
+		],
+
 		"8.5": [
 			# https://wiki.php.net/todo/php85#release_managers
 			# https://www.php.net/gpg-keys.php#gpg-8.5
@@ -351,9 +359,16 @@ RUN set -eux; \
 # https://github.com/docker-library/php/issues/439
 		--with-mhash \
 		\
+{{ if rcVersion | IN("8.2", "8.3", "8.4", "8.5") then ( -}}
 # https://github.com/docker-library/php/issues/822
 		--with-pic \
 		\
+{{ ) else ( -}}
+# https://github.com/docker-library/php/issues/822
+# https://github.com/php/php-src/pull/21067/changes#diff-4b9db5b77bcd56aa33b310dc44c8bc99c729c9abb195df2e98e6985b81289ae8R130
+		--enable-pic \
+		\
+{{ ) end -}}
 {{ if install_pear_pecl then ( -}}
 # --enable-mbstring is included here because otherwise there's no way to get pecl to use it properly (see https://github.com/docker-library/php/issues/195)
 		--enable-mbstring \

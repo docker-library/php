@@ -132,5 +132,27 @@
       "alpine3.23/fpm",
       "alpine3.23/zts"
     ]
+  },
+  "8.6-rc": {
+    "version": "8.6.0alpha1",
+    "url": "https://downloads.php.net/~mbeccati/php-8.6.0alpha1.tar.xz",
+    "ascUrl": "https://downloads.php.net/~mbeccati/php-8.6.0alpha1.tar.xz.asc",
+    "sha256": "2d4cba8e5511b026b0c786c69b3272fe53dc8643f086cd10fc0e902c20a1757c",
+    "variants": [
+      "trixie/cli",
+      "trixie/apache",
+      "trixie/fpm",
+      "trixie/zts",
+      "bookworm/cli",
+      "bookworm/apache",
+      "bookworm/fpm",
+      "bookworm/zts",
+      "alpine3.24/cli",
+      "alpine3.24/fpm",
+      "alpine3.24/zts",
+      "alpine3.23/cli",
+      "alpine3.23/fpm",
+      "alpine3.23/zts"
+    ]
   }
 }
