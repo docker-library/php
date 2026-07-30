@@ -144,6 +144,17 @@ for version; do
 		variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
 		variantArches="${parentRepoToArches[$variantParent]}"
 
+		# php segfaults on arm32v6 for these pre-releases
+		# https://github.com/docker-library/php/issues/1675
+		if [[ "$suite" =~ 'alpine'* ]]; then
+			if [[ "$fullVersion" == '8.6.0alpha'[23] ]]; then
+				variantArches="$(jq <<<"$variantArches" --raw-input --raw-output '
+					split(" ") - [ "arm32v6" ]
+					| join(" ")
+				')"
+			fi
+		fi
+
 		commit="$(dirCommit "$dir")"
 
 		echo
