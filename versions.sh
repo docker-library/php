@@ -14,6 +14,8 @@ else
 fi
 versions=( "${versions[@]%/}" )
 
+now="$(date --utc '+%s')"
+
 for version in "${versions[@]}"; do
 	rcVersion="${version%-rc}"
 	export version rcVersion
@@ -45,6 +47,7 @@ for version in "${versions[@]}"; do
 			]
 		'
 	fi
+	apiUrl+="&cachebuster=$now" # combat over-aggressive cache on php.net
 	IFS=$'\n'
 	possibles=( $(
 		curl -fsSL "$apiUrl" \
