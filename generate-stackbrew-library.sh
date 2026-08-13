@@ -147,7 +147,7 @@ for version; do
 		# php segfaults on arm32v6 for these pre-releases
 		# https://github.com/docker-library/php/issues/1675
 		if [[ "$suite" =~ 'alpine'* ]]; then
-			if [[ "$fullVersion" == '8.6.0alpha'[23] ]]; then
+			if [[ "$fullVersion" == '8.6.0beta'* ]]; then
 				variantArches="$(jq <<<"$variantArches" --raw-input --raw-output '
 					split(" ") - [ "arm32v6" ]
 					| join(" ")
