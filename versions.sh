@@ -103,7 +103,7 @@ for version in "${versions[@]}"; do
 						"cli",
 						"apache",
 						"fpm",
-						"zts",
+						(if env.rcVersion | IN("8.2", "8.3", "8.4", "8.5") then "zts" else empty end),
 						empty
 					) as $variant
 					| if $suite | startswith("alpine") and $variant == "apache" then empty else

@@ -180,6 +180,10 @@ RUN set -eux; \
 		--enable-fpm \
 		--with-fpm-user=www-data \
 		--with-fpm-group=www-data \
+		\
+		--enable-zts \
+# https://externals.io/message/118859
+		--disable-zend-signals \
 	; \
 	make -j "$(nproc)"; \
 	find -type f -name '*.a' -delete; \
