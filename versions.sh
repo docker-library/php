@@ -101,9 +101,10 @@ for version in "${versions[@]}"; do
 					) as $suite
 					| (
 						"cli",
-						"apache",
+						# mod_php (apache2) has been disrecommended for years in favor of php-fpm; 8.6+ builds everything zts, and mod_php gains nothing from that (still no threaded MPM), so there is no reason left to keep it -- https://www.php.net/manual/en/install.unix.apache2.php ("Use PHP-FPM Instead")
+						if IN(env.rcVersion; "8.2", "8.3", "8.4", "8.5") then "apache" else empty end,
 						"fpm",
-						(if env.rcVersion | IN("8.2", "8.3", "8.4", "8.5") then "zts" else empty end),
+						if IN(env.rcVersion; "8.2", "8.3", "8.4", "8.5") then "zts" else empty end,
 						empty
 					) as $variant
 					| if $suite | startswith("alpine") and $variant == "apache" then empty else
