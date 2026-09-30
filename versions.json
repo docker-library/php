@@ -98,10 +98,8 @@
     "sha256": "ef3fba21c311e9bbace0e2102702446d322c275b8a10e6b33b28f2561299671c",
     "variants": [
       "trixie/cli",
-      "trixie/apache",
       "trixie/fpm",
       "bookworm/cli",
-      "bookworm/apache",
       "bookworm/fpm",
       "alpine3.24/cli",
       "alpine3.24/fpm",
