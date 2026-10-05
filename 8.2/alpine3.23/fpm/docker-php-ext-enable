@@ -65,6 +65,8 @@ fi
 pm='unknown'
 if [ -e /lib/apk/db/installed ]; then
 	pm='apk'
+elif [ -e /var/lib/dpkg/status ]; then
+	pm='apt'
 fi
 
 apkDel=
@@ -77,6 +79,13 @@ if [ "$pm" = 'apk' ]; then
 		apk add --no-cache --virtual '.docker-php-ext-enable-deps' binutils
 		apkDel='.docker-php-ext-enable-deps'
 	fi
+fi
+
+aptPurge=
+if [ "$pm" = 'apt' ] && ! command -v readelf > /dev/null; then
+	apt-get update
+	apt-get install -y --no-install-recommends binutils
+	aptPurge='binutils'
 fi
 
 for module in $modules; do
@@ -118,4 +127,9 @@ done
 
 if [ "$pm" = 'apk' ] && [ -n "$apkDel" ]; then
 	apk del --no-network $apkDel
+fi
+
+if [ "$pm" = 'apt' ] && [ -n "$aptPurge" ]; then
+	apt-get purge -y --auto-remove $aptPurge
+	rm -rf /var/lib/apt/lists/*
 fi
