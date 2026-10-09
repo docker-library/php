@@ -374,11 +374,14 @@ RUN set -eux; \
 # https://github.com/docker-library/php/issues/822
 		--with-pic \
 		\
-{{ ) else ( -}}
+{{ ) elif env.variant == "apache" then ( -}}
 # https://github.com/docker-library/php/issues/822
 # https://github.com/php/php-src/pull/21067/changes#diff-4b9db5b77bcd56aa33b310dc44c8bc99c729c9abb195df2e98e6985b81289ae8R130
 		--enable-pic \
 		\
+{{ ) else ( -}}
+# Forcing PIC also removes -fpie from executable objects, preventing local-exec TLS.
+# So do not --enable-pic
 {{ ) end -}}
 {{ if install_pear_pecl then ( -}}
 # --enable-mbstring is included here because otherwise there's no way to get pecl to use it properly (see https://github.com/docker-library/php/issues/195)
