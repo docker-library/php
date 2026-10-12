@@ -380,8 +380,7 @@ RUN set -eux; \
 		--enable-pic \
 		\
 {{ ) else ( -}}
-# Forcing PIC also removes -fpie from executable objects, preventing local-exec TLS.
-# So do not --enable-pic
+# no --enable-pic; forcing PIC also removes -fpie from executable objects, preventing local-exec TLS: https://github.com/docker-library/php/pull/1692
 {{ ) end -}}
 {{ if install_pear_pecl then ( -}}
 # --enable-mbstring is included here because otherwise there's no way to get pecl to use it properly (see https://github.com/docker-library/php/issues/195)
