@@ -92,10 +92,10 @@
   },
   "8.5-rc": null,
   "8.6-rc": {
-    "version": "8.6.0RC3",
-    "url": "https://downloads.php.net/~svpernova09/php-8.6.0RC3.tar.xz",
-    "ascUrl": "https://downloads.php.net/~svpernova09/php-8.6.0RC3.tar.xz.asc",
-    "sha256": "131f87a206bdd90c178d8e44e80243ae0c333c4cee8531f63d1caa9acdd8696a",
+    "version": "8.6.0RC4",
+    "url": "https://downloads.php.net/~mbeccati/php-8.6.0RC4.tar.xz",
+    "ascUrl": "https://downloads.php.net/~mbeccati/php-8.6.0RC4.tar.xz.asc",
+    "sha256": "93f208da9ae059bf6863b0e1d101e6c6475a7b0f0acbf6c084950ab522f514d8",
     "variants": [
       "trixie/cli",
       "trixie/apache",
