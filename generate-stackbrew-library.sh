@@ -24,17 +24,18 @@ fileCommit() {
 # get the most recent commit which modified "$1/Dockerfile" or any file COPY'd from "$1/Dockerfile"
 dirCommit() {
 	local dir="$1"; shift
+	local copyPaths;
 	(
 		cd "$dir"
-		fileCommit \
-			Dockerfile \
-			$(git show HEAD:./Dockerfile | awk '
-				toupper($1) == "COPY" {
-					for (i = 2; i < NF; i++) {
-						print $i
-					}
+		IFS=" " read -r -a copyPaths <<< "$(git show HEAD:./Dockerfile | awk '
+			BEGIN { ORS=" "; }
+			toupper($1) == "COPY" {
+				for (i = 2; i < NF; i++) {
+					print $i
 				}
-			')
+			}
+		')"
+		fileCommit Dockerfile "${copyPaths[@]}"
 	)
 }
 
