@@ -14,6 +14,6 @@ jobs:
     name: Check For Uncomitted Changes
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: ./apply-templates.sh
       - run: git diff --exit-code
