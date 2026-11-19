@@ -91,11 +91,11 @@
     ]
   },
   "8.5-rc": null,
-  "8.6-rc": {
-    "version": "8.6.0RC7",
-    "url": "https://downloads.php.net/~svpernova09/php-8.6.0RC7.tar.xz",
-    "ascUrl": "https://downloads.php.net/~svpernova09/php-8.6.0RC7.tar.xz.asc",
-    "sha256": "63dba3b693d2f2689f12d5264d212d7b813acfd56fb375c620d04e1eef4bb00a",
+  "8.6": {
+    "version": "8.6.0",
+    "url": "https://www.php.net/distributions/php-8.6.0.tar.xz",
+    "ascUrl": "https://www.php.net/distributions/php-8.6.0.tar.xz.asc",
+    "sha256": "5f84beaa3d763aee1e4feed99bf54ec692c383b322e25626807b589238c3a087",
     "variants": [
       "trixie/cli",
       "trixie/apache",
@@ -108,5 +108,6 @@
       "alpine3.23/cli",
       "alpine3.23/fpm"
     ]
-  }
+  },
+  "8.6-rc": null
 }

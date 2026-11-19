@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM debian:trixie-slim
+FROM debian:bookworm-slim
 
 # prevent Debian's PHP packages from being installed
 # https://github.com/docker-library/php/pull/542
@@ -37,7 +37,7 @@ RUN set -eux; \
 		curl \
 		xz-utils \
 	; \
-	apt-get dist-clean
+	rm -rf /var/lib/apt/lists/*
 
 ENV PHP_INI_DIR /usr/local/etc/php
 RUN set -eux; \
@@ -60,16 +60,16 @@ ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
 ENV GPG_KEYS D95C03BC702BE9515344AE3374E44BC9067701A5 016895DE9A475111D537A6E69134FF30BC5A99B5 5CFF17B64DC1C244F5D0EAC3E43535E2EB19010E
 
-ENV PHP_VERSION 8.6.0RC7
-ENV PHP_URL="https://downloads.php.net/~svpernova09/php-8.6.0RC7.tar.xz" PHP_ASC_URL="https://downloads.php.net/~svpernova09/php-8.6.0RC7.tar.xz.asc"
-ENV PHP_SHA256="63dba3b693d2f2689f12d5264d212d7b813acfd56fb375c620d04e1eef4bb00a"
+ENV PHP_VERSION 8.6.0
+ENV PHP_URL="https://www.php.net/distributions/php-8.6.0.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.6.0.tar.xz.asc"
+ENV PHP_SHA256="5f84beaa3d763aee1e4feed99bf54ec692c383b322e25626807b589238c3a087"
 
 RUN set -eux; \
 	\
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends gnupg; \
-	apt-get dist-clean; \
+	rm -rf /var/lib/apt/lists/*; \
 	\
 	mkdir -p /usr/src; \
 	cd /usr/src; \
@@ -167,14 +167,16 @@ RUN set -eux; \
 		--with-readline \
 		--with-zlib \
 		\
-# https://github.com/docker-library/php/pull/1259
-		--enable-phpdbg \
-		--enable-phpdbg-readline \
+# https://github.com/bwoebi/phpdbg-docs/issues/1#issuecomment-163872806 ("phpdbg is primarily a CLI debugger, and is not suitable for debugging an fpm stack.")
+		--disable-phpdbg \
 		\
 		--with-libdir="lib/$debMultiarch" \
 		\
-# https://github.com/docker-library/php/pull/939#issuecomment-730501748
-		--enable-embed \
+		--disable-cgi \
+		\
+		--enable-fpm \
+		--with-fpm-user=www-data \
+		--with-fpm-group=www-data \
 		\
 		--enable-zts \
 # https://externals.io/message/118859
@@ -212,7 +214,7 @@ RUN set -eux; \
 		| xargs -r apt-mark manual \
 	; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-	apt-get dist-clean; \
+	rm -rf /var/lib/apt/lists/*; \
 	\
 # smoke test
 	php --version
@@ -223,4 +225,51 @@ COPY docker-php-ext-* docker-php-entrypoint /usr/local/bin/
 RUN docker-php-ext-enable sodium
 
 ENTRYPOINT ["docker-php-entrypoint"]
-CMD ["php", "-a"]
+WORKDIR /var/www/html
+
+RUN set -eux; \
+	cd "${PHP_INI_DIR%/php}"; \
+	\
+	cp -v php-fpm.conf.default php-fpm.conf; \
+	cp -v php-fpm.d/www.conf.default php-fpm.d/www.conf; \
+	\
+	# comment out localhost-only listen address
+	grep -E '^listen = 127.0.0.1:9000' php-fpm.d/www.conf; \
+	sed -ri 's/^(listen = 127.0.0.1:9000)/;\1/' php-fpm.d/www.conf; \
+	grep -E '^;listen = 127.0.0.1:9000' php-fpm.d/www.conf; \
+	\
+	{ \
+		echo '[global]'; \
+		echo 'error_log = /proc/self/fd/2'; \
+		echo; echo '; https://github.com/docker-library/php/pull/725#issuecomment-443540114'; echo 'log_limit = 8192'; \
+		echo; \
+		echo '[www]'; \
+		echo '; php-fpm closes STDOUT on startup, so sending logs to /proc/self/fd/1 does not work.'; \
+		echo '; https://bugs.php.net/bug.php?id=73886'; \
+		echo 'access.log = /proc/self/fd/2'; \
+		echo; \
+		echo 'clear_env = no'; \
+		echo; \
+		echo '; Ensure worker stdout and stderr are sent to the main error log.'; \
+		echo 'catch_workers_output = yes'; \
+		echo 'decorate_workers_output = no'; \
+		echo; \
+		echo '; default listen address for easy override in later php-fpm.d/*.conf files'; \
+		echo 'listen = 9000'; \
+	} | tee php-fpm.d/docker.conf; \
+	{ \
+		echo '[global]'; \
+		echo 'daemonize = no'; \
+	} | tee php-fpm.d/zz-docker.conf; \
+	mkdir -p "$PHP_INI_DIR/conf.d"; \
+	{ \
+		echo '; https://github.com/docker-library/php/issues/878#issuecomment-938595965'; \
+		echo 'fastcgi.logging = Off'; \
+	} > "$PHP_INI_DIR/conf.d/docker-fpm.ini"
+
+# Override stop signal to stop process gracefully
+# https://github.com/php/php-src/blob/17baa87faddc2550def3ae7314236826bc1b1398/sapi/fpm/php-fpm.8.in#L163
+STOPSIGNAL SIGQUIT
+
+EXPOSE 9000
+CMD ["php-fpm"]
