@@ -25,7 +25,7 @@
 	def need_patch_18743:
 		# https://github.com/docker-library/php/pull/1580
 		# https://github.com/php/php-src/issues/18743 "Incompatibility in Inline TLS Assembly on Alpine 3.22 with zend_jit_ir.c"
-		env.variant == "zts"
+		env.variant == "zts" # only needed for ZTS builds
 		and is_alpine
 		and IN(rcVersion; "8.2")
 	;
@@ -374,7 +374,7 @@ RUN set -eux; \
 # https://github.com/docker-library/php/issues/822
 		--with-pic \
 		\
-{{ ) elif env.variant == "apache" then ( -}}
+{{ ) elif env.variant != "zts" then ( -}}
 # https://github.com/docker-library/php/issues/822
 # https://github.com/php/php-src/pull/21067/changes#diff-4b9db5b77bcd56aa33b310dc44c8bc99c729c9abb195df2e98e6985b81289ae8R130
 		--enable-pic \
@@ -449,7 +449,7 @@ RUN set -eux; \
 		--with-fpm-user=www-data \
 		--with-fpm-group=www-data \
 {{ ) else "" end -}}
-{{ if env.variant == "zts" or (rcVersion | version_id) >= 80600 then ( -}}
+{{ if env.variant == "zts" then ( -}}
 		\
 		--enable-zts \
 # https://externals.io/message/118859
