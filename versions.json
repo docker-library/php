@@ -100,13 +100,17 @@
       "trixie/cli",
       "trixie/apache",
       "trixie/fpm",
+      "trixie/nts",
       "bookworm/cli",
       "bookworm/apache",
       "bookworm/fpm",
+      "bookworm/nts",
       "alpine3.24/cli",
       "alpine3.24/fpm",
+      "alpine3.24/nts",
       "alpine3.23/cli",
-      "alpine3.23/fpm"
+      "alpine3.23/fpm",
+      "alpine3.23/nts"
     ]
   },
   "8.6-rc": null
