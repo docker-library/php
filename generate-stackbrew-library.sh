@@ -119,6 +119,13 @@ for version; do
 		| .[0]
 	' versions.json)"
 
+	# when there is an "nts" variant (and no "zts" variant), "cli" is the ZTS build
+	cliIsZts="$(jq -r '
+		.[env.version].variants
+		| map(split("/")[1])
+		| (index("nts") != null) and (index("zts") == null)
+	' versions.json)"
+
 	for dir in "${variants[@]}"; do
 		suite="$(dirname "$dir")" # "buster", etc
 		variant="$(basename "$dir")" # "cli", etc
@@ -126,6 +133,9 @@ for version; do
 		[ -f "$dir/Dockerfile" ] || continue
 
 		variantAliases=( "${versionAliases[@]/%/-$variant}" )
+		if [ "$variant" = 'cli' ] && [ "$cliIsZts" = 'true' ]; then
+			variantAliases+=( "${versionAliases[@]/%/-zts}" )
+		fi
 		variantAliases=( "${variantAliases[@]//latest-/}" )
 
 		if [ "$variant" = 'cli' ]; then
